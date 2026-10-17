@@ -1,0 +1,132 @@
+(function () {
+  "use strict";
+  const STORAGE_KEY = "abijan-life-demo-v1";
+  const STARTING_BALANCE = 5000;
+  const STARTING_ENERGY = 80;
+  const COSTS = Object.freeze({ beach: 0, bar: 500, market: 0, lavage: 0 });
+  const ACTIVITIES = Object.freeze({
+    beach: { title: "Walked along Grand-Bassam Beach", energy: -5, message: "The sea breeze helped you unwind. Energy -5." },
+    bar: { title: "Visited Les Palmiers Beach Bar", energy: -3, message: "A refreshing break by the coast. 500 FCFA spent." },
+    market: { title: "Browsed Artisan Corner", energy: -4, message: "You discovered local crafts and found inspiration. Energy -4." },
+    lavage: { title: "Stopped by Lavage International", energy: -2, message: "You checked out the car wash. No real booking was made. Energy -2." }
+  });
+  const $ = (id) => document.getElementById(id);
+  let state = null;
+  let toastTimer = null;
+  function freshState(name, style) {
+    return { version: 1, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], createdAt: new Date().toISOString() };
+  }
+  function validState(value) {
+    return Boolean(value && value.version === 1 && typeof value.name === "string" &&
+      value.name.trim().length >= 2 && value.name.length <= 24 &&
+      ["Coastal creative", "Ambitious newcomer"].includes(value.style) &&
+      Number.isInteger(value.balance) && value.balance >= 0 && value.balance <= 1000000 &&
+      Number.isInteger(value.energy) && value.energy >= 0 && value.energy <= 100 &&
+      Array.isArray(value.actions) && value.actions.length <= 100 &&
+      value.actions.every((a) => a && typeof a.title === "string" && typeof a.at === "string"));
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch (_) { showToast("Progress could not be saved on this device. You can keep playing for now."); }
+  }
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!validState(parsed)) { localStorage.removeItem(STORAGE_KEY); return null; }
+      return parsed;
+    } catch (_) { return null; }
+  }
+  function showToast(message) {
+    const toast = $("toast");
+    toast.textContent = message;
+    toast.hidden = false;
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.hidden = true; }, 3200);
+  }
+  function showGame() {
+    $("welcome-screen").hidden = true;
+    $("game-screen").hidden = false;
+    $("player-name").textContent = state.name;
+    $("profile-name").textContent = state.name;
+    $("profile-style").textContent = state.style;
+    $("avatar-initial").textContent = state.name.trim().charAt(0).toUpperCase();
+    renderState();
+  }
+  function renderState() {
+    $("balance").textContent = state.balance.toLocaleString("en-US");
+    $("energy-text").textContent = String(state.energy);
+    $("energy-meter").style.width = state.energy + "%";
+    document.querySelectorAll("[data-action]").forEach((button) => {
+      const key = button.dataset.action;
+      button.disabled = state.energy <= 0 || state.balance < COSTS[key];
+      button.setAttribute("aria-disabled", String(button.disabled));
+      button.style.opacity = button.disabled ? ".55" : "1";
+    });
+    const list = $("activity-list");
+    list.replaceChildren();
+    state.actions.slice().reverse().forEach((action) => {
+      const item = document.createElement("li");
+      const title = document.createElement("span");
+      title.textContent = action.title;
+      const time = document.createElement("time");
+      time.dateTime = action.at;
+      time.textContent = new Date(action.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      item.append(title, time);
+      list.append(item);
+    });
+    $("activity-empty").hidden = state.actions.length > 0;
+    $("activity-count").textContent = state.actions.length + (state.actions.length === 1 ? " action" : " actions");
+  }
+  function startGame(event) {
+    event.preventDefault();
+    const name = $("character-name").value.trim();
+    if (name.length < 2 || name.length > 24) {
+      $("character-name").setCustomValidity("Use a name between 2 and 24 characters.");
+      $("character-name").reportValidity();
+      return;
+    }
+    $("character-name").setCustomValidity("");
+    state = freshState(name, document.querySelector('input[name="style"]:checked').value);
+    save();
+    showGame();
+    showToast("Welcome to Grand-Bassam, " + name + "!");
+  }
+  function doActivity(key) {
+    const activity = ACTIVITIES[key];
+    if (!activity || !state) return;
+    if (state.energy <= 0) { showToast("You are out of energy. Reset the demo to start a fresh day."); return; }
+    if (state.balance < COSTS[key]) { showToast("Not enough demo FCFA for this activity."); return; }
+    state.balance -= COSTS[key];
+    state.energy = Math.max(0, Math.min(100, state.energy + activity.energy));
+    state.actions.push({ title: activity.title, at: new Date().toISOString() });
+    state.actions = state.actions.slice(-100);
+    save();
+    renderState();
+    showToast(activity.message);
+  }
+  function resetGame() {
+    if (!window.confirm("Reset this demo character and local progress?")) return;
+    try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+    state = null;
+    $("game-screen").hidden = true;
+    $("welcome-screen").hidden = false;
+    $("character-form").reset();
+    $("character-name").value = "";
+    $("character-name").focus();
+  }
+  function init() {
+    $("character-form").addEventListener("submit", startGame);
+    $("character-name").addEventListener("input", () => $("character-name").setCustomValidity(""));
+    document.querySelectorAll("[data-action]").forEach((button) => button.addEventListener("click", () => doActivity(button.dataset.action)));
+    $("reset-button").addEventListener("click", resetGame);
+    state = load();
+    if (state) showGame();
+  }
+  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY };
+  if (typeof document !== "undefined") {
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+  }
+})();
