@@ -14,7 +14,7 @@ Run regression tests with Node.js 18 or later:
 
 - Character creation with name and starting style.
 - Four location cards and working activities.
-- Simulated FCFA balance and energy changes.
+- Simulated FCFA balance and energy changes, including a free rest action to recover energy.
 - Recent activity history.
 - Best-effort device-local save and reset.
 - Responsive phone/desktop layout and keyboard focus styles.
