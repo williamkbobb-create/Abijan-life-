@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { freshState, validState, calculateActivity, calculateRest, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY } = require("../game.js");
+const { freshState, validState, calculateActivity, calculateRest, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, STARTING_ENERGY } = require("../game.js");
 test("new character starts with the documented demo balance and energy", () => {
   const state = freshState("Aya Kouassi", "Coastal creative");
   assert.equal(state.name, "Aya Kouassi");
@@ -10,11 +10,11 @@ test("new character starts with the documented demo balance and energy", () => {
   assert.deepEqual(state.actions, []);
   assert.equal(validState(state), true);
 });
-test("activity costs and energy effects are defined for all four locations", () => {
-  assert.deepEqual(Object.keys(ACTIVITIES).sort(), ["bar", "beach", "dance", "drink", "food", "lavage", "meet", "restaurant", "swim"]);
+test("activity costs and energy effects are defined for all playable actions", () => {
+  assert.deepEqual(Object.keys(ACTIVITIES).sort(), ["bar","beach","chat","dance","drink","explore","food","freestyle","friend","game","greet","inspect","invite","lavage","meet","photo","restaurant","sit","swim"].sort());
   assert.equal(COSTS.bar, 500);
   assert.equal(COSTS.beach, 0);
-  for (const activity of Object.values(ACTIVITIES)) assert.ok(activity.energy < 0);
+  for (const activity of Object.values(ACTIVITIES)) assert.ok(Number.isInteger(activity.energy));
 });
 test("persisted state validator rejects invalid or unsafe state shapes", () => {
   assert.equal(validState(null), false);
@@ -28,20 +28,12 @@ test("persisted state validator rejects invalid or unsafe state shapes", () => {
 test("valid state accepts the known character styles and bounded counters", () => {
   assert.equal(validState(freshState("Koffi", "Ambitious newcomer")), true);
 });
-
 test("activity catalog has a non-negative cost for every activity", () => {
   for (const key of Object.keys(ACTIVITIES)) {
     assert.ok(Number.isInteger(COSTS[key]));
     assert.ok(COSTS[key] >= 0);
   }
 });
-test("rest and activity history are bounded in the documented demo state", () => {
-  const state = freshState("Aya", "Coastal creative");
-  assert.equal(state.actions.length, 0);
-  assert.equal(state.energy, 80);
-  assert.equal(state.balance, 5000);
-});
-
 test("activity transition deducts cost, updates energy, and records history", () => {
   const initial = freshState("Aya", "Coastal creative");
   const next = calculateActivity(initial, "bar", "2026-10-17T12:00:00.000Z");
@@ -57,40 +49,37 @@ test("activity transition refuses unknown actions, exhausted energy, and insuffi
   assert.equal(calculateActivity({ ...initial, balance: 100 }, "bar"), null);
 });
 test("activity transition keeps history at the most recent 100 entries", () => {
-  const initial = {
-    ...freshState("Aya", "Coastal creative"),
-    actions: Array.from({ length: 100 }, (_, i) => ({ title: "Old " + i, at: "2026-10-17T12:00:00.000Z" }))
-  };
+  const initial = { ...freshState("Aya", "Coastal creative"), actions: Array.from({ length: 100 }, (_, i) => ({ title: "Old " + i, at: "2026-10-17T12:00:00.000Z" })) };
   const next = calculateActivity(initial, "beach", "2026-10-17T12:01:00.000Z");
   assert.equal(next.actions.length, 100);
   assert.equal(next.actions.at(-1).title, ACTIVITIES.beach.title);
 });
-
-test("rest recovers up to 25 energy without exceeding 100", () => {
+test("rest recovers energy without exceeding 100", () => {
   const initial = { ...freshState("Aya", "Coastal creative"), energy: 90 };
   const result = calculateRest(initial, "2026-10-17T12:00:00.000Z");
   assert.equal(result.recovered, 10);
   assert.equal(result.state.energy, 100);
   assert.equal(result.state.actions.length, 1);
-  assert.equal(initial.energy, 90, "rest transition must not mutate previous state");
+  assert.equal(initial.energy, 90);
 });
 test("rest is unavailable when energy is already full", () => {
-  const initial = { ...freshState("Aya", "Coastal creative"), energy: 100 };
-  assert.equal(calculateRest(initial), null);
+  assert.equal(calculateRest({ ...freshState("Aya", "Coastal creative"), energy: 100 }), null);
 });
-
-test("Grand-Bassam social activities have simulated costs and energy effects", () => {
-  assert.equal(COSTS.drink, 500);
-  assert.equal(COSTS.food, 750);
-  for (const key of ["swim", "drink", "dance", "food", "meet"]) assert.ok(ACTIVITIES[key], key + " activity exists");
-  const initial = freshState("Aya", "Coastal creative");
-  const next = calculateActivity(initial, "swim", "2026-10-17T12:00:00.000Z");
-  assert.equal(next.energy, 68);
-  assert.equal(next.balance, 5000);
-  assert.equal(next.actions[0].title, ACTIVITIES.swim.title);
-});
-test("buying a drink and local food deduct only simulated FCFA", () => {
+test("buying drinks and local food deduct only simulated FCFA", () => {
   const initial = freshState("Aya", "Coastal creative");
   assert.equal(calculateActivity(initial, "drink").balance, 4500);
   assert.equal(calculateActivity(initial, "food").balance, 4250);
+});
+test("each playable location has a local crowd grouped into sections", () => {
+  for (const location of ["beach", "bar", "restaurant", "lavage"]) {
+    assert.ok(PEOPLE[location].length >= 3);
+    assert.ok(PEOPLE[location].every((person) => person.id && person.name && person.section && person.line));
+  }
+  assert.ok(PEOPLE.beach.some((person) => person.section !== PEOPLE.beach[0].section));
+});
+test("sitting can restore energy and is recorded as a game activity", () => {
+  const initial = { ...freshState("Aya", "Coastal creative"), energy: 60 };
+  const next = calculateActivity(initial, "sit", "2026-10-17T12:00:00.000Z");
+  assert.equal(next.energy, 68);
+  assert.equal(next.actions[0].title, ACTIVITIES.sit.title);
 });
