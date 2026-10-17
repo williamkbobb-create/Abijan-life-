@@ -6,50 +6,50 @@
   const REST_RECOVERY = 25;
   const COSTS = Object.freeze({ beach: 0, swim: 0, bar: 500, drink: 500, dance: 0, freestyle: 0, food: 750, meet: 0, restaurant: 0, lavage: 0, explore: 0, photo: 0, sit: 0, game: 0, inspect: 0, washcar: 0, chat: 0, greet: 0, friend: 0, invite: 0 });
   const ACTIVITIES = Object.freeze({
-    beach: { title: "Explored Grand-Bassam Beach", energy: -5, message: "You took a walk along the coast. Energy -5." },
-    bar: { title: "Visited Les Palmiers Beach Bar", energy: -3, message: "A refreshing break by the coast. 500 simulated FCFA spent." },
-    restaurant: { title: "Visited Chez Bassam Restaurant", energy: -2, message: "You settled in for a little time out. Energy -2." },
-    lavage: { title: "Stopped by Lavage International", energy: -2, message: "You checked out the car wash. No real booking was made. Energy -2." },
-    swim: { title: "Went for a swim at Grand-Bassam Beach", energy: -12, message: "You swam in the ocean and cooled off. Energy -12." },
-    drink: { title: "Bought a drink", energy: -2, message: "You enjoyed a drink. 500 simulated FCFA spent." },
-    dance: { title: "Danced on the floor", energy: -10, message: "You hit the dance floor. Energy -10." },
-    freestyle: { title: "Freestyled on the dance floor", energy: -12, message: "You showed off your moves. Energy -12." },
-    food: { title: "Tried a local coastal dish", energy: -3, message: "A tasty local meal. 750 simulated FCFA spent." },
-    meet: { title: "Met someone new", energy: -3, message: "You introduced yourself to someone new. Your social story begins." },
-    explore: { title: "Explored the area", energy: -5, message: "You discovered a little more of Grand-Bassam. Energy -5." },
-    photo: { title: "Took a photo", energy: -1, message: "A new memory saved to your demo activity history." },
-    sit: { title: "Sat down and took a break", energy: 8, message: "You sat down, caught your breath and recovered 8 energy." },
-    game: { title: "Played a social game", energy: -4, message: "A friendly game brought everyone together. Energy -4." },
-    inspect: { title: "Looked around Lavage International", energy: -2, message: "You checked the queue and wash bays. No service was booked." },
-    washcar: { title: "Helped wash a car at Lavage International", energy: -6, message: "You helped clean a car while the queue moved along. No real service was booked or paid for." },
-    chat: { title: "Had a conversation", energy: -2, message: "You shared a conversation and got to know someone better." },
-    greet: { title: "Greeted someone", energy: -1, message: "A friendly greeting opened the door to a new connection." },
-    friend: { title: "Made a new friend", energy: -2, message: "Your friendship level increased in this local demo." },
-    invite: { title: "Invited someone to hang out", energy: -2, message: "You invited them to spend more time together." }
+    beach: { title: "Exploration de la plage de Grand-Bassam", points d’énergie: -5, message: "Tu as marché le long de la côte. Énergie −5." },
+    bar: { title: "Visite du bar de plage Les Palmiers", points d’énergie: -3, message: "Une pause rafraîchissante au bord de la mer. 500 FCFA fictifs dépensés." },
+    restaurant: { title: "Visite du restaurant Chez Bassam", points d’énergie: -2, message: "Tu as pris un petit moment pour toi. Énergie −2." },
+    lavage: { title: "Passage chez Lavage International", points d’énergie: -2, message: "Tu as découvert le lavage auto. Aucune réservation réelle. Énergie −2." },
+    swim: { title: "Baignade à la plage de Grand-Bassam", points d’énergie: -12, message: "Tu as nagé dans l’océan pour te rafraîchir. Énergie −12." },
+    drink: { title: "Achat d’une boisson", points d’énergie: -2, message: "Tu as pris une boisson. 500 FCFA fictifs dépensés." },
+    dance: { title: "Danse sur la piste", points d’énergie: -10, message: "Tu as rejoint la piste de danse. Énergie −10." },
+    freestyle: { title: "Freestyle sur la piste", points d’énergie: -12, message: "Tu as montré tes meilleurs pas. Énergie −12." },
+    food: { title: "Dégustation d’un plat local", points d’énergie: -3, message: "Un délicieux plat local. 750 FCFA fictifs dépensés." },
+    meet: { title: "Nouvelle rencontre", points d’énergie: -3, message: "Tu as fait connaissance avec quelqu’un. Ton histoire sociale commence." },
+    explore: { title: "Exploration des environs", points d’énergie: -5, message: "Tu as découvert un peu plus de Grand-Bassam. Énergie −5." },
+    photo: { title: "Photo prise", points d’énergie: -1, message: "Un nouveau souvenir a été ajouté à ton historique de démo." },
+    sit: { title: "Pause et repos", points d’énergie: 8, message: "Tu t’es assis pour reprendre ton souffle et récupérer 8 points d’énergie." },
+    game: { title: "Partie de jeu entre amis", points d’énergie: -4, message: "Un jeu convivial a rapproché tout le monde. Énergie −4." },
+    inspect: { title: "Découverte de Lavage International", points d’énergie: -2, message: "Tu as regardé la file d’attente et les espaces de lavage. Aucun service réservé." },
+    washcar: { title: "Aide au lavage d’une voiture", points d’énergie: -6, message: "Tu as aidé à nettoyer une voiture pendant que la file avançait. Aucun service réel réservé ou payé." },
+    chat: { title: "Conversation", points d’énergie: -2, message: "Vous avez discuté et appris à mieux vous connaître." },
+    greet: { title: "Salutation", points d’énergie: -1, message: "Un bonjour amical a permis de créer un premier lien." },
+    friend: { title: "Nouvelle amitié", points d’énergie: -2, message: "Votre niveau d’amitié a augmenté dans cette démo." },
+    invite: { title: "Invitation à sortir", points d’énergie: -2, message: "Tu lui as proposé de passer plus de temps ensemble." }
   });
   const PEOPLE = Object.freeze({
     beach: [
-      { id: "aya", name: "Aya Kouassi", role: "Beach regular", mood: "Relaxed", section: "By the shoreline", emoji: "👩🏾‍🦱", line: "The breeze is perfect today." },
-      { id: "koffi", name: "Koffi Yao", role: "Football fan", mood: "Friendly", section: "Beach games", emoji: "🧑🏾", line: "Want to join a quick game?" },
-      { id: "amina", name: "Amina Traoré", role: "Student", mood: "Curious", section: "Palm shade", emoji: "👩🏿", line: "Have you found a favourite spot yet?" },
-      { id: "junior", name: "Junior N’Guessan", role: "Music lover", mood: "Energetic", section: "Near the music", emoji: "🧑🏿‍🦱", line: "We should find somewhere to dance later." }
+      { id: "aya", name: "Aya Kouassi", role: "Habituée de la plage", mood: "Détendue", section: "Au bord de l’eau", emoji: "👩🏾‍🦱", line: "La brise est parfaite aujourd’hui." },
+      { id: "koffi", name: "Koffi Yao", role: "Fan de football", mood: "Sympa", section: "Jeux de plage", emoji: "🧑🏾", line: "Tu veux faire une petite partie ?" },
+      { id: "amina", name: "Amina Traoré", role: "Student", mood: "Curieuse", section: "À l’ombre des palmiers", emoji: "👩🏿", line: "Tu as déjà trouvé ton endroit préféré ?" },
+      { id: "junior", name: "Junior N’Guessan", role: "Amateur de musique", mood: "Énergique", section: "Près de la musique", emoji: "🧑🏿‍🦱", line: "On devrait trouver un endroit pour danser tout à l’heure." }
     ],
     bar: [
-      { id: "mariam", name: "Mariam Koné", role: "Dance lover", mood: "Energetic", section: "Dance floor", emoji: "👩🏾", line: "Come on, the next song is ours!" },
-      { id: "serge", name: "Serge Bamba", role: "DJ’s friend", mood: "Outgoing", section: "DJ corner", emoji: "🧑🏾‍🦱", line: "The music gets better every minute." },
-      { id: "nadia", name: "Nadia Aka", role: "Nightlife regular", mood: "Chill", section: "Lounge chairs", emoji: "👩🏿‍🦱", line: "Grab a seat and tell me about yourself." },
-      { id: "ismael", name: "Ismaël Diabaté", role: "Football fan", mood: "Playful", section: "Bar counter", emoji: "🧔🏾", line: "Who’s winning the next match?" }
+      { id: "mariam", name: "Mariam Koné", role: "Passionnée de danse", mood: "Énergique", section: "Piste de danse", emoji: "👩🏾", line: "Allez, la prochaine chanson est pour nous !" },
+      { id: "serge", name: "Serge Bamba", role: "Ami du DJ", mood: "Sociable", section: "Coin du DJ", emoji: "🧑🏾‍🦱", line: "La musique est de mieux en mieux !" },
+      { id: "nadia", name: "Nadia Aka", role: "Habituée des soirées", mood: "Tranquille", section: "Espace détente", emoji: "👩🏿‍🦱", line: "Assieds-toi et parle-moi un peu de toi." },
+      { id: "ismael", name: "Ismaël Diabaté", role: "Fan de football", mood: "Joueur", section: "Comptoir du bar", emoji: "🧔🏾", line: "Qui va gagner le prochain match ?" }
     ],
     restaurant: [
-      { id: "fatou", name: "Fatou N’Dri", role: "Food lover", mood: "Warm", section: "Dining tables", emoji: "👩🏾‍🦱", line: "You have to try the local grilled fish." },
-      { id: "yann", name: "Yann Kouamé", role: "Young entrepreneur", mood: "Ambitious", section: "Window seats", emoji: "🧑🏾", line: "I’m always looking for new ideas." },
-      { id: "esther", name: "Esther Gnahoré", role: "Artist", mood: "Thoughtful", section: "Patio", emoji: "👩🏿", line: "This place gives me so much inspiration." },
-      { id: "marco", name: "Marco Assi", role: "Local guide", mood: "Helpful", section: "Dining tables", emoji: "🧑🏿‍🦱", line: "I can point you toward some nice places." }
+      { id: "fatou", name: "Fatou N’Dri", role: "Amatrice de cuisine", mood: "Chaleureuse", section: "Tables du restaurant", emoji: "👩🏾‍🦱", line: "Tu dois goûter le poisson braisé du coin." },
+      { id: "yann", name: "Yann Kouamé", role: "Jeune entrepreneur", mood: "Ambitieux", section: "Près des fenêtres", emoji: "🧑🏾", line: "Je suis toujours à la recherche de nouvelles idées." },
+      { id: "esther", name: "Esther Gnahoré", role: "Artist", mood: "Réfléchie", section: "Terrasse", emoji: "👩🏿", line: "Cet endroit m’inspire beaucoup." },
+      { id: "marco", name: "Marco Assi", role: "Guide local", mood: "Serviable", section: "Tables du restaurant", emoji: "🧑🏿‍🦱", line: "Je peux te conseiller de bons endroits." }
     ],
     lavage: [
-      { id: "ibrahim", name: "Ibrahim Touré", role: "Car enthusiast", mood: "Focused", section: "Wash bay", emoji: "🧑🏾‍🦱", line: "That paintwork deserves a proper shine." },
-      { id: "solange", name: "Solange Koffi", role: "Business owner", mood: "Confident", section: "Waiting area", emoji: "👩🏾", line: "A good network is everything." },
-      { id: "patrick", name: "Patrick Guei", role: "Mechanic", mood: "Easygoing", section: "Parking area", emoji: "🧔🏿", line: "Cars always have a story to tell." }
+      { id: "ibrahim", name: "Ibrahim Touré", role: "Passionné d’automobile", mood: "Concentré", section: "Zone de lavage", emoji: "🧑🏾‍🦱", line: "Cette carrosserie mérite un bon coup de propre." },
+      { id: "solange", name: "Solange Koffi", role: "Entrepreneuse", mood: "Sûre d’elle", section: "Salle d’attente", emoji: "👩🏾", line: "Un bon réseau, c’est essentiel." },
+      { id: "patrick", name: "Patrick Guei", role: "Mécanicien", mood: "Décontracté", section: "Parking", emoji: "🧔🏿", line: "Chaque voiture a son histoire." }
     ]
   });
   const $ = (id) => document.getElementById(id);
@@ -58,12 +58,12 @@
   let currentLocation = "beach";
   let selectedPerson = null;
   function freshState(name, style) {
-    return { version: 1, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, createdAt: new Date().toISOString() };
+    return { version: 1, name: name.trim(), style, balance: STARTING_BALANCE, points d’énergie: STARTING_ENERGY, actions: [], relationships: {}, createdAt: new Date().toISOString() };
   }
   function validState(value) {
     return Boolean(value && value.version === 1 && typeof value.name === "string" &&
       value.name.trim().length >= 2 && value.name.length <= 24 &&
-      ["Coastal creative", "Ambitious newcomer"].includes(value.style) &&
+      ["Coastal creative", "Ambitieux newcomer"].includes(value.style) &&
       Number.isInteger(value.balance) && value.balance >= 0 && value.balance <= 1000000 &&
       Number.isInteger(value.energy) && value.energy >= 0 && value.energy <= 100 &&
       Array.isArray(value.actions) && value.actions.length <= 100 &&
@@ -71,7 +71,7 @@
   }
   function save() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); return true; }
-    catch (_) { showToast("Progress could not be saved on this device. You can keep playing for now."); return false; }
+    catch (_) { showToast("La progression n’a pas pu être enregistrée sur cet appareil. Tu peux continuer à jouer."); return false; }
   }
   function load() {
     try {
@@ -131,7 +131,7 @@
     event.preventDefault();
     const name = $("character-name").value.trim();
     if (name.length < 2 || name.length > 24) {
-      $("character-name").setCustomValidity("Use a name between 2 and 24 characters.");
+      $("character-name").setCustomValidity("Choisis un nom de 2 à 24 caractères.");
       $("character-name").reportValidity();
       return;
     }
@@ -139,7 +139,7 @@
     state = freshState(name, document.querySelector('input[name="style"]:checked').value);
     const saved = save();
     showGame();
-    if (saved) showToast("Welcome to Grand-Bassam, " + name + "!");
+    if (saved) showToast("Bienvenue à Grand-Bassam, " + name + "!");
   }
   function calculateActivity(current, key, at = new Date().toISOString()) {
     const activity = ACTIVITIES[key];
@@ -148,15 +148,15 @@
     return {
       ...current,
       balance: current.balance - COSTS[key],
-      energy: Math.max(0, Math.min(100, nextEnergy)),
+      points d’énergie: Math.max(0, Math.min(100, nextEnergy)),
       actions: [...current.actions, { title: activity.title, at }].slice(-100)
     };
   }
   function doActivity(key, customMessage) {
     const activity = ACTIVITIES[key];
     if (!activity || !state) return;
-    if (state.energy <= 0 && activity.energy <= 0) { showToast("You are out of energy. Sit down or rest, then keep exploring."); return; }
-    if (state.balance < COSTS[key]) { showToast("Not enough demo FCFA for this activity."); return; }
+    if (state.energy <= 0 && activity.energy <= 0) { showToast("Tu n’as plus d’énergie. Assieds-toi ou repose-toi avant de continuer."); return; }
+    if (state.balance < COSTS[key]) { showToast("Tu n’as pas assez de FCFA fictifs pour cette activité."); return; }
     const previousEnergy = state.energy;
     state = calculateActivity(state, key);
     if (!state) return;
@@ -174,10 +174,10 @@
     lavage: { title: "Lavage International", description: "Explore the wash bay, inspect cars and meet people in the waiting area.", cover: "lavage-cover", icon: "🚘", kicker: "GRAND-BASSAM · TOWN", actions: ["inspect", "washcar", "explore", "photo", "sit", "chat", "meet"] }
   };
   const ACTION_LABELS = {
-    swim: ["🏊", "Swim", "−12 energy"], explore: ["🚶", "Explore", "−5 energy"], drink: ["🍹", "Buy a drink", "500 FCFA"],
-    dance: ["💃", "Dance", "−10 energy"], freestyle: ["🪩", "Freestyle", "−12 energy"], food: ["🍲", "Eat local food", "750 FCFA"],
-    meet: ["👋", "Meet people", "Social"], photo: ["📸", "Take photo", "−1 energy"], sit: ["🪑", "Sit & rest", "+8 energy"],
-    game: ["⚽", "Play a game", "−4 energy"], inspect: ["🚘", "Inspect car queue", "−2 energy"], washcar: ["🧽", "Help wash a car", "−6 energy"], chat: ["💬", "Chat", "−2 energy"]
+    swim: ["🏊", "Swim", "−12 points d’énergie"], explore: ["🚶", "Explore", "−5 points d’énergie"], drink: ["🍹", "Buy a drink", "500 FCFA"],
+    dance: ["💃", "Dance", "−10 points d’énergie"], freestyle: ["🪩", "Freestyle", "−12 points d’énergie"], food: ["🍲", "Eat local food", "750 FCFA"],
+    meet: ["👋", "Meet people", "Social"], photo: ["📸", "Take photo", "−1 points d’énergie"], sit: ["🪑", "Sit & rest", "+8 points d’énergie"],
+    game: ["⚽", "Play a game", "−4 points d’énergie"], inspect: ["🚘", "Inspect car queue", "−2 points d’énergie"], washcar: ["🧽", "Help wash a car", "−6 points d’énergie"], chat: ["💬", "Chat", "−2 points d’énergie"]
   };
   function selectLocation(key) {
     const scene = document.querySelector(".world-scene");
@@ -251,10 +251,10 @@
         const info = document.createElement("div"); info.className = "person-info";
         const name = document.createElement("b"); name.textContent = person.name;
         const role = document.createElement("span"); role.textContent = person.role + " · " + person.mood;
-        const score = document.createElement("small"); score.textContent = "Friendship " + (state.relationships[person.id] || 0) + "/5";
+        const score = document.createElement("small"); score.textContent = "Amitié " + (state.relationships[person.id] || 0) + "/5";
         const actions = document.createElement("div"); actions.className = "person-actions";
         const talk = document.createElement("button"); talk.type = "button"; talk.textContent = "Talk"; talk.addEventListener("click", () => openPerson(person.id));
-        const wave = document.createElement("button"); wave.type = "button"; wave.textContent = "Say hi"; wave.addEventListener("click", () => { selectedPerson = person; doActivity("greet", "You greeted " + person.name + ". " + person.line); renderPeople(); });
+        const wave = document.createElement("button"); wave.type = "button"; wave.textContent = "Say hi"; wave.addEventListener("click", () => { selectedPerson = person; doActivity("greet", "Tu as salué " + person.name + ". " + person.line); renderPeople(); });
         info.append(name, role, score); actions.append(talk, wave); card.append(avatar, info, actions); grid.append(card);
       });
       container.append(grid);
@@ -267,7 +267,7 @@
     $("person-name").textContent = selectedPerson.name;
     $("person-role").textContent = selectedPerson.role + " · " + selectedPerson.mood;
     $("person-line").textContent = "“" + selectedPerson.line + "”";
-    $("person-friendship").textContent = "Friendship " + (state.relationships[id] || 0) + "/5";
+    $("person-friendship").textContent = "Amitié " + (state.relationships[id] || 0) + "/5";
     $("person-screen").hidden = false;
     $("meet-screen").hidden = true;
     $("club-screen").hidden = true;
@@ -276,13 +276,13 @@
     if (!selectedPerson) return;
     const personName = selectedPerson.name;
     const messages = {
-      greet: "You said hello to " + personName + ". " + selectedPerson.line,
-      chat: "You and " + personName + " had a good conversation.",
-      friend: personName + " is now closer to you. Friendship increased!",
-      invite: "You invited " + personName + " to hang out. They said they’ll see you around!"
+      greet: "Tu as dit bonjour à " + personName + ". " + selectedPerson.line,
+      chat: "Toi et " + personName + " avez eu une bonne conversation.",
+      friend: personName + " is now closer to you. Amitié increased!",
+      invite: "Tu as invité " + personName + " à sortir. Cette personne a dit qu’elle te reverrait bientôt !"
     };
     doActivity(key, messages[key]);
-    $("person-friendship").textContent = "Friendship " + (state.relationships[selectedPerson.id] || 0) + "/5";
+    $("person-friendship").textContent = "Amitié " + (state.relationships[selectedPerson.id] || 0) + "/5";
   }
   function openClub(freestyle) {
     $("club-screen").hidden = false;
@@ -290,7 +290,7 @@
     $("person-screen").hidden = true;
     $("club-screen").classList.toggle("club-freestyle", Boolean(freestyle));
     $("club-location-name").textContent = currentLocation === "bar" ? "LES PALMIERS · CLUB FLOOR" : "COASTAL DANCE FLOOR";
-    $("club-status").textContent = freestyle ? "FREESTYLE SESSION" : "THE MUSIC IS ON";
+    $("club-status").textContent = freestyle ? "SESSION FREESTYLE" : "LA MUSIQUE EST LANCÉE";
   }
   function closeOverlays() {
     $("meet-screen").hidden = true;
@@ -301,22 +301,22 @@
     if (!current || current.energy >= 100) return null;
     const recovered = Math.min(REST_RECOVERY, 100 - current.energy);
     return {
-      state: { ...current, energy: current.energy + recovered, actions: [...current.actions, { title: "Took a quiet break and recovered " + recovered + " energy", at }].slice(-100) },
+      state: { ...current, points d’énergie: current.energy + recovered, actions: [...current.actions, { title: "Tu as fait une pause et récupéré " + recovered + " points d’énergie", at }].slice(-100) },
       recovered
     };
   }
   function rest() {
-    if (!state || state.energy >= 100) { showToast("Your energy is already full."); return; }
+    if (!state || state.energy >= 100) { showToast("Your points d’énergie is already full."); return; }
     const result = calculateRest(state);
     state = result.state;
     const saved = save();
     renderState();
-    if (saved) showToast("You took a breather. Energy +" + result.recovered + ".");
+    if (saved) showToast("Tu as repris ton souffle. Énergie +" + result.recovered + ".");
   }
   function resetGame() {
-    if (!window.confirm("Reset this demo character and local progress?")) return;
+    if (!window.confirm("Réinitialiser ce personnage et la progression locale de la démo ?")) return;
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
-    state = freshState("Grey", "Ambitious newcomer");
+    state = freshState("Grey", "Ambitieux newcomer");
     save();
     closeOverlays();
     showGame();
@@ -332,19 +332,19 @@
       const scene = document.querySelector(".world-scene");
       const active = scene.classList.toggle("map-focus");
       $("map-view-button").setAttribute("aria-pressed", String(active));
-      showToast(active ? "Choose a destination on the map." : "Destination actions are back.");
+      showToast(active ? "Choisis un lieu sur la carte." : "Les actions du lieu sont de nouveau disponibles.");
     });
     document.querySelectorAll("[data-close-overlay]").forEach((button) => button.addEventListener("click", closeOverlays));
     document.querySelectorAll("[data-person-action]").forEach((button) => button.addEventListener("click", () => personAction(button.dataset.personAction)));
     document.querySelectorAll("[data-club-action]").forEach((button) => button.addEventListener("click", () => {
       const key = button.dataset.clubAction;
       if (key === "meet") openMeet();
-      else if (key === "sit") doActivity("sit", "You found a chair, took a break and watched the dance floor.");
-      else doActivity(key, key === "dance" ? "You danced with the crowd. Energy -10." : key === "freestyle" ? "You took the spotlight and freestyled. Energy -12." : key === "drink" ? "You ordered a drink at the club. 500 simulated FCFA spent." : ACTIVITIES[key].message);
+      else if (key === "sit") doActivity("sit", "Tu as trouvé une chaise, fait une pause et regardé la piste de danse.");
+      else doActivity(key, key === "dance" ? "Tu as dansé avec le public. Énergie −10." : key === "freestyle" ? "Tu as attiré les regards avec ton freestyle. Énergie −12." : key === "drink" ? "Tu as commandé une boisson au club. 500 FCFA fictifs dépensés." : ACTIVITIES[key].message);
     }));
     $("person-back").addEventListener("click", openMeet);
     state = load();
-    if (!state) { state = freshState("Grey", "Ambitious newcomer"); save(); }
+    if (!state) { state = freshState("Grey", "Ambitieux newcomer"); save(); }
     showGame();
     selectLocation("beach");
   }
