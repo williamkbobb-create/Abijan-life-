@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#092e2c"><meta name="description" content="Enter the world of Abijan Life, a coastal life-simulation game set in Grand-Bassam."><title>Abijan Life — Enter Grand-Bassam</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="social.css"><link rel="stylesheet" href="phone.css"><script src="game.js" defer></script><script src="phone.js" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#092e2c"><meta name="description" content="Enter the world of Abijan Life, a coastal life-simulation game set in Grand-Bassam."><title>Abijan Life — Enter Grand-Bassam</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="social.css"><link rel="stylesheet" href="phone.css"><link rel="stylesheet" href="feedback.css"><script src="supabase-config.js"></script><script src="game.js" defer></script><script src="phone.js" defer></script><script src="feedback.js" defer></script></head>
 <body>
 <header class="topbar"><a class="brand" href="#" aria-label="Abijan Life home"><span class="brand-mark">A</span><span>ABIJAN <b>LIFE</b><small>YOUR WORLD. YOUR STORY.</small></span></a><span class="demo-pill"><i></i> GAME DEMO</span></header>
 <main id="app">
@@ -18,5 +18,45 @@
 <div id="club-screen" class="game-overlay club-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="club-title"><div class="club-room"><div class="club-topline"><span id="club-location-name">COASTAL DANCE FLOOR</span><button type="button" data-close-overlay aria-label="Leave club">×</button></div><div class="club-lights" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="club-sign"><span>TONIGHT IN BASSAM</span><h2 id="club-title">THE DANCE FLOOR</h2><p id="club-status">THE MUSIC IS ON</p></div><div class="club-stage"><div class="club-dj">DJ <b>ASSI</b><small>ON THE DECKS</small></div><div class="club-crowd" aria-label="People dancing"><span>🕺🏾</span><span>💃🏿</span><span>🕺🏿</span><span>💃🏾</span><span>🕺🏾</span><span>💃🏿</span><span>🕺🏾</span><span>💃🏾</span><span>🕺🏿</span></div><div class="club-floor-grid"></div></div><div class="club-lounge"><div class="club-chair">🪑<small>LOUNGE SEATS</small></div><div class="club-table">◉<small>TABLES</small></div><div class="club-chair">🪑<small>LOUNGE SEATS</small></div></div><div class="club-actions"><button type="button" data-club-action="dance">💃 Dance <small>−10 energy</small></button><button type="button" data-club-action="freestyle">🪩 Freestyle <small>−12 energy</small></button><button type="button" data-club-action="sit">🪑 Sit & rest <small>+8 energy</small></button><button type="button" data-club-action="drink">🍹 Order drink <small>500 FCFA</small></button><button type="button" data-club-action="meet">👋 Meet the crowd</button></div><p class="club-footnote">Simulated local characters · No real bookings or transactions</p></div></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </section>
-</main><footer class="site-footer"><span>ABIJAN LIFE</span><span>Made for stories rooted in Côte d’Ivoire.</span></footer>
+
+<section id="player-feedback-section" aria-labelledby="feedback-title">
+  <p class="eyebrow">HELP SHAPE THE NEXT UPDATE</p>
+  <h2 id="feedback-title">How was your time in Grand-Bassam?</h2>
+  <p class="feedback-intro">You’re testing an early demo. Tell us what felt good, what broke, and what you want to see next. Don’t include passwords or private information.</p>
+  <form id="player-feedback-form">
+    <div class="feedback-grid">
+      <label for="feedback-name">Name (optional)
+        <input id="feedback-name" name="player_name" maxlength="40" autocomplete="nickname" placeholder="Your name or nickname">
+      </label>
+      <label for="feedback-category">What is this about?
+        <select id="feedback-category" name="category" required>
+          <option value="gameplay">Gameplay</option>
+          <option value="visuals">Visuals and design</option>
+          <option value="bugs">Bug or problem</option>
+          <option value="ideas">Ideas for the next update</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+    </div>
+    <fieldset style="border:0;padding:0;margin:0">
+      <legend style="font-size:12px;font-weight:700;margin-bottom:8px">Rate your experience</legend>
+      <div class="feedback-rating">
+        <label><input type="radio" name="rating" value="1" required> 1 — Poor</label>
+        <label><input type="radio" name="rating" value="2"> 2</label>
+        <label><input type="radio" name="rating" value="3"> 3 — Okay</label>
+        <label><input type="radio" name="rating" value="4"> 4</label>
+        <label><input type="radio" name="rating" value="5"> 5 — Great</label>
+      </div>
+    </fieldset>
+    <label for="feedback-message">Your feedback
+      <textarea id="feedback-message" name="message" minlength="8" maxlength="1200" required placeholder="What did you enjoy? What should we fix or add?" aria-describedby="feedback-hint"></textarea>
+    </label>
+    <p id="feedback-hint" style="margin:0;color:#52695e;font-size:11px">8–1,200 characters. Reviews are stored for the development team to read; they are not displayed publicly.</p>
+    <label class="feedback-honeypot" aria-hidden="true" for="feedback-website">Leave this field blank
+      <input id="feedback-website" name="website" tabindex="-1" autocomplete="off">
+    </label>
+    <button class="feedback-submit" type="submit">SEND REVIEW</button>
+    <p id="feedback-status" role="status" aria-live="polite" hidden></p>
+  </form>
+</section>\n</main><footer class="site-footer"><span>ABIJAN LIFE</span><span>Made for stories rooted in Côte d’Ivoire.</span></footer>
 </body></html>
