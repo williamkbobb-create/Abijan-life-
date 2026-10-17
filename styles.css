@@ -112,3 +112,15 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
 @keyframes foam-drift{from{translate:-1.5% 0;opacity:.7}to{translate:2% 2px;opacity:1}}
 @keyframes palm-sway{from{rotate:-1deg}to{rotate:1.5deg}}
 @media(prefers-reduced-motion:reduce){.scene-ocean .wave,.scene-foam,.scene-palm{animation:none!important}.world-pin{transition:none}}
+
+/* Map-first world: the four playable destinations are the only active pins. */
+.pin-restaurant{top:62%;left:67%}
+.pin-restaurant .pin-icon{background:linear-gradient(145deg,#fff4d7,#f2d6a5)}
+.map-hint{position:absolute;z-index:3;top:17%;left:50%;transform:translateX(-50%);padding:8px 12px;border:1px solid #ffffff45;border-radius:30px;background:#123e39a8;color:#fff;font-size:9px;font-weight:700;letter-spacing:1.5px;white-space:nowrap;backdrop-filter:blur(8px);pointer-events:none;animation:hint-pulse 3.2s ease-in-out infinite}
+.world-scene .pin-market{display:none!important}
+.world-scene .location-dock{backdrop-filter:blur(14px)}
+.dock-art.restaurant-cover{background:linear-gradient(145deg,#e9b875,#a85f3f 48%,#375e49)}
+.world-scene.location-restaurant .scene-village{opacity:1;filter:drop-shadow(0 7px 7px #5c452e60)}
+@keyframes hint-pulse{0%,100%{opacity:.75}50%{opacity:1}}
+@media(max-width:760px){.pin-restaurant{top:61%;left:68%}.map-hint{top:15%;font-size:8px;letter-spacing:1px}.world-pin{min-width:86px}.world-pin small{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.map-hint{animation:none}}
