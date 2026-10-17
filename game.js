@@ -132,10 +132,9 @@
   }
   function rest() {
     if (!state || state.energy >= 100) { showToast("Your energy is already full."); return; }
-    const recovered = Math.min(REST_RECOVERY, 100 - state.energy);
-    state.energy += recovered;
-    state.actions.push({ title: "Took a quiet break and recovered " + recovered + " energy", at: new Date().toISOString() });
-    state.actions = state.actions.slice(-100);
+    const result = calculateRest(state);
+    state = result.state;
+    const recovered = result.recovered;
     save();
     renderState();
     showToast("You took a breather. Energy +" + recovered + ".");
@@ -159,7 +158,7 @@
     state = load();
     if (state) showGame();
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, calculateActivity, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY };
+  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, calculateActivity, calculateRest, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY, REST_RECOVERY };
   if (typeof document !== "undefined") {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
     else init();
