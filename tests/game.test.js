@@ -78,8 +78,8 @@ test("each playable location has a local crowd grouped into sections", () => {
     assert.ok(PEOPLE[location].every((person) => person.id && person.name && person.section && person.line));
   }
   assert.ok(PEOPLE.beach.some((person) => person.section !== PEOPLE.beach[0].section));
-  assert.ok(PEOPLE.lavage.some((person) => person.section === "Wash bay"));
-  assert.ok(PEOPLE.lavage.some((person) => person.section === "Parking area"));
+  assert.ok(PEOPLE.lavage.some((person) => person.section === "Zone de lavage"));
+  assert.ok(PEOPLE.lavage.some((person) => person.section === "Parking"));
 });
 test("sitting can restore energy and is recorded as a game activity", () => {
   const initial = { ...freshState("Aya", "Coastal creative"), energy: 60 };
@@ -100,5 +100,5 @@ test("phone interface is loaded as a compact side panel with the world still pre
   for (const tab of ["messages", "calls", "contacts", "activities", "settings"]) assert.ok(js.includes('data-phone-tab="' + tab + '"'));
   assert.match(css, /\.phone-panel/);
   assert.match(css, /@media\s*\(max-width:\s*650px\)/);
-  assert.match(js, /No real calls or online messages are sent/);
+  assert.match(js, /Aucun appel réel ni message en ligne n’est envoyé/);
 });
