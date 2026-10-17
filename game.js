@@ -54,7 +54,6 @@
   function showGame() {
     $("welcome-screen").hidden = true;
     $("game-screen").hidden = false;
-    $("player-name").textContent = state.name;
     $("profile-name").textContent = state.name;
     $("profile-style").textContent = state.style;
     $("avatar-initial").textContent = state.name.trim().charAt(0).toUpperCase();
@@ -135,6 +134,10 @@
     market: ["🛍️", "Browse", "−4 energy"], lavage: ["🚘", "Visit", "−2 energy"]
   };
   function selectLocation(key) {
+    const scene = document.querySelector(".world-scene");
+    if (scene) scene.classList.remove("map-focus");
+    const mapButton = $("map-view-button");
+    if (mapButton) mapButton.setAttribute("aria-pressed", "false");
     const location = LOCATION_DETAILS[key];
     if (!location) return;
     document.querySelectorAll("[data-location]").forEach((pin) => {
@@ -199,6 +202,12 @@
     document.querySelectorAll("[data-location]").forEach((button) => button.addEventListener("click", () => selectLocation(button.dataset.location)));
     $("reset-button").addEventListener("click", resetGame);
     $("rest-button").addEventListener("click", rest);
+    $("map-view-button").addEventListener("click", () => {
+      const scene = document.querySelector(".world-scene");
+      const active = scene.classList.toggle("map-focus");
+      $("map-view-button").setAttribute("aria-pressed", String(active));
+      showToast(active ? "Choose a destination on the map." : "Destination actions are back.");
+    });
     state = load();
     if (!state) {
       state = freshState("Grey", "Ambitious newcomer");
