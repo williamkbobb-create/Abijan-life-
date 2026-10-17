@@ -95,3 +95,20 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
 .world-pin{backdrop-filter:blur(7px);box-shadow:0 9px 24px #073b3655}
 .world-pin .pin-icon{background:linear-gradient(145deg,#ffffff26,#ffffff08)}
 @media(max-width:760px){.scene-village{top:33%;width:65%;gap:4px}.scene-village i{width:25px;height:25px}.scene-village i:nth-child(2){height:36px}.scene-village i:nth-child(3){height:30px}.scene-village i:nth-child(4){height:22px}.scene-village i:nth-child(5){height:31px}.scene-pirogue{top:39%;right:13%}.scene-shoreline{top:44%;height:17%}.scene-foam{top:45%}}
+
+/* Subtle ambient motion makes the scene feel alive without blocking play. */
+.scene-ocean .wave{animation:wave-drift 8s ease-in-out infinite alternate;transform-origin:center}
+.scene-ocean .wave-b{animation-delay:-2.5s}.scene-ocean .wave-c{animation-delay:-4.5s}
+.scene-foam{animation:foam-drift 7s ease-in-out infinite alternate}
+.scene-palm{animation:palm-sway 6s ease-in-out infinite alternate}
+.palm-b{animation-delay:-2s}
+.world-pin{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
+.world-pin:active{transform:scale(.96)}
+.world-scene.location-bar .scene-sun{filter:saturate(1.1);box-shadow:0 0 58px #ffdba780}
+.world-scene.location-market .scene-village{opacity:1;filter:drop-shadow(0 5px 6px #5c452e4a)}
+.world-scene.location-lavage .scene-road{filter:drop-shadow(0 3px 2px #fff6d4aa)}
+.world-scene.location-beach .scene-foam{opacity:1}
+@keyframes wave-drift{from{translate:-1.5% 0;scale:1 1}to{translate:2% 2px;scale:1.025 1}}
+@keyframes foam-drift{from{translate:-1.5% 0;opacity:.7}to{translate:2% 2px;opacity:1}}
+@keyframes palm-sway{from{rotate:-1deg}to{rotate:1.5deg}}
+@media(prefers-reduced-motion:reduce){.scene-ocean .wave,.scene-foam,.scene-palm{animation:none!important}.world-pin{transition:none}}
