@@ -11,7 +11,7 @@ test("new character starts with the documented demo balance and energy", () => {
   assert.equal(validState(state), true);
 });
 test("activity costs and energy effects are defined for all four locations", () => {
-  assert.deepEqual(Object.keys(ACTIVITIES).sort(), ["bar", "beach", "dance", "drink", "food", "lavage", "market", "meet", "swim"]);
+  assert.deepEqual(Object.keys(ACTIVITIES).sort(), ["bar", "beach", "dance", "drink", "food", "lavage", "meet", "restaurant", "swim"]);
   assert.equal(COSTS.bar, 500);
   assert.equal(COSTS.beach, 0);
   for (const activity of Object.values(ACTIVITIES)) assert.ok(activity.energy < 0);
