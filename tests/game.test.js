@@ -111,8 +111,10 @@ test("French preview UI avoids untranslated map and action labels", () => {
   const game = fs.readFileSync(path.join(__dirname, "..", "game.js"), "utf8");
   const phone = fs.readFileSync(path.join(__dirname, "..", "phone.js"), "utf8");
   assert.match(html, /<span>ÉNERGIE<\\/span>/);
-  assert.match(html, /GOLFE DE GUINÉE/);
-  assert.doesNotMatch(html, /GULF OF GUINEA|TOUCHE UN LIEU POUR EXPLORERR|💬 Discuter/);
+  assert.ok(html.includes("GOLFE DE GUINÉE"));
+  assert.ok(!html.includes("GULF OF GUINEA"));
+  assert.ok(!html.includes("TOUCHE UN LIEU POUR EXPLORERR"));
+  assert.ok(!html.includes("💬 Discuter"));
   assert.match(game, /talk.textContent = "Discuter"/);
   assert.match(game, /wave.textContent = "Dire bonjour"/);
   assert.match(phone, /Les appels sont simulés/);
