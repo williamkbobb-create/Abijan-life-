@@ -118,6 +118,18 @@
     renderState();
     showToast(activity.message);
   }
+  function calculateRest(current, at = new Date().toISOString()) {
+    if (!current || current.energy >= 100) return null;
+    const recovered = Math.min(REST_RECOVERY, 100 - current.energy);
+    return {
+      state: {
+        ...current,
+        energy: current.energy + recovered,
+        actions: [...current.actions, { title: "Took a quiet break and recovered " + recovered + " energy", at }].slice(-100)
+      },
+      recovered
+    };
+  }
   function rest() {
     if (!state || state.energy >= 100) { showToast("Your energy is already full."); return; }
     const recovered = Math.min(REST_RECOVERY, 100 - state.energy);
