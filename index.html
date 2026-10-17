@@ -20,42 +20,42 @@
 </section>
 
 <section id="player-feedback-section" aria-labelledby="feedback-title">
-  <p class="eyebrow">HELP SHAPE THE NEXT UPDATE</p>
-  <h2 id="feedback-title">How was your time in Grand-Bassam?</h2>
-  <p class="feedback-intro">You’re testing an early demo. Tell us what felt good, what broke, and what you want to see next. Don’t include passwords or private information.</p>
+  <p class="eyebrow">AIDE-NOUS À PRÉPARER LA PROCHAINE MISE À JOUR</p>
+  <h2 id="feedback-title">Comment as-tu vécu ton expérience à Grand-Bassam ?</h2>
+  <p class="feedback-intro">Tu testes une première version du jeu. Dis-nous ce que tu as aimé, ce qui ne fonctionne pas et ce que tu aimerais voir ensuite. Ne partage aucun mot de passe ni renseignement privé.</p>
   <form id="player-feedback-form">
     <div class="feedback-grid">
-      <label for="feedback-name">Name (optional)
-        <input id="feedback-name" name="player_name" maxlength="40" autocomplete="nickname" placeholder="Your name or nickname">
+      <label for="feedback-name">Nom (facultatif)
+        <input id="feedback-name" name="player_name" maxlength="40" autocomplete="nickname" placeholder="Ton nom ou pseudo">
       </label>
-      <label for="feedback-category">What is this about?
+      <label for="feedback-category">Quel est le sujet de ton avis ?
         <select id="feedback-category" name="category" required>
-          <option value="gameplay">Gameplay</option>
-          <option value="visuals">Visuals and design</option>
-          <option value="bugs">Bug or problem</option>
-          <option value="ideas">Ideas for the next update</option>
-          <option value="other">Other</option>
+          <option value="gameplay">Jouabilité</option>
+          <option value="visuals">Graphismes et design</option>
+          <option value="bugs">Bug ou problème</option>
+          <option value="ideas">Idées pour la prochaine mise à jour</option>
+          <option value="other">Autre</option>
         </select>
       </label>
     </div>
     <fieldset style="border:0;padding:0;margin:0">
-      <legend style="font-size:12px;font-weight:700;margin-bottom:8px">Rate your experience</legend>
+      <legend style="font-size:12px;font-weight:700;margin-bottom:8px">Note ton expérience</legend>
       <div class="feedback-rating">
-        <label><input type="radio" name="rating" value="1" required> 1 — Poor</label>
+        <label><input type="radio" name="rating" value="1" required> 1 — Mauvaise</label>
         <label><input type="radio" name="rating" value="2"> 2</label>
-        <label><input type="radio" name="rating" value="3"> 3 — Okay</label>
+        <label><input type="radio" name="rating" value="3"> 3 — Moyenne</label>
         <label><input type="radio" name="rating" value="4"> 4</label>
-        <label><input type="radio" name="rating" value="5"> 5 — Great</label>
+        <label><input type="radio" name="rating" value="5"> 5 — Excellente</label>
       </div>
     </fieldset>
-    <label for="feedback-message">Your feedback
-      <textarea id="feedback-message" name="message" minlength="8" maxlength="1200" required placeholder="What did you enjoy? What should we fix or add?" aria-describedby="feedback-hint"></textarea>
+    <label for="feedback-message">Ton avis
+      <textarea id="feedback-message" name="message" minlength="8" maxlength="1200" required placeholder="Qu’as-tu aimé ? Que devons-nous corriger ou ajouter ?" aria-describedby="feedback-hint"></textarea>
     </label>
-    <p id="feedback-hint" style="margin:0;color:#52695e;font-size:11px">8–1,200 characters. Reviews are stored for the development team to read; they are not displayed publicly.</p>
-    <label class="feedback-honeypot" aria-hidden="true" for="feedback-website">Leave this field blank
+    <p id="feedback-hint" style="margin:0;color:#52695e;font-size:11px">De 8 à 1 200 caractères. Les avis sont enregistrés pour l’équipe de développement et ne sont pas publiés.</p>
+    <label class="feedback-honeypot" aria-hidden="true" for="feedback-website">Laisse ce champ vide
       <input id="feedback-website" name="website" tabindex="-1" autocomplete="off">
     </label>
-    <button class="feedback-submit" type="submit">SEND REVIEW</button>
+    <button class="feedback-submit" type="submit">ENVOYER MON AVIS</button>
     <p id="feedback-status" role="status" aria-live="polite" hidden></p>
   </form>
 </section>\n</main><footer class="site-footer"><span>ABIJAN LIFE</span><span>Des histoires inspirées de la Côte d’Ivoire.</span></footer>
