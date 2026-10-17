@@ -113,10 +113,7 @@
     if (!activity || !state) return;
     if (state.energy <= 0) { showToast("You are out of energy. Take a break to recover, then keep exploring."); return; }
     if (state.balance < COSTS[key]) { showToast("Not enough demo FCFA for this activity."); return; }
-    state.balance -= COSTS[key];
-    state.energy = Math.max(0, Math.min(100, state.energy + activity.energy));
-    state.actions.push({ title: activity.title, at: new Date().toISOString() });
-    state.actions = state.actions.slice(-100);
+    state = calculateActivity(state, key);
     save();
     renderState();
     showToast(activity.message);
