@@ -3,7 +3,7 @@
 ## Version 1: first playable Grand-Bassam demo
 - Mobile-first browser experience with character creation.
 - Four demo destinations: Grand-Bassam Beach, Les Palmiers Beach Bar, Artisan Corner, and Lavage International.
-- Activities change demo energy, virtual FCFA balance, and recent activity.
+- Activities change demo energy, virtual FCFA balance, and recent activity; resting restores energy.
 - Local-device progress persistence with input/state validation and a reset control.
 - Clear labels: FCFA is simulated, weather/time is not live, and Lavage International is not a real booking.
 - Basic automated tests for initial state and persisted-state validation.
