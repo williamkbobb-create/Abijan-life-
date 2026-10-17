@@ -137,6 +137,8 @@
     });
   }
   function init() {
+    if ($("game-screen")) $("game-screen").hidden = true;
+    if ($("welcome-screen")) $("welcome-screen").hidden = false;
     buildAuthPanel();
     if (!config || !config.url || !config.publishableKey || !window.supabase || !window.supabase.createClient) {
       status("Supabase n’est pas configuré. Vérifie l’URL et la clé publique.", "error");
