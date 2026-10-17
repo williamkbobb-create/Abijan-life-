@@ -148,3 +148,24 @@ test("player feedback is compact and the next-update plan is visible", () => {
   assert.ok(roadmap.includes("Tutoriel de première visite"));
   assert.ok(roadmap.includes("URL officielle de NouchiLink doit être confirmée"));
 });
+
+
+test("account access and first-play tutorial are wired into the preview", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const root = path.join(__dirname, "..");
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const auth = fs.readFileSync(path.join(root, "auth.js"), "utf8");
+  const css = fs.readFileSync(path.join(root, "auth.css"), "utf8");
+  assert.match(html, /cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@2/);
+  assert.match(html, /src="auth\.js"/);
+  assert.match(html, /href="auth\.css"/);
+  assert.match(auth, /client\.auth\.signUp/);
+  assert.match(auth, /client\.auth\.signInWithPassword/);
+  assert.match(auth, /client\.auth\.signOut/);
+  assert.match(auth, /first-play-tutorial/);
+  assert.match(auth, /TUTORIAL_PREFIX/);
+  assert.match(auth, /progression est enregistrée sur cet appareil, pas encore dans le cloud/);
+  assert.match(css, /\.tutorial-backdrop/);
+  assert.match(css, /\.auth-panel/);
+});
