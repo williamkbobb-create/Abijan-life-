@@ -98,6 +98,16 @@
     showGame();
     showToast("Welcome to Grand-Bassam, " + name + "!");
   }
+  function calculateActivity(current, key, at = new Date().toISOString()) {
+    const activity = ACTIVITIES[key];
+    if (!current || !activity || current.energy <= 0 || current.balance < COSTS[key]) return null;
+    return {
+      ...current,
+      balance: current.balance - COSTS[key],
+      energy: Math.max(0, Math.min(100, current.energy + activity.energy)),
+      actions: [...current.actions, { title: activity.title, at }].slice(-100)
+    };
+  }
   function doActivity(key) {
     const activity = ACTIVITIES[key];
     if (!activity || !state) return;
