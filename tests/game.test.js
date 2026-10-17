@@ -28,3 +28,16 @@ test("persisted state validator rejects invalid or unsafe state shapes", () => {
 test("valid state accepts the known character styles and bounded counters", () => {
   assert.equal(validState(freshState("Koffi", "Ambitious newcomer")), true);
 });
+
+test("activity catalog has a non-negative cost for every activity", () => {
+  for (const key of Object.keys(ACTIVITIES)) {
+    assert.ok(Number.isInteger(COSTS[key]));
+    assert.ok(COSTS[key] >= 0);
+  }
+});
+test("rest and activity history are bounded in the documented demo state", () => {
+  const state = freshState("Aya", "Coastal creative");
+  assert.equal(state.actions.length, 0);
+  assert.equal(state.energy, 80);
+  assert.equal(state.balance, 5000);
+});
