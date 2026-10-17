@@ -54,7 +54,6 @@
     panel.setAttribute("aria-label", "In-game phone");
     panel.innerHTML = '<div class="phone-top"><div class="phone-camera"></div><div class="phone-status"><span>● BASSAM MOBILE</span><span id="phone-clock">21:39</span></div></div><header class="phone-header"><div><small>YOUR POCKET WORLD</small><h2 id="phone-title">Messages</h2></div><button id="phone-close" type="button" aria-label="Put phone away">−</button></header><nav class="phone-tabs" aria-label="Phone apps"><button type="button" data-phone-tab="messages">Messages <i id="phone-unread">2</i></button><button type="button" data-phone-tab="calls">Calls</button><button type="button" data-phone-tab="contacts">Contacts</button><button type="button" data-phone-tab="activities">Activity</button><button type="button" data-phone-tab="settings">Settings</button></nav><div id="phone-content" class="phone-content"></div><footer class="phone-footer"><span>●</span> ABJ MOBILE <span>·</span> SIMULATED WORLD</footer>';
     game.append(launcher, panel);
-    launcher.addEventListener("click", togglePhone);
     $("phone-close").addEventListener("click", togglePhone);
     panel.querySelectorAll("[data-phone-tab]").forEach((tab) => tab.addEventListener("click", () => openTab(tab.dataset.phoneTab)));
     document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !panel.hidden) togglePhone(); });
