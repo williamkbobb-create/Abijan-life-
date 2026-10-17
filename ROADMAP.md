@@ -31,7 +31,7 @@ Ces éléments sont planifiés comme prochaines étapes; ils ne sont pas tous im
 ## Safety and release boundaries
 - This is a browser-only prototype. Browser local storage is user-editable and is not a secure source of truth.
 - Do not use it for real accounts, real money, real bookings, multiplayer, or authoritative economy state.
-- Supabase Auth provides email account creation and login in this branch; gameplay saves still use browser local storage and are not synced to an account.
+- The current demo starts directly with character creation; account registration and cloud saves are not part of this preview.
 - No schema migrations, production settings changes, paid resources, or production deployment are part of this release review.
 - Before real accounts/social play: design server-side authorization, persistence, abuse controls, privacy defaults, moderation/reporting, and integration tests.
 - Keep Nigerian games as systems references, not templates for Nigerian identity. Build Côte d’Ivoire-specific environments and cultural detail deliberately.
