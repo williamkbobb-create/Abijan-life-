@@ -27,8 +27,8 @@
       value.actions.every((a) => a && typeof a.title === "string" && a.title.length <= 160 && typeof a.at === "string" && !Number.isNaN(Date.parse(a.at))));
   }
   function save() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-    catch (_) { showToast("Progress could not be saved on this device. You can keep playing for now."); }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); return true; }
+    catch (_) { showToast("Progress could not be saved on this device. You can keep playing for now."); return false; }
   }
   function load() {
     try {
@@ -94,9 +94,9 @@
     }
     $("character-name").setCustomValidity("");
     state = freshState(name, document.querySelector('input[name="style"]:checked').value);
-    save();
+    const saved = save();
     showGame();
-    showToast("Welcome to Grand-Bassam, " + name + "!");
+    if (saved) showToast("Welcome to Grand-Bassam, " + name + "!");
   }
   function calculateActivity(current, key, at = new Date().toISOString()) {
     const activity = ACTIVITIES[key];
@@ -114,9 +114,9 @@
     if (state.energy <= 0) { showToast("You are out of energy. Take a break to recover, then keep exploring."); return; }
     if (state.balance < COSTS[key]) { showToast("Not enough demo FCFA for this activity."); return; }
     state = calculateActivity(state, key);
-    save();
+    const saved = save();
     renderState();
-    showToast(activity.message);
+    if (saved) showToast(activity.message);
   }
   function calculateRest(current, at = new Date().toISOString()) {
     if (!current || current.energy >= 100) return null;
@@ -135,9 +135,9 @@
     const result = calculateRest(state);
     state = result.state;
     const recovered = result.recovered;
-    save();
+    const saved = save();
     renderState();
-    showToast("You took a breather. Energy +" + recovered + ".");
+    if (saved) showToast("You took a breather. Energy +" + recovered + ".");
   }
   function resetGame() {
     if (!window.confirm("Reset this demo character and local progress?")) return;
