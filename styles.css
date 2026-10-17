@@ -124,3 +124,18 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
 @keyframes hint-pulse{0%,100%{opacity:.75}50%{opacity:1}}
 @media(max-width:760px){.pin-restaurant{top:61%;left:68%}.map-hint{top:15%;font-size:8px;letter-spacing:1px}.world-pin{min-width:86px}.world-pin small{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.map-hint{animation:none}}
+
+
+/* Lavage International: a visible queue of cars, only at the car-wash location. */
+.lavage-car-lineup{display:none;position:absolute;z-index:3;left:23%;top:35%;width:44%;height:24%;align-items:flex-end;justify-content:center;gap:clamp(3px,.8vw,11px);transform:rotate(-7deg);pointer-events:none}
+.location-lavage .lavage-car-lineup{display:flex}
+.wash-car{position:relative;flex:1;max-width:94px;min-width:28px;height:31%;min-height:21px;border-radius:9px 11px 5px 5px;border:1px solid #ffffffa8;background:linear-gradient(180deg,#f4f7ed 0 27%,#d3ded7 28% 100%);box-shadow:0 7px 7px #173d3652;transform:rotate(-2deg)}
+.wash-car:before{content:"";position:absolute;left:17%;right:17%;top:-35%;height:48%;border-radius:7px 8px 2px 2px;background:linear-gradient(135deg,#6eaaa9,#b9d8d5 58%,#467f81);border:1px solid #e6f5f1}
+.wash-car:after{content:"";position:absolute;left:11%;right:11%;bottom:-4px;height:7px;border-radius:5px;background:radial-gradient(circle at 13% 50%,#263b3b 0 4px,transparent 4.5px),radial-gradient(circle at 87% 50%,#263b3b 0 4px,transparent 4.5px)}
+.wash-car i{position:absolute;right:2px;top:43%;width:4px;height:5px;background:#f5d39a;border-radius:2px}
+.wash-car b{position:absolute;left:2px;top:43%;width:4px;height:5px;background:#f2a38c;border-radius:2px}
+.wash-car-two{background:linear-gradient(180deg,#f9f2d8 0 27%,#d4a66d 28% 100%);transform:translateY(-9px) rotate(2deg)}
+.wash-car-three{background:linear-gradient(180deg,#eef4f4 0 27%,#668c91 28% 100%);transform:translateY(-2px) rotate(-4deg)}
+.wash-car-four{background:linear-gradient(180deg,#f4f1e7 0 27%,#7c9b70 28% 100%);transform:translateY(-12px) rotate(3deg)}
+.location-lavage .pin-lavage{box-shadow:0 0 0 7px #f8e9bf55,0 8px 20px #173d3650}
+@media(max-width:760px){.lavage-car-lineup{left:17%;top:31%;width:53%;height:21%;gap:3px}.wash-car{min-height:18px}.wash-car:before{top:-29%;height:42%}}
