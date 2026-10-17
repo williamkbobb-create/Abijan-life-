@@ -87,3 +87,18 @@ test("sitting can restore energy and is recorded as a game activity", () => {
   assert.equal(next.energy, 68);
   assert.equal(next.actions[0].title, ACTIVITIES.sit.title);
 });
+
+
+test("phone interface is loaded as a compact side panel with the world still present", () => {
+  const fs = require("node:fs");
+  const html = fs.readFileSync(require("node:path").join(__dirname, "..", "index.html"), "utf8");
+  const css = fs.readFileSync(require("node:path").join(__dirname, "..", "phone.css"), "utf8");
+  const js = fs.readFileSync(require("node:path").join(__dirname, "..", "phone.js"), "utf8");
+  assert.match(html, /href="phone\.css"/);
+  assert.match(html, /src="phone\.js"/);
+  assert.match(html, /class="world-scene"/);
+  for (const tab of ["messages", "calls", "contacts", "activities", "settings"]) assert.ok(js.includes('data-phone-tab="' + tab + '"'));
+  assert.match(css, /\.phone-panel/);
+  assert.match(css, /@media\s*\(max-width:\s*650px\)/);
+  assert.match(js, /No real calls or online messages are sent/);
+});
