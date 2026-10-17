@@ -11,7 +11,7 @@ test("new character starts with the documented demo balance and energy", () => {
   assert.equal(validState(state), true);
 });
 test("activity costs and energy effects are defined for all four locations", () => {
-  assert.deepEqual(Object.keys(ACTIVITIES).sort(), ["bar", "beach", "lavage", "market"]);
+  assert.deepEqual(Object.keys(ACTIVITIES).sort(), ["bar", "beach", "dance", "drink", "food", "lavage", "market", "meet", "swim"]);
   assert.equal(COSTS.bar, 500);
   assert.equal(COSTS.beach, 0);
   for (const activity of Object.values(ACTIVITIES)) assert.ok(activity.energy < 0);
@@ -77,4 +77,20 @@ test("rest recovers up to 25 energy without exceeding 100", () => {
 test("rest is unavailable when energy is already full", () => {
   const initial = { ...freshState("Aya", "Coastal creative"), energy: 100 };
   assert.equal(calculateRest(initial), null);
+});
+
+test("Grand-Bassam social activities have simulated costs and energy effects", () => {
+  assert.equal(COSTS.drink, 500);
+  assert.equal(COSTS.food, 750);
+  for (const key of ["swim", "drink", "dance", "food", "meet"]) assert.ok(ACTIVITIES[key], key + " activity exists");
+  const initial = freshState("Aya", "Coastal creative");
+  const next = calculateActivity(initial, "swim", "2026-10-17T12:00:00.000Z");
+  assert.equal(next.energy, 68);
+  assert.equal(next.balance, 5000);
+  assert.equal(next.actions[0].title, ACTIVITIES.swim.title);
+});
+test("buying a drink and local food deduct only simulated FCFA", () => {
+  const initial = freshState("Aya", "Coastal creative");
+  assert.equal(calculateActivity(initial, "drink").balance, 4500);
+  assert.equal(calculateActivity(initial, "food").balance, 4250);
 });
