@@ -130,3 +130,21 @@ test("French preview UI avoids untranslated map and action labels", () => {
   assert.match(favicon, /<svg[\s>]/);
   assert.match(favicon, /#092e2c/);
 });
+
+
+test("player feedback is compact and the next-update plan is visible", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const css = fs.readFileSync(path.join(__dirname, "..", "feedback.css"), "utf8");
+  const roadmap = fs.readFileSync(path.join(__dirname, "..", "ROADMAP.md"), "utf8");
+  assert.ok(html.includes('id="next-update"'));
+  assert.ok(html.includes("Un avis rapide suffit."));
+  assert.ok(html.includes('maxlength="300"'));
+  assert.ok(!html.includes('id="feedback-name"'));
+  assert.ok(html.includes('id="feedback-category"'));
+  assert.ok(html.includes('id="feedback-message"'));
+  assert.ok(css.includes(".next-update-list"));
+  assert.ok(roadmap.includes("Tutoriel de première visite"));
+  assert.ok(roadmap.includes("URL officielle de NouchiLink doit être confirmée"));
+});
