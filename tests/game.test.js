@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { freshState, validState, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY } = require("../game.js");
+const { freshState, validState, calculateActivity, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY } = require("../game.js");
 test("new character starts with the documented demo balance and energy", () => {
   const state = freshState("Aya Kouassi", "Coastal creative");
   assert.equal(state.name, "Aya Kouassi");
@@ -40,4 +40,28 @@ test("rest and activity history are bounded in the documented demo state", () =>
   assert.equal(state.actions.length, 0);
   assert.equal(state.energy, 80);
   assert.equal(state.balance, 5000);
+});
+
+test("activity transition deducts cost, updates energy, and records history", () => {
+  const initial = freshState("Aya", "Coastal creative");
+  const next = calculateActivity(initial, "bar", "2026-10-17T12:00:00.000Z");
+  assert.equal(next.balance, 4500);
+  assert.equal(next.energy, 77);
+  assert.deepEqual(next.actions, [{ title: ACTIVITIES.bar.title, at: "2026-10-17T12:00:00.000Z" }]);
+  assert.equal(initial.balance, 5000, "transition must not mutate previous state");
+});
+test("activity transition refuses unknown actions, exhausted energy, and insufficient funds", () => {
+  const initial = freshState("Aya", "Coastal creative");
+  assert.equal(calculateActivity(initial, "unknown"), null);
+  assert.equal(calculateActivity({ ...initial, energy: 0 }, "beach"), null);
+  assert.equal(calculateActivity({ ...initial, balance: 100 }, "bar"), null);
+});
+test("activity transition keeps history at the most recent 100 entries", () => {
+  const initial = {
+    ...freshState("Aya", "Coastal creative"),
+    actions: Array.from({ length: 100 }, (_, i) => ({ title: "Old " + i, at: "2026-10-17T12:00:00.000Z" }))
+  };
+  const next = calculateActivity(initial, "beach", "2026-10-17T12:01:00.000Z");
+  assert.equal(next.actions.length, 100);
+  assert.equal(next.actions.at(-1).title, ACTIVITIES.beach.title);
 });
