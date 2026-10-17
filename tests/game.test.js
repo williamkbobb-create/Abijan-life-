@@ -13,6 +13,8 @@ test("new character starts with the documented demo balance and energy", () => {
 test("activity costs and energy effects are defined for all playable actions", () => {
   assert.deepEqual(Object.keys(ACTIVITIES).sort(), ["bar","beach","chat","dance","drink","explore","food","freestyle","friend","game","greet","inspect","invite","lavage","meet","photo","restaurant","sit","swim"].sort());
   assert.equal(COSTS.bar, 500);
+  assert.equal(COSTS.washcar, 0);
+  assert.ok(ACTIVITIES.washcar.energy < 0);
   assert.equal(COSTS.beach, 0);
   for (const activity of Object.values(ACTIVITIES)) assert.ok(Number.isInteger(activity.energy));
 });
@@ -76,6 +78,8 @@ test("each playable location has a local crowd grouped into sections", () => {
     assert.ok(PEOPLE[location].every((person) => person.id && person.name && person.section && person.line));
   }
   assert.ok(PEOPLE.beach.some((person) => person.section !== PEOPLE.beach[0].section));
+  assert.ok(PEOPLE.lavage.some((person) => person.section === "Wash bay"));
+  assert.ok(PEOPLE.lavage.some((person) => person.section === "Parking area"));
 });
 test("sitting can restore energy and is recorded as a game activity", () => {
   const initial = { ...freshState("Aya", "Coastal creative"), energy: 60 };
