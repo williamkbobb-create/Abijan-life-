@@ -21,20 +21,20 @@
     const data = new FormData(form);
     // Honeypot for basic bot filtering. This is not a substitute for server-side rate limiting.
     if (String(data.get("website") || "").trim()) {
-      showStatus("Thanks for sharing your feedback.", "success");
+      showStatus("Merci pour ton avis.", "success");
       form.reset();
       return;
     }
 
     if (!config || !config.url || !config.publishableKey) {
-      showStatus("Feedback is temporarily unavailable. Please try again later.", "error");
+      showStatus("Le formulaire est temporairement indisponible. Réessaie plus tard.", "error");
       return;
     }
 
     let lastSubmit = 0;
     try { lastSubmit = Number(localStorage.getItem(COOLDOWN_KEY) || 0); } catch (_) {}
     if (Date.now() - lastSubmit < COOLDOWN_MS) {
-      showStatus("Please wait 30 seconds before sending another review.", "error");
+      showStatus("Attends 30 secondes avant d’envoyer un autre avis.", "error");
       return;
     }
 
@@ -47,7 +47,7 @@
     };
 
     submit.disabled = true;
-    submit.textContent = "SENDING…";
+    submit.textContent = "ENVOI…";
     try {
       const response = await fetch(config.url + "/rest/v1/player_feedback", {
         method: "POST",
@@ -61,12 +61,12 @@
       if (!response.ok) throw new Error("Feedback request failed (" + response.status + ")");
       try { localStorage.setItem(COOLDOWN_KEY, String(Date.now())); } catch (_) {}
       form.reset();
-      showStatus("Thank you — your review has been received. Your feedback will help improve Abijan Life.", "success");
+      showStatus("Merci ! Ton avis a bien été envoyé. Il nous aidera à améliorer Abijan Life.", "success");
     } catch (_) {
-      showStatus("We couldn’t send that review right now. Please check your connection and try again.", "error");
+      showStatus("Nous n’avons pas pu envoyer ton avis. Vérifie ta connexion et réessaie.", "error");
     } finally {
       submit.disabled = false;
-      submit.textContent = "SEND REVIEW";
+      submit.textContent = "ENVOYER MON AVIS";
     }
   });
 })();
