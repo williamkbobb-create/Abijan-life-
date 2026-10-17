@@ -102,3 +102,18 @@ test("phone interface is loaded as a compact side panel with the world still pre
   assert.match(css, /@media\s*\(max-width:\s*650px\)/);
   assert.match(js, /Aucun appel réel ni message en ligne n’est envoyé/);
 });
+
+
+test("French preview UI avoids untranslated map and action labels", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const game = fs.readFileSync(path.join(__dirname, "..", "game.js"), "utf8");
+  const phone = fs.readFileSync(path.join(__dirname, "..", "phone.js"), "utf8");
+  assert.match(html, /<span>ÉNERGIE<\\/span>/);
+  assert.match(html, /GOLFE DE GUINÉE/);
+  assert.doesNotMatch(html, /GULF OF GUINEA|TOUCHE UN LIEU POUR EXPLORERR|💬 Discuter/);
+  assert.match(game, /talk.textContent = "Discuter"/);
+  assert.match(game, /wave.textContent = "Dire bonjour"/);
+  assert.match(phone, /Les appels sont simulés/);
+});
