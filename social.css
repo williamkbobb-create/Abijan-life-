@@ -1,0 +1,61 @@
+/* Social discovery and dance-floor scenes for the playable demo. */
+.game-overlay[hidden]{display:none!important}
+.game-overlay{position:fixed;z-index:50;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:#061d1be8;backdrop-filter:blur(9px);overflow:auto}
+.overlay-panel{width:min(850px,100%);max-height:calc(100svh - 32px);overflow:auto;padding:22px;background:#f7f3e9;color:#17382f;border:1px solid #d9d2bf;border-radius:14px;box-shadow:0 24px 80px #0007}
+.overlay-header{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.overlay-kicker{font-size:9px;font-weight:800;letter-spacing:1.7px;color:#a46d47;margin:0 0 8px;text-transform:uppercase}
+.overlay-header h2,.person-panel h2{font:500 clamp(27px,4vw,38px) 'Playfair Display',serif;margin:0 0 5px}
+.overlay-subtitle{font-size:12px;color:#67766b;margin:0 0 10px}
+.overlay-close,.club-topline button{width:38px;height:38px;border:1px solid #d5d8cc;border-radius:50%;background:#fff;color:#21483a;font-size:25px;flex:0 0 auto}
+.crowd-note{padding:12px 14px;background:#e7eee4;border-left:3px solid #3b765a;color:#4e6558;font-size:12px;line-height:1.6;border-radius:0 6px 6px 0}
+.people-section-title{margin:19px 0 9px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#718174}
+.people-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.person-card{display:grid;grid-template-columns:48px minmax(0,1fr);gap:9px;padding:12px;background:#fff;border:1px solid #e1e1d7;border-radius:9px;min-width:0}
+.person-avatar{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:linear-gradient(145deg,#f4d4ad,#c8dfc9);font-size:27px}
+.person-info{display:grid;gap:4px;min-width:0}
+.person-info b{font-size:12px;overflow-wrap:anywhere}
+.person-info>span,.person-info small{font-size:10px;color:#748176;line-height:1.4}
+.person-actions{grid-column:1/-1;display:flex;gap:7px}
+.person-actions button,.person-action-grid button,.club-actions button{border:1px solid #d4dfd3;background:#edf3eb;color:#214a3a;border-radius:6px;padding:9px 10px;font-size:11px;font-weight:700}
+.person-actions button:first-child{background:#174c40;color:white;border-color:#174c40}
+.secondary-game-button{width:100%;margin-top:16px;border:1px solid #c9d6ca;background:transparent;color:#2a5947;padding:12px;border-radius:7px;font-size:12px;font-weight:700}
+.person-panel{width:min(430px,100%);text-align:center}
+.text-back{display:block;margin-bottom:20px;border:0;background:transparent;color:#527261;font-size:12px}
+.person-profile-avatar{width:90px;height:90px;margin:0 auto 16px;display:grid;place-items:center;border-radius:28px;background:linear-gradient(145deg,#f5d6b0,#c7dfc9);font-size:50px}
+.person-quote{margin:20px 0;padding:16px;border-radius:8px;background:#e8eee5;color:#52695a;font:italic 16px 'Playfair Display',serif}
+.friendship-meter{font-size:11px;color:#7a684b}
+.person-action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.person-action-grid button{min-height:48px}
+.club-overlay{background:#080716f2}
+.club-room{position:relative;width:min(920px,100%);max-height:calc(100svh - 32px);overflow:auto;padding:18px 20px 14px;border:1px solid #8c5caa;border-radius:15px;color:#fff;background:radial-gradient(ellipse at 50% 12%,#67346f 0,#201735 45%,#0a1020 100%);box-shadow:0 0 55px #9c42e655,inset 0 0 80px #1b1237}
+.club-topline{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:9px;font-weight:800;letter-spacing:2px;color:#f4d8ff}
+.club-topline button{color:#fff;background:#ffffff12;border-color:#ffffff3b}
+.club-lights{position:absolute;inset:54px 0 auto;height:90px;display:flex;justify-content:space-around;pointer-events:none;overflow:hidden}
+.club-lights i{width:12%;height:130px;transform-origin:top;filter:blur(7px);opacity:.75;background:linear-gradient(#ff47db,#ff47db00);animation:club-sweep 3s ease-in-out infinite alternate}
+.club-lights i:nth-child(2){background:linear-gradient(#33dfff,#33dfff00);animation-delay:-1s;transform:rotate(24deg)}
+.club-lights i:nth-child(3){background:linear-gradient(#ffd65a,#ffd65a00);animation-delay:-2s;transform:rotate(-20deg)}
+.club-lights i:nth-child(4){background:linear-gradient(#8c64ff,#8c64ff00);animation-delay:-.5s}
+.club-sign{text-align:center;position:relative;padding:16px 0 12px}
+.club-sign>span{font-size:8px;letter-spacing:3px;color:#f2a9ff}
+.club-sign h2{margin:8px 0 5px;font:700 clamp(25px,5vw,46px) 'DM Sans',sans-serif;letter-spacing:2px;text-shadow:0 0 18px #d34aff}
+.club-sign p{font-size:9px;letter-spacing:2px;color:#75edff;margin:0}
+.club-stage{position:relative;min-height:190px;overflow:hidden;border:1px solid #a45bca80;border-radius:9px 9px 0 0;background:linear-gradient(180deg,#27123e,#150e2d 63%,#30204a);display:flex;align-items:flex-end;justify-content:center}
+.club-dj{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:88px;padding:8px;text-align:center;border:1px solid #bd7be6;background:#301641;border-radius:6px;color:#f2d7ff;font-size:11px}
+.club-dj b{color:#69e9ff}.club-dj small{display:block;font-size:7px;letter-spacing:1px;margin-top:4px}
+.club-crowd{z-index:2;display:flex;justify-content:center;align-items:flex-end;gap:clamp(2px,2vw,16px);width:100%;padding:0 6px 8px}
+.club-crowd span{font-size:clamp(24px,5vw,45px);filter:drop-shadow(0 0 9px #d753f4);animation:dance-bounce .7s ease-in-out infinite alternate}
+.club-crowd span:nth-child(2n){animation-delay:-.3s;transform:translateY(-8px)}
+.club-crowd span:nth-child(3n){animation-delay:-.5s}
+.club-floor-grid{position:absolute;bottom:0;left:0;right:0;height:43px;background:repeating-linear-gradient(90deg,#8e51bd33 0 1px,transparent 1px 40px),repeating-linear-gradient(0deg,#8e51bd33 0 1px,transparent 1px 22px);transform:perspective(90px) rotateX(22deg);transform-origin:bottom}
+.club-lounge{display:flex;justify-content:space-around;gap:8px;padding:9px;background:#100d22;border:1px solid #7c448d;border-top:0;border-radius:0 0 9px 9px}
+.club-chair,.club-table{min-width:78px;padding:8px 10px;text-align:center;border-radius:8px;background:linear-gradient(#48254e,#24152e);color:#f8d9ff;font-size:20px}
+.club-chair small,.club-table small{display:block;font-size:7px;letter-spacing:1px;color:#bba4ce;margin-top:4px}
+.club-actions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:13px}
+.club-actions button{display:flex;flex-direction:column;gap:5px;align-items:center;justify-content:center;min-height:57px;background:#211833;border-color:#79508c;color:#fff;font-size:11px}
+.club-actions button:active{background:#59306d}
+.club-actions small{font-size:8px;color:#d1b7df;font-weight:500}
+.club-footnote{text-align:center;margin:12px 0 0;font-size:9px;color:#a99ab9}
+@keyframes dance-bounce{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-13px) rotate(4deg)}}
+@keyframes club-sweep{from{transform:rotate(-22deg)}to{transform:rotate(22deg)}}
+@media(max-width:600px){.overlay-panel{padding:15px;max-height:calc(100svh - 20px)}.people-grid{grid-template-columns:1fr}.person-card{grid-template-columns:42px minmax(0,1fr);padding:10px}.person-avatar{width:42px;height:42px;font-size:24px}.club-room{padding:12px;max-height:calc(100svh - 20px)}.club-stage{min-height:160px}.club-actions{grid-template-columns:repeat(3,minmax(0,1fr))}.club-actions button{min-height:55px}.club-sign{padding-top:12px}.club-crowd{gap:0}.club-crowd span{font-size:clamp(22px,7vw,37px)}}
+@media(prefers-reduced-motion:reduce){.club-lights i,.club-crowd span{animation:none!important}}
