@@ -187,12 +187,10 @@
   function resetGame() {
     if (!window.confirm("Reset this demo character and local progress?")) return;
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
-    state = null;
-    $("game-screen").hidden = true;
-    $("welcome-screen").hidden = false;
-    $("character-form").reset();
-    $("character-name").value = "";
-    $("character-name").focus();
+    state = freshState("Grey", "Ambitious newcomer");
+    save();
+    showGame();
+    selectLocation("beach");
   }
   function init() {
     $("character-form").addEventListener("submit", startGame);
@@ -202,7 +200,12 @@
     $("reset-button").addEventListener("click", resetGame);
     $("rest-button").addEventListener("click", rest);
     state = load();
-    if (state) showGame();
+    if (!state) {
+      state = freshState("Grey", "Ambitious newcomer");
+      save();
+    }
+    showGame();
+    selectLocation("beach");
   }
   if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, calculateActivity, calculateRest, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY, REST_RECOVERY };
   if (typeof document !== "undefined") {
