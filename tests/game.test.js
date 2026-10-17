@@ -11,7 +11,7 @@ test("new character starts with the documented demo balance and energy", () => {
   assert.equal(validState(state), true);
 });
 test("activity costs and energy effects are defined for all playable actions", () => {
-  assert.deepEqual(Object.keys(ACTIVITIES).sort(), ["bar","beach","chat","dance","drink","explore","food","freestyle","friend","game","greet","inspect","invite","lavage","meet","photo","restaurant","sit","swim"].sort());
+  assert.deepEqual(Object.keys(ACTIVITIES).sort(), ["bar","beach","chat","dance","drink","explore","food","freestyle","friend","game","greet","inspect","invite","lavage","meet","photo","restaurant","sit","swim","washcar"].sort());
   assert.equal(COSTS.bar, 500);
   assert.equal(COSTS.washcar, 0);
   assert.ok(ACTIVITIES.washcar.energy < 0);
