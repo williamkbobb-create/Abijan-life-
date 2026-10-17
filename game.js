@@ -63,7 +63,7 @@
   function validState(value) {
     return Boolean(value && value.version === 1 && typeof value.name === "string" &&
       value.name.trim().length >= 2 && value.name.length <= 24 &&
-      ["Coastal creative", "Ambitious newcomer", "Créatif de la côte", "Ambitieux newcomer", "Nouvel arrivant ambitieux"].includes(value.style) &&
+      ["Coastal creative", "Ambitious newcomer", "Créatif de la côte", "Nouvel arrivant ambitieux", "Nouvel arrivant ambitieux"].includes(value.style) &&
       Number.isInteger(value.balance) && value.balance >= 0 && value.balance <= 1000000 &&
       Number.isInteger(value.energy) && value.energy >= 0 && value.energy <= 100 &&
       Array.isArray(value.actions) && value.actions.length <= 100 &&
@@ -253,8 +253,8 @@
         const role = document.createElement("span"); role.textContent = person.role + " · " + person.mood;
         const score = document.createElement("small"); score.textContent = "Amitié " + (state.relationships[person.id] || 0) + "/5";
         const actions = document.createElement("div"); actions.className = "person-actions";
-        const talk = document.createElement("button"); talk.type = "button"; talk.textContent = "Talk"; talk.addEventListener("click", () => openPerson(person.id));
-        const wave = document.createElement("button"); wave.type = "button"; wave.textContent = "Say hi"; wave.addEventListener("click", () => { selectedPerson = person; doActivity("greet", "Tu as salué " + person.name + ". " + person.line); renderPeople(); });
+        const talk = document.createElement("button"); talk.type = "button"; talk.textContent = "Discuter"; talk.addEventListener("click", () => openPerson(person.id));
+        const wave = document.createElement("button"); wave.type = "button"; wave.textContent = "Dire bonjour"; wave.addEventListener("click", () => { selectedPerson = person; doActivity("greet", "Tu as salué " + person.name + ". " + person.line); renderPeople(); });
         info.append(name, role, score); actions.append(talk, wave); card.append(avatar, info, actions); grid.append(card);
       });
       container.append(grid);
@@ -278,7 +278,7 @@
     const messages = {
       greet: "Tu as dit bonjour à " + personName + ". " + selectedPerson.line,
       chat: "Toi et " + personName + " avez eu une bonne conversation.",
-      friend: personName + " is now closer to you. Amitié increased!",
+      friend: personName + " est devenu(e) plus proche de toi. Votre amitié a progressé !",
       invite: "Tu as invité " + personName + " à sortir. Cette personne a dit qu’elle te reverrait bientôt !"
     };
     doActivity(key, messages[key]);
@@ -306,7 +306,7 @@
     };
   }
   function rest() {
-    if (!state || state.energy >= 100) { showToast("Your points d’énergie is already full."); return; }
+    if (!state || state.energy >= 100) { showToast("Ton énergie est déjà au maximum."); return; }
     const result = calculateRest(state);
     state = result.state;
     const saved = save();
@@ -316,7 +316,7 @@
   function resetGame() {
     if (!window.confirm("Réinitialiser ce personnage et la progression locale de la démo ?")) return;
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
-    state = freshState("Grey", "Ambitieux newcomer");
+    state = freshState("Grey", "Nouvel arrivant ambitieux");
     save();
     closeOverlays();
     showGame();
@@ -344,7 +344,7 @@
     }));
     $("person-back").addEventListener("click", openMeet);
     state = load();
-    if (!state) { state = freshState("Grey", "Ambitieux newcomer"); save(); }
+    if (!state) { state = freshState("Grey", "Nouvel arrivant ambitieux"); save(); }
     showGame();
     selectLocation("beach");
   }
