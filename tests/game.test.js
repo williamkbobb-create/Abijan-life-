@@ -119,3 +119,14 @@ test("French preview UI avoids untranslated map and action labels", () => {
   assert.match(game, /wave.textContent = "Dire bonjour"/);
   assert.match(phone, /Les appels sont simulés/);
 });
+
+
+ test("branded favicon is linked and exists as an SVG asset", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const favicon = fs.readFileSync(path.join(__dirname, "..", "favicon.svg"), "utf8");
+  assert.ok(html.includes('rel="icon" type="image/svg+xml" href="favicon.svg"'));
+  assert.match(favicon, /<svg[\s>]/);
+  assert.match(favicon, /#092e2c/);
+});
