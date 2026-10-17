@@ -140,6 +140,10 @@
     if (mapButton) mapButton.setAttribute("aria-pressed", "false");
     const location = LOCATION_DETAILS[key];
     if (!location) return;
+    if (scene) {
+      scene.classList.remove("location-beach", "location-bar", "location-market", "location-lavage");
+      scene.classList.add("location-" + key);
+    }
     document.querySelectorAll("[data-location]").forEach((pin) => {
       const selected = pin.dataset.location === key;
       pin.classList.toggle("selected", selected);
