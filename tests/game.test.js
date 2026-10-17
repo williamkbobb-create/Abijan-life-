@@ -22,6 +22,8 @@ test("persisted state validator rejects invalid or unsafe state shapes", () => {
   assert.equal(validState({ version: 1, name: "Aya", style: "Coastal creative", balance: -1, energy: 80, actions: [] }), false);
   assert.equal(validState({ version: 1, name: "Aya", style: "Coastal creative", balance: 5000, energy: 101, actions: [] }), false);
   assert.equal(validState({ version: 1, name: "Aya", style: "Coastal creative", balance: 5000, energy: 80, actions: Array(101).fill({}) }), false);
+  assert.equal(validState({ ...freshState("Aya", "Coastal creative"), actions: [{ title: "x".repeat(161), at: new Date().toISOString() }] }), false);
+  assert.equal(validState({ ...freshState("Aya", "Coastal creative"), actions: [{ title: "Bad timestamp", at: "not-a-date" }] }), false);
 });
 test("valid state accepts the known character styles and bounded counters", () => {
   assert.equal(validState(freshState("Koffi", "Ambitious newcomer")), true);
