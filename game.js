@@ -4,11 +4,11 @@
   const STARTING_BALANCE = 5000;
   const STARTING_ENERGY = 80;
   const REST_RECOVERY = 25;
-  const COSTS = Object.freeze({ beach: 0, swim: 0, bar: 500, drink: 500, dance: 0, food: 750, meet: 0, market: 0, lavage: 0 });
+  const COSTS = Object.freeze({ beach: 0, swim: 0, bar: 0, drink: 500, dance: 0, food: 750, meet: 0, restaurant: 0, lavage: 0 });
   const ACTIVITIES = Object.freeze({
     beach: { title: "Walked along Grand-Bassam Beach", energy: -5, message: "The sea breeze helped you unwind. Energy -5." },
     bar: { title: "Visited Les Palmiers Beach Bar", energy: -3, message: "A refreshing break by the coast. 500 FCFA spent." },
-    market: { title: "Browsed Artisan Corner", energy: -4, message: "You discovered local crafts and found inspiration. Energy -4." },
+    restaurant: { title: "Visited the Grand-Bassam restaurant", energy: -2, message: "You stopped in for a local meal and a little time out. Energy -2." },
     lavage: { title: "Stopped by Lavage International", energy: -2, message: "You checked out the car wash. No real booking was made. Energy -2." },
     swim: { title: "Went for a swim at Grand-Bassam Beach", energy: -12, message: "You swam in the ocean and cooled off. Energy -12." },
     drink: { title: "Bought someone a drink at the beach", energy: -2, message: "You shared a drink and started a conversation. 500 simulated FCFA spent." },
@@ -125,13 +125,13 @@
   const LOCATION_DETAILS = {
     beach: { title: "Grand-Bassam Beach", description: "Make a splash. The coast is yours.", cover: "beach-cover", icon: "🏝️", kicker: "GRAND-BASSAM · COAST", actions: ["swim", "beach", "drink", "dance", "food", "meet"] },
     bar: { title: "Les Palmiers Beach Bar", description: "Cold drinks, coastal music, and new faces.", cover: "bar-cover", icon: "🍹", kicker: "GRAND-BASSAM · NIGHTLIFE", actions: ["drink", "dance", "food", "meet"] },
-    market: { title: "Artisan Corner", description: "Explore local finds and meet the makers.", cover: "market-cover", icon: "🛍️", kicker: "GRAND-BASSAM · MARKET", actions: ["market", "meet", "food"] },
+    restaurant: { title: "Chez Bassam Restaurant", description: "Settle in for local coastal food and meet people around town.", cover: "restaurant-cover", icon: "🍽️", kicker: "GRAND-BASSAM · DINING", actions: ["food", "drink", "meet"] },
     lavage: { title: "Lavage International", description: "Pull up and see what's happening around town.", cover: "lavage-cover", icon: "🚘", kicker: "GRAND-BASSAM · TOWN", actions: ["lavage", "meet"] }
   };
   const ACTION_LABELS = {
     swim: ["🏊", "Swim", "−12 energy"], beach: ["🚶", "Explore", "−5 energy"], drink: ["🍹", "Buy a drink", "500 FCFA"],
     dance: ["💃", "Dance", "−10 energy"], food: ["🍲", "Eat", "750 FCFA"], meet: ["👋", "Meet people", "Social"],
-    market: ["🛍️", "Browse", "−4 energy"], lavage: ["🚘", "Visit", "−2 energy"]
+    restaurant: ["🍽️", "Visit", "−2 energy"], lavage: ["🚘", "Visit", "−2 energy"]
   };
   function selectLocation(key) {
     const scene = document.querySelector(".world-scene");
@@ -141,7 +141,7 @@
     const location = LOCATION_DETAILS[key];
     if (!location) return;
     if (scene) {
-      scene.classList.remove("location-beach", "location-bar", "location-market", "location-lavage");
+      scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage");
       scene.classList.add("location-" + key);
     }
     document.querySelectorAll("[data-location]").forEach((pin) => {
