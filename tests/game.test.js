@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { freshState, validState, calculateActivity, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY } = require("../game.js");
+const { freshState, validState, calculateActivity, calculateRest, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY } = require("../game.js");
 test("new character starts with the documented demo balance and energy", () => {
   const state = freshState("Aya Kouassi", "Coastal creative");
   assert.equal(state.name, "Aya Kouassi");
@@ -64,4 +64,17 @@ test("activity transition keeps history at the most recent 100 entries", () => {
   const next = calculateActivity(initial, "beach", "2026-10-17T12:01:00.000Z");
   assert.equal(next.actions.length, 100);
   assert.equal(next.actions.at(-1).title, ACTIVITIES.beach.title);
+});
+
+test("rest recovers up to 25 energy without exceeding 100", () => {
+  const initial = { ...freshState("Aya", "Coastal creative"), energy: 90 };
+  const result = calculateRest(initial, "2026-10-17T12:00:00.000Z");
+  assert.equal(result.recovered, 10);
+  assert.equal(result.state.energy, 100);
+  assert.equal(result.state.actions.length, 1);
+  assert.equal(initial.energy, 90, "rest transition must not mutate previous state");
+});
+test("rest is unavailable when energy is already full", () => {
+  const initial = { ...freshState("Aya", "Coastal creative"), energy: 100 };
+  assert.equal(calculateRest(initial), null);
 });
