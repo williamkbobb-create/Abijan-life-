@@ -78,8 +78,8 @@ test("each playable location has a local crowd grouped into sections", () => {
     assert.ok(PEOPLE[location].every((person) => person.id && person.name && person.section && person.line));
   }
   assert.ok(PEOPLE.beach.some((person) => person.section !== PEOPLE.beach[0].section));
-  assert.ok(PEOPLE.lavage.some((person) => person.section === "Wash bay"));
-  assert.ok(PEOPLE.lavage.some((person) => person.section === "Parking area"));
+  assert.ok(PEOPLE.lavage.some((person) => person.section === "Zone de lavage"));
+  assert.ok(PEOPLE.lavage.some((person) => person.section === "Parking"));
 });
 test("sitting can restore energy and is recorded as a game activity", () => {
   const initial = { ...freshState("Aya", "Coastal creative"), energy: 60 };
@@ -100,5 +100,72 @@ test("phone interface is loaded as a compact side panel with the world still pre
   for (const tab of ["messages", "calls", "contacts", "activities", "settings"]) assert.ok(js.includes('data-phone-tab="' + tab + '"'));
   assert.match(css, /\.phone-panel/);
   assert.match(css, /@media\s*\(max-width:\s*650px\)/);
-  assert.match(js, /No real calls or online messages are sent/);
+  assert.match(js, /Aucun appel réel ni message en ligne n’est envoyé/);
+});
+
+
+test("French preview UI avoids untranslated map and action labels", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const game = fs.readFileSync(path.join(__dirname, "..", "game.js"), "utf8");
+  const phone = fs.readFileSync(path.join(__dirname, "..", "phone.js"), "utf8");
+  assert.ok(html.includes("<span>ÉNERGIE</span>"));
+  assert.ok(html.includes("GOLFE DE GUINÉE"));
+  assert.ok(!html.includes("GULF OF GUINEA"));
+  assert.ok(!html.includes("TOUCHE UN LIEU POUR EXPLORERR"));
+  assert.ok(!html.includes("💬 Discuter"));
+  assert.match(game, /talk.textContent = "Discuter"/);
+  assert.match(game, /wave.textContent = "Dire bonjour"/);
+  assert.match(phone, /Les appels sont simulés/);
+});
+
+
+ test("branded favicon is linked and exists as an SVG asset", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const favicon = fs.readFileSync(path.join(__dirname, "..", "favicon.svg"), "utf8");
+  assert.ok(html.includes('rel="icon" type="image/svg+xml" href="favicon.svg"'));
+  assert.match(favicon, /<svg[\s>]/);
+  assert.match(favicon, /#092e2c/);
+});
+
+
+test("player feedback is compact and the next-update plan is visible", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const css = fs.readFileSync(path.join(__dirname, "..", "feedback.css"), "utf8");
+  const roadmap = fs.readFileSync(path.join(__dirname, "..", "ROADMAP.md"), "utf8");
+  assert.ok(html.includes('id="next-update"'));
+  assert.ok(html.includes("Un avis rapide suffit."));
+  assert.ok(html.includes('maxlength="300"'));
+  assert.ok(!html.includes('id="feedback-name"'));
+  assert.ok(html.includes('id="feedback-category"'));
+  assert.ok(html.includes('id="feedback-message"'));
+  assert.ok(css.includes(".next-update-list"));
+  assert.ok(roadmap.includes("Tutoriel de première visite"));
+  assert.ok(roadmap.includes("URL officielle de NouchiLink doit être confirmée"));
+});
+
+
+test("account access and first-play tutorial are wired into the preview", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const root = path.join(__dirname, "..");
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const auth = fs.readFileSync(path.join(root, "auth.js"), "utf8");
+  const css = fs.readFileSync(path.join(root, "auth.css"), "utf8");
+  assert.match(html, /cdn\.jsdelivr\.net\/npm\/@supabase\/supabase-js@2/);
+  assert.match(html, /src="auth\.js"/);
+  assert.match(html, /href="auth\.css"/);
+  assert.match(auth, /client\.auth\.signUp/);
+  assert.match(auth, /client\.auth\.signInWithPassword/);
+  assert.match(auth, /client\.auth\.signOut/);
+  assert.match(auth, /first-play-tutorial/);
+  assert.match(auth, /TUTORIAL_PREFIX/);
+  assert.match(auth, /progression est enregistrée sur cet appareil, pas encore dans le cloud/);
+  assert.match(css, /\.tutorial-backdrop/);
+  assert.match(css, /\.auth-panel/);
 });
