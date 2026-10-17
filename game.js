@@ -4,7 +4,7 @@
   const STARTING_BALANCE = 5000;
   const STARTING_ENERGY = 80;
   const REST_RECOVERY = 25;
-  const COSTS = Object.freeze({ beach: 0, swim: 0, bar: 0, drink: 500, dance: 0, food: 750, meet: 0, restaurant: 0, lavage: 0 });
+  const COSTS = Object.freeze({ beach: 0, swim: 0, bar: 500, drink: 500, dance: 0, food: 750, meet: 0, restaurant: 0, lavage: 0 });
   const ACTIVITIES = Object.freeze({
     beach: { title: "Walked along Grand-Bassam Beach", energy: -5, message: "The sea breeze helped you unwind. Energy -5." },
     bar: { title: "Visited Les Palmiers Beach Bar", energy: -3, message: "A refreshing break by the coast. 500 FCFA spent." },
