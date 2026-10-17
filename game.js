@@ -3,6 +3,7 @@
   const STORAGE_KEY = "abijan-life-demo-v1";
   const STARTING_BALANCE = 5000;
   const STARTING_ENERGY = 80;
+  const REST_RECOVERY = 25;
   const COSTS = Object.freeze({ beach: 0, bar: 500, market: 0, lavage: 0 });
   const ACTIVITIES = Object.freeze({
     beach: { title: "Walked along Grand-Bassam Beach", energy: -5, message: "The sea breeze helped you unwind. Energy -5." },
@@ -23,7 +24,7 @@
       Number.isInteger(value.balance) && value.balance >= 0 && value.balance <= 1000000 &&
       Number.isInteger(value.energy) && value.energy >= 0 && value.energy <= 100 &&
       Array.isArray(value.actions) && value.actions.length <= 100 &&
-      value.actions.every((a) => a && typeof a.title === "string" && typeof a.at === "string"));
+      value.actions.every((a) => a && typeof a.title === "string" && a.title.length <= 160 && typeof a.at === "string" && !Number.isNaN(Date.parse(a.at))));
   }
   function save() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -64,6 +65,10 @@
       button.setAttribute("aria-disabled", String(button.disabled));
       button.style.opacity = button.disabled ? ".55" : "1";
     });
+    const restButton = $("rest-button");
+    restButton.disabled = state.energy >= 100;
+    restButton.setAttribute("aria-disabled", String(restButton.disabled));
+    restButton.style.opacity = restButton.disabled ? ".55" : "1";
     const list = $("activity-list");
     list.replaceChildren();
     state.actions.slice().reverse().forEach((action) => {
@@ -106,6 +111,16 @@
     renderState();
     showToast(activity.message);
   }
+  function rest() {
+    if (!state || state.energy >= 100) { showToast("Your energy is already full."); return; }
+    const recovered = Math.min(REST_RECOVERY, 100 - state.energy);
+    state.energy += recovered;
+    state.actions.push({ title: "Took a quiet break and recovered " + recovered + " energy", at: new Date().toISOString() });
+    state.actions = state.actions.slice(-100);
+    save();
+    renderState();
+    showToast("You took a breather. Energy +" + recovered + ".");
+  }
   function resetGame() {
     if (!window.confirm("Reset this demo character and local progress?")) return;
     try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
@@ -121,6 +136,7 @@
     $("character-name").addEventListener("input", () => $("character-name").setCustomValidity(""));
     document.querySelectorAll("[data-action]").forEach((button) => button.addEventListener("click", () => doActivity(button.dataset.action)));
     $("reset-button").addEventListener("click", resetGame);
+    $("rest-button").addEventListener("click", rest);
     state = load();
     if (state) showGame();
   }
