@@ -124,25 +124,43 @@
     if (saved) showToast(activity.message);
   }
   const LOCATION_DETAILS = {
-    beach: { title: "Grand-Bassam Beach", description: "The waves are calling. Swim, relax on the sand, or explore the shoreline.", cover: "beach-cover", badge: "● LOCATION OPEN", actions: ["swim", "beach", "drink", "dance", "food", "meet"] },
-    bar: { title: "Les Palmiers Beach Bar", description: "A lively coastal hangout. Order a drink, dance to the music, or meet someone new.", cover: "bar-cover", badge: "● BAR OPEN", actions: ["drink", "dance", "food", "meet"] },
-    market: { title: "Artisan Corner", description: "Explore a local market, browse handmade crafts, and meet the people behind them.", cover: "market-cover", badge: "● MARKET OPEN", actions: ["market", "meet", "food"] },
-    lavage: { title: "Lavage International", description: "Stop by the local car wash and see what is happening around the neighbourhood.", cover: "lavage-cover", badge: "● SERVICE OPEN", actions: ["lavage", "meet"] }
+    beach: { title: "Grand-Bassam Beach", description: "Make a splash. The coast is yours.", cover: "beach-cover", icon: "🏝️", kicker: "GRAND-BASSAM · COAST", actions: ["swim", "beach", "drink", "dance", "food", "meet"] },
+    bar: { title: "Les Palmiers Beach Bar", description: "Cold drinks, coastal music, and new faces.", cover: "bar-cover", icon: "🍹", kicker: "GRAND-BASSAM · NIGHTLIFE", actions: ["drink", "dance", "food", "meet"] },
+    market: { title: "Artisan Corner", description: "Explore local finds and meet the makers.", cover: "market-cover", icon: "🛍️", kicker: "GRAND-BASSAM · MARKET", actions: ["market", "meet", "food"] },
+    lavage: { title: "Lavage International", description: "Pull up and see what's happening around town.", cover: "lavage-cover", icon: "🚘", kicker: "GRAND-BASSAM · TOWN", actions: ["lavage", "meet"] }
   };
   const ACTION_LABELS = {
-    swim: ["🏊", "Go for a swim", "Energy −12"], beach: ["🚶", "Walk the beach", "Energy −5"], drink: ["🍹", "Buy someone a drink", "500 FCFA"], dance: ["💃", "Dance", "Energy −10"], food: ["🍲", "Try local food", "750 FCFA"], meet: ["👋", "Meet someone", "Social activity"], market: ["🛍️", "Browse the stalls", "Energy −4"], lavage: ["🚗", "Visit the car wash", "Energy −2"]
+    swim: ["🏊", "Swim", "−12 energy"], beach: ["🚶", "Explore", "−5 energy"], drink: ["🍹", "Buy a drink", "500 FCFA"],
+    dance: ["💃", "Dance", "−10 energy"], food: ["🍲", "Eat", "750 FCFA"], meet: ["👋", "Meet people", "Social"],
+    market: ["🛍️", "Browse", "−4 energy"], lavage: ["🚘", "Visit", "−2 energy"]
   };
   function selectLocation(key) {
     const location = LOCATION_DETAILS[key];
     if (!location) return;
-    document.querySelectorAll("[data-location]").forEach((pin) => { const selected = pin.dataset.location === key; pin.classList.toggle("selected", selected); pin.setAttribute("aria-pressed", String(selected)); });
+    document.querySelectorAll("[data-location]").forEach((pin) => {
+      const selected = pin.dataset.location === key;
+      pin.classList.toggle("selected", selected);
+      pin.setAttribute("aria-pressed", String(selected));
+    });
     $("detail-title").textContent = location.title;
     $("detail-description").textContent = location.description;
-    const cover = document.querySelector(".detail-cover"); cover.className = "detail-cover " + location.cover; cover.querySelector(".detail-badge").textContent = location.badge;
-    const titles = { beach: ["GRAND-BASSAM", "BEACH CLUB"], bar: ["COASTAL", "BEACH BAR"], market: ["LOCAL", "ARTISAN MARKET"], lavage: ["LOCAL", "CAR WASH"] };
-    const coverTitle = cover.querySelector(".cover-title"); coverTitle.replaceChildren(document.createTextNode(titles[key][0])); const strong = document.createElement("b"); strong.textContent = titles[key][1]; coverTitle.append(document.createElement("br"), strong);
-    const actions = $("location-actions"); actions.replaceChildren();
-    location.actions.forEach((actionKey) => { const label = ACTION_LABELS[actionKey]; const button = document.createElement("button"); button.type = "button"; button.className = "world-action"; button.dataset.action = actionKey; const emoji = document.createElement("span"); emoji.textContent = label[0]; const title = document.createElement("b"); title.textContent = label[1]; const cost = document.createElement("small"); cost.textContent = label[2]; button.append(emoji, title, cost); button.addEventListener("click", () => doActivity(actionKey)); actions.append(button); });
+    $("location-kicker").textContent = location.kicker;
+    $("dock-icon").textContent = location.icon;
+    const art = document.querySelector(".dock-art");
+    art.className = "dock-art " + location.cover;
+    const actions = $("location-actions");
+    actions.replaceChildren();
+    location.actions.forEach((actionKey) => {
+      const label = ACTION_LABELS[actionKey];
+      const button = document.createElement("button");
+      button.type = "button"; button.className = "game-action"; button.dataset.action = actionKey;
+      button.setAttribute("aria-label", label[1] + ", " + label[2]);
+      const emoji = document.createElement("span"); emoji.textContent = label[0];
+      const title = document.createElement("b"); title.textContent = label[1];
+      button.append(emoji, title);
+      button.addEventListener("click", () => doActivity(actionKey));
+      actions.append(button);
+    });
     renderState();
   }
   function calculateRest(current, at = new Date().toISOString()) {
