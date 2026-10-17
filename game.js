@@ -147,7 +147,7 @@
     state = load();
     if (state) showGame();
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY };
+  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, calculateActivity, COSTS, ACTIVITIES, STARTING_BALANCE, STARTING_ENERGY };
   if (typeof document !== "undefined") {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
     else init();
