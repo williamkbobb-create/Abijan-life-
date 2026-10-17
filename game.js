@@ -165,19 +165,19 @@
     }
     const saved = save();
     renderState();
-    if (saved) showToast(customMessage || activity.message + (state.energy > previousEnergy ? " Energy +" + (state.energy - previousEnergy) + "." : ""));
+    if (saved) showToast(customMessage || activity.message + (state.energy > previousEnergy ? " Énergie +" + (state.energy - previousEnergy) + "." : ""));
   }
   const LOCATION_DETAILS = {
-    beach: { title: "Grand-Bassam Beach", description: "Swim, relax, play games and meet people all around the beach.", cover: "beach-cover", icon: "🏝️", kicker: "GRAND-BASSAM · COAST", actions: ["swim", "explore", "photo", "game", "dance", "meet"] },
-    bar: { title: "Les Palmiers Beach Bar", description: "Dance, sit in the lounge, meet the crowd and enjoy the music.", cover: "bar-cover", icon: "🍹", kicker: "GRAND-BASSAM · NIGHTLIFE", actions: ["drink", "dance", "freestyle", "sit", "food", "meet"] },
-    restaurant: { title: "Chez Bassam Restaurant", description: "Eat local food, sit at a table, take a photo and meet people.", cover: "restaurant-cover", icon: "🍽️", kicker: "GRAND-BASSAM · DINING", actions: ["food", "drink", "sit", "photo", "chat", "meet"] },
-    lavage: { title: "Lavage International", description: "Explore the wash bay, inspect cars and meet people in the waiting area.", cover: "lavage-cover", icon: "🚘", kicker: "GRAND-BASSAM · TOWN", actions: ["inspect", "washcar", "explore", "photo", "sit", "chat", "meet"] }
+    beach: { title: "Plage de Grand-Bassam", description: "Baignade, détente et loisirs au bord de l’océan.", cover: "beach-cover", icon: "🏝️", kicker: "GRAND-BASSAM · CÔTE", actions: ["swim", "explore", "photo", "game", "dance", "meet"] },
+    bar: { title: "Bar de plage Les Palmiers", description: "Profite de la musique, danse ou détends-toi dans l’espace lounge.", cover: "bar-cover", icon: "🍹", kicker: "GRAND-BASSAM · VIE NOCTURNE", actions: ["drink", "dance", "freestyle", "sit", "food", "meet"] },
+    restaurant: { title: "Restaurant Chez Bassam", description: "Savoure un plat local, prends une photo et profite d’un moment de détente.", cover: "restaurant-cover", icon: "🍽️", kicker: "GRAND-BASSAM · RESTAURATION", actions: ["food", "drink", "sit", "photo", "chat", "meet"] },
+    lavage: { title: "Lavage International", description: "Découvre la zone de lavage et observe les voitures dans la file d’attente.", cover: "lavage-cover", icon: "🚘", kicker: "GRAND-BASSAM · VILLE", actions: ["inspect", "washcar", "explore", "photo", "sit", "chat", "meet"] }
   };
   const ACTION_LABELS = {
-    swim: ["🏊", "Swim", "−12 points d’énergie"], explore: ["🚶", "Explore", "−5 points d’énergie"], drink: ["🍹", "Buy a drink", "500 FCFA"],
-    dance: ["💃", "Dance", "−10 points d’énergie"], freestyle: ["🪩", "Freestyle", "−12 points d’énergie"], food: ["🍲", "Eat local food", "750 FCFA"],
-    meet: ["👋", "Meet people", "Social"], photo: ["📸", "Take photo", "−1 points d’énergie"], sit: ["🪑", "Sit & rest", "+8 points d’énergie"],
-    game: ["⚽", "Play a game", "−4 points d’énergie"], inspect: ["🚘", "Inspect car queue", "−2 points d’énergie"], washcar: ["🧽", "Help wash a car", "−6 points d’énergie"], chat: ["💬", "Chat", "−2 points d’énergie"]
+    swim: ["🏊", "Se baigner", "−12 points d’énergie"], explore: ["🚶", "Explorer", "−5 points d’énergie"], drink: ["🍹", "Acheter une boisson", "500 FCFA"],
+    dance: ["💃", "Danser", "−10 points d’énergie"], freestyle: ["🪩", "Freestyle", "−12 points d’énergie"], food: ["🍲", "Manger un plat local", "750 FCFA"],
+    meet: ["👋", "Rencontrer des gens", "Social"], photo: ["📸", "Prendre une photo", "−1 point d’énergie"], sit: ["🪑", "S’asseoir", "+8 points d’énergie"],
+    game: ["⚽", "Jouer", "−4 points d’énergie"], inspect: ["🚘", "Observer la file", "−2 points d’énergie"], washcar: ["🧽", "Aider au lavage", "−6 points d’énergie"], chat: ["", "Discuter", "−2 points d’énergie"]
   };
   function selectLocation(key) {
     const scene = document.querySelector(".world-scene");
@@ -236,7 +236,7 @@
     container.replaceChildren();
     const people = PEOPLE[currentLocation] || [];
     const sections = [...new Set(people.map((person) => person.section))];
-    $("people-count").textContent = people.length + " people around this location";
+    $("people-count").textContent = people.length + " personnes présentes ici";
     sections.forEach((section) => {
       const heading = document.createElement("h3");
       heading.className = "people-section-title";
@@ -289,7 +289,7 @@
     $("meet-screen").hidden = true;
     $("person-screen").hidden = true;
     $("club-screen").classList.toggle("club-freestyle", Boolean(freestyle));
-    $("club-location-name").textContent = currentLocation === "bar" ? "LES PALMIERS · CLUB FLOOR" : "COASTAL DANCE FLOOR";
+    $("club-location-name").textContent = currentLocation === "bar" ? "LES PALMIERS · PISTE DE DANSE" : "PISTE DE DANSE DE BASSAM";
     $("club-status").textContent = freestyle ? "SESSION FREESTYLE" : "LA MUSIQUE EST LANCÉE";
   }
   function closeOverlays() {
