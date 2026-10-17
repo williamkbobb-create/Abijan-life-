@@ -6,32 +6,32 @@
   const REST_RECOVERY = 25;
   const COSTS = Object.freeze({ beach: 0, swim: 0, bar: 500, drink: 500, dance: 0, freestyle: 0, food: 750, meet: 0, restaurant: 0, lavage: 0, explore: 0, photo: 0, sit: 0, game: 0, inspect: 0, washcar: 0, chat: 0, greet: 0, friend: 0, invite: 0 });
   const ACTIVITIES = Object.freeze({
-    beach: { title: "Exploration de la plage de Grand-Bassam", points d’énergie: -5, message: "Tu as marché le long de la côte. Énergie −5." },
-    bar: { title: "Visite du bar de plage Les Palmiers", points d’énergie: -3, message: "Une pause rafraîchissante au bord de la mer. 500 FCFA fictifs dépensés." },
-    restaurant: { title: "Visite du restaurant Chez Bassam", points d’énergie: -2, message: "Tu as pris un petit moment pour toi. Énergie −2." },
-    lavage: { title: "Passage chez Lavage International", points d’énergie: -2, message: "Tu as découvert le lavage auto. Aucune réservation réelle. Énergie −2." },
-    swim: { title: "Baignade à la plage de Grand-Bassam", points d’énergie: -12, message: "Tu as nagé dans l’océan pour te rafraîchir. Énergie −12." },
-    drink: { title: "Achat d’une boisson", points d’énergie: -2, message: "Tu as pris une boisson. 500 FCFA fictifs dépensés." },
-    dance: { title: "Danse sur la piste", points d’énergie: -10, message: "Tu as rejoint la piste de danse. Énergie −10." },
-    freestyle: { title: "Freestyle sur la piste", points d’énergie: -12, message: "Tu as montré tes meilleurs pas. Énergie −12." },
-    food: { title: "Dégustation d’un plat local", points d’énergie: -3, message: "Un délicieux plat local. 750 FCFA fictifs dépensés." },
-    meet: { title: "Nouvelle rencontre", points d’énergie: -3, message: "Tu as fait connaissance avec quelqu’un. Ton histoire sociale commence." },
-    explore: { title: "Exploration des environs", points d’énergie: -5, message: "Tu as découvert un peu plus de Grand-Bassam. Énergie −5." },
-    photo: { title: "Photo prise", points d’énergie: -1, message: "Un nouveau souvenir a été ajouté à ton historique de démo." },
-    sit: { title: "Pause et repos", points d’énergie: 8, message: "Tu t’es assis pour reprendre ton souffle et récupérer 8 points d’énergie." },
-    game: { title: "Partie de jeu entre amis", points d’énergie: -4, message: "Un jeu convivial a rapproché tout le monde. Énergie −4." },
-    inspect: { title: "Découverte de Lavage International", points d’énergie: -2, message: "Tu as regardé la file d’attente et les espaces de lavage. Aucun service réservé." },
-    washcar: { title: "Aide au lavage d’une voiture", points d’énergie: -6, message: "Tu as aidé à nettoyer une voiture pendant que la file avançait. Aucun service réel réservé ou payé." },
-    chat: { title: "Conversation", points d’énergie: -2, message: "Vous avez discuté et appris à mieux vous connaître." },
-    greet: { title: "Salutation", points d’énergie: -1, message: "Un bonjour amical a permis de créer un premier lien." },
-    friend: { title: "Nouvelle amitié", points d’énergie: -2, message: "Votre niveau d’amitié a augmenté dans cette démo." },
-    invite: { title: "Invitation à sortir", points d’énergie: -2, message: "Tu lui as proposé de passer plus de temps ensemble." }
+    beach: { title: "Exploration de la plage de Grand-Bassam", energy: -5, message: "Tu as marché le long de la côte. Énergie −5." },
+    bar: { title: "Visite du bar de plage Les Palmiers", energy: -3, message: "Une pause rafraîchissante au bord de la mer. 500 FCFA fictifs dépensés." },
+    restaurant: { title: "Visite du restaurant Chez Bassam", energy: -2, message: "Tu as pris un petit moment pour toi. Énergie −2." },
+    lavage: { title: "Passage chez Lavage International", energy: -2, message: "Tu as découvert le lavage auto. Aucune réservation réelle. Énergie −2." },
+    swim: { title: "Baignade à la plage de Grand-Bassam", energy: -12, message: "Tu as nagé dans l’océan pour te rafraîchir. Énergie −12." },
+    drink: { title: "Achat d’une boisson", energy: -2, message: "Tu as pris une boisson. 500 FCFA fictifs dépensés." },
+    dance: { title: "Danse sur la piste", energy: -10, message: "Tu as rejoint la piste de danse. Énergie −10." },
+    freestyle: { title: "Freestyle sur la piste", energy: -12, message: "Tu as montré tes meilleurs pas. Énergie −12." },
+    food: { title: "Dégustation d’un plat local", energy: -3, message: "Un délicieux plat local. 750 FCFA fictifs dépensés." },
+    meet: { title: "Nouvelle rencontre", energy: -3, message: "Tu as fait connaissance avec quelqu’un. Ton histoire sociale commence." },
+    explore: { title: "Exploration des environs", energy: -5, message: "Tu as découvert un peu plus de Grand-Bassam. Énergie −5." },
+    photo: { title: "Photo prise", energy: -1, message: "Un nouveau souvenir a été ajouté à ton historique de démo." },
+    sit: { title: "Pause et repos", energy: 8, message: "Tu t’es assis pour reprendre ton souffle et récupérer 8 points d’énergie." },
+    game: { title: "Partie de jeu entre amis", energy: -4, message: "Un jeu convivial a rapproché tout le monde. Énergie −4." },
+    inspect: { title: "Découverte de Lavage International", energy: -2, message: "Tu as regardé la file d’attente et les espaces de lavage. Aucun service réservé." },
+    washcar: { title: "Aide au lavage d’une voiture", energy: -6, message: "Tu as aidé à nettoyer une voiture pendant que la file avançait. Aucun service réel réservé ou payé." },
+    chat: { title: "Conversation", energy: -2, message: "Vous avez discuté et appris à mieux vous connaître." },
+    greet: { title: "Salutation", energy: -1, message: "Un bonjour amical a permis de créer un premier lien." },
+    friend: { title: "Nouvelle amitié", energy: -2, message: "Votre niveau d’amitié a augmenté dans cette démo." },
+    invite: { title: "Invitation à sortir", energy: -2, message: "Tu lui as proposé de passer plus de temps ensemble." }
   });
   const PEOPLE = Object.freeze({
     beach: [
       { id: "aya", name: "Aya Kouassi", role: "Habituée de la plage", mood: "Détendue", section: "Au bord de l’eau", emoji: "👩🏾‍🦱", line: "La brise est parfaite aujourd’hui." },
       { id: "koffi", name: "Koffi Yao", role: "Fan de football", mood: "Sympa", section: "Jeux de plage", emoji: "🧑🏾", line: "Tu veux faire une petite partie ?" },
-      { id: "amina", name: "Amina Traoré", role: "Student", mood: "Curieuse", section: "À l’ombre des palmiers", emoji: "👩🏿", line: "Tu as déjà trouvé ton endroit préféré ?" },
+      { id: "amina", name: "Amina Traoré", role: "Étudiante", mood: "Curieuse", section: "À l’ombre des palmiers", emoji: "👩🏿", line: "Tu as déjà trouvé ton endroit préféré ?" },
       { id: "junior", name: "Junior N’Guessan", role: "Amateur de musique", mood: "Énergique", section: "Près de la musique", emoji: "🧑🏿‍🦱", line: "On devrait trouver un endroit pour danser tout à l’heure." }
     ],
     bar: [
@@ -43,7 +43,7 @@
     restaurant: [
       { id: "fatou", name: "Fatou N’Dri", role: "Amatrice de cuisine", mood: "Chaleureuse", section: "Tables du restaurant", emoji: "👩🏾‍🦱", line: "Tu dois goûter le poisson braisé du coin." },
       { id: "yann", name: "Yann Kouamé", role: "Jeune entrepreneur", mood: "Ambitieux", section: "Près des fenêtres", emoji: "🧑🏾", line: "Je suis toujours à la recherche de nouvelles idées." },
-      { id: "esther", name: "Esther Gnahoré", role: "Artist", mood: "Réfléchie", section: "Terrasse", emoji: "👩🏿", line: "Cet endroit m’inspire beaucoup." },
+      { id: "esther", name: "Esther Gnahoré", role: "Artiste", mood: "Réfléchie", section: "Terrasse", emoji: "👩🏿", line: "Cet endroit m’inspire beaucoup." },
       { id: "marco", name: "Marco Assi", role: "Guide local", mood: "Serviable", section: "Tables du restaurant", emoji: "🧑🏿‍🦱", line: "Je peux te conseiller de bons endroits." }
     ],
     lavage: [
@@ -58,12 +58,12 @@
   let currentLocation = "beach";
   let selectedPerson = null;
   function freshState(name, style) {
-    return { version: 1, name: name.trim(), style, balance: STARTING_BALANCE, points d’énergie: STARTING_ENERGY, actions: [], relationships: {}, createdAt: new Date().toISOString() };
+    return { version: 1, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, createdAt: new Date().toISOString() };
   }
   function validState(value) {
     return Boolean(value && value.version === 1 && typeof value.name === "string" &&
       value.name.trim().length >= 2 && value.name.length <= 24 &&
-      ["Coastal creative", "Ambitieux newcomer"].includes(value.style) &&
+      ["Coastal creative", "Ambitious newcomer", "Créatif de la côte", "Ambitieux newcomer", "Nouvel arrivant ambitieux"].includes(value.style) &&
       Number.isInteger(value.balance) && value.balance >= 0 && value.balance <= 1000000 &&
       Number.isInteger(value.energy) && value.energy >= 0 && value.energy <= 100 &&
       Array.isArray(value.actions) && value.actions.length <= 100 &&
@@ -148,7 +148,7 @@
     return {
       ...current,
       balance: current.balance - COSTS[key],
-      points d’énergie: Math.max(0, Math.min(100, nextEnergy)),
+      energy: Math.max(0, Math.min(100, nextEnergy)),
       actions: [...current.actions, { title: activity.title, at }].slice(-100)
     };
   }
@@ -301,7 +301,7 @@
     if (!current || current.energy >= 100) return null;
     const recovered = Math.min(REST_RECOVERY, 100 - current.energy);
     return {
-      state: { ...current, points d’énergie: current.energy + recovered, actions: [...current.actions, { title: "Tu as fait une pause et récupéré " + recovered + " points d’énergie", at }].slice(-100) },
+      state: { ...current, energy: current.energy + recovered, actions: [...current.actions, { title: "Tu as fait une pause et récupéré " + recovered + " points d’énergie", at }].slice(-100) },
       recovered
     };
   }
