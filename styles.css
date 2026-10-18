@@ -179,4 +179,4 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
 /* Fictional demo neighbors in the player-home district. */
 .pin-house-aya{left:82%;top:66%}.pin-house-koffi{left:78%;top:88%}.pin-house-mariam{left:57%;top:88%}
 .pin-house-aya .pin-icon,.pin-house-koffi .pin-icon,.pin-house-mariam .pin-icon{background:linear-gradient(145deg,#e2f0da,#9fc69d)}
-@media(max-width:760px){.pin-house-aya{left:80%;top:64%}.pin-house-koffi{left:75%;top:88%}.pin-house-mariam{left:53%;top:88%}}
+@media(max-width:760px){.pin-house-aya{left:80%;top:64%}.pin-house-koffi{left:75%;top:88%}.pin-house-mariam{left:53%;top:88%}.street-label{font-size:7px;padding:4px 5px;letter-spacing:.6px}.street-label-d{left:64%;top:50%}.street-label-e{left:4%;top:56%}.street-label-f{left:48%;top:63%}}
