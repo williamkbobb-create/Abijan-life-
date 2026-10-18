@@ -170,7 +170,7 @@ test("version 2 saves migrate to version 3 without changing existing wallet and 
   const v2 = { ...freshState("Aya", "Coastal creative"), version: 2, balance: 654321, energy: 37, actions: [{ title: "Existing progress", at: "2026-10-17T12:00:00.000Z" }] };
   delete v2.inventory; delete v2.day; delete v2.timeMinutes; delete v2.location; delete v2.home; delete v2.work;
   const migrated = migrateState(v2);
-  assert.equal(migrated.version, 4);
+  assert.equal(migrated.version, 5);
   assert.equal(migrated.balance, 654321);
   assert.equal(migrated.energy, 37);
   assert.equal(migrated.actions[0].title, "Existing progress");
@@ -255,7 +255,7 @@ test("version 3 saves migrate to version 4 and keep their existing wallet and pr
   const v3 = { ...freshState("Aya", "Coastal creative"), version: 3, balance: 876543, energy: 41, day: 3, timeMinutes: 900, location: "restaurant" };
   delete v3.transportMode;
   const migrated = migrateState(v3);
-  assert.equal(migrated.version, 4);
+  assert.equal(migrated.version, 5);
   assert.equal(migrated.transportMode, "gbaka");
   assert.equal(migrated.balance, 876543);
   assert.equal(migrated.energy, 41);
