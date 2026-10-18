@@ -1,0 +1,42 @@
+(function(){"use strict";
+const $=id=>document.getElementById(id), relKey="abijan-life-local-relationships-v1", types=["Sister","Brother","Parent","Close friend"];
+function read(){try{return JSON.parse(localStorage.getItem(relKey))||{}}catch(_){return{}}}
+function write(v){try{localStorage.setItem(relKey,JSON.stringify(v))}catch(_){}}
+function mapUI(){const scene=document.querySelector(".world-scene"),life=$("life-panel"),dock=document.querySelector(".location-dock");if(!scene||!life||!dock||scene.dataset.polished)return;scene.dataset.polished="1";
+const traffic=document.createElement("div");traffic.className="street-life";traffic.setAttribute("aria-label","Moving cars and pedestrians");traffic.innerHTML='<div class="traffic-lane traffic-lane-one"><span class="traffic-car car-orange">🚙</span><span class="traffic-car car-blue">🚕</span><span class="traffic-car car-white">🚗</span></div><div class="traffic-lane traffic-lane-two"><span class="traffic-car car-green">🚐</span><span class="traffic-car car-yellow">🚕</span></div><div class="street-walkers"><span class="walker walker-one">🚶🏾</span><span class="walker walker-two">🚶🏿‍♀️</span><span class="walker walker-three">🚶🏾‍♂️</span><span class="walker walker-four">🚶🏿</span></div>';scene.append(traffic);
+const tools=document.createElement("div");tools.className="map-tools";tools.innerHTML='<button class="map-tool" id="life-drawer-toggle" type="button" aria-expanded="false">☰ Everyday life</button><button class="map-tool" id="map-phone-toggle" type="button">▣ Phone & messages</button>';scene.append(tools);
+const drawer=document.createElement("div");drawer.className="life-drawer";drawer.hidden=true;drawer.setAttribute("aria-label","Everyday life tools");drawer.append(life);scene.append(drawer);
+$("life-drawer-toggle").addEventListener("click",()=>{drawer.hidden=!drawer.hidden;const b=$("life-drawer-toggle");b.setAttribute("aria-expanded",String(!drawer.hidden));b.textContent=drawer.hidden?"☰ Everyday life":"× Close life menu"});
+$("map-phone-toggle").addEventListener("click",()=>{const b=$("phone-launcher");if(b)b.click()});
+const close=document.createElement("button");close.type="button";close.className="location-dismiss";close.textContent="×";close.title="Close location details";close.setAttribute("aria-label","Close location details");dock.append(close);
+const reopen=document.createElement("button");reopen.type="button";reopen.className="location-reopen";reopen.hidden=true;reopen.innerHTML='<span aria-hidden="true">⌖</span><span>Show location details</span>';scene.append(reopen);
+const hide=()=>{dock.hidden=true;reopen.hidden=false},show=()=>{dock.hidden=false;reopen.hidden=true};close.addEventListener("click",hide);reopen.addEventListener("click",show);
+document.querySelectorAll("[data-location]").forEach(pin=>pin.addEventListener("click",()=>{show();drawer.hidden=true;$("life-drawer-toggle").setAttribute("aria-expanded","false");$("life-drawer-toggle").textContent="☰ Everyday life"}));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){drawer.hidden=true;$("life-drawer-toggle").setAttribute("aria-expanded","false");$("life-drawer-toggle").textContent="☰ Everyday life";if(!dock.hidden)hide()}});
+}
+function phoneHomeUI(){
+const panel=$("phone-panel"),launcher=$("phone-launcher");
+if(!panel||!launcher||panel.dataset.homeReady)return;
+panel.dataset.homeReady="1";
+const nav=panel.querySelector(".phone-tabs"),content=$("phone-content"),header=panel.querySelector(".phone-header");
+const home=document.createElement("div");home.className="phone-app-home";home.hidden=true;
+home.innerHTML='<button class="phone-app-icon" data-app="messages" type="button"><span>💬</span>Messages</button><button class="phone-app-icon" data-app="calls" type="button"><span>📞</span>Calls</button><button class="phone-app-icon" data-app="contacts" type="button"><span>👥</span>Contacts</button><button class="phone-app-icon" data-app="activities" type="button"><span>🧾</span>Activity</button><button class="phone-app-icon" data-app="settings" type="button"><span>⚙️</span>Settings</button><button class="phone-app-icon" data-app="wallet" type="button"><span>💸</span>Wallet</button>';
+panel.insertBefore(home,nav);
+const title=header&&header.querySelector("h2");
+function showHome(){home.hidden=false;nav.hidden=true;content.hidden=true;if(title)title.textContent="Your apps";panel.dataset.onHome="1";}
+function showApp(app){home.hidden=true;nav.hidden=false;content.hidden=false;panel.dataset.onHome="0";const tab=panel.querySelector('[data-phone-tab="'+app+'"]');if(tab)tab.click();else if(app==="wallet"){const t=panel.querySelector('[data-phone-tab="messages"]');if(t)t.click();setTimeout(()=>{const b=content.querySelector(".phone-primary");if(b)b.click();},0);}}
+home.querySelectorAll("[data-app]").forEach(b=>b.addEventListener("click",()=>showApp(b.dataset.app)));
+const close=$("phone-close");if(close)close.addEventListener("click",()=>{home.hidden=true;nav.hidden=false;content.hidden=false;panel.dataset.onHome="0";});
+launcher.addEventListener("click",()=>setTimeout(()=>{if(!panel.hidden)showHome();else{home.hidden=true;nav.hidden=false;content.hidden=false;}},0));
+}
+function conversation(){const panel=$("phone-panel"),content=$("phone-content");if(!panel||panel.hidden||!content)return null;const h=content.querySelector(".phone-thread h3");return h?{content,name:h.textContent.trim(),key:h.textContent.trim().toLowerCase()}:null}
+function decorate(){const c=conversation();if(!c||c.content.querySelector(".phone-person-actions"))return;const saved=read(),prior=saved[c.key]||{},actions=document.createElement("div");actions.className="phone-person-actions";
+const add=document.createElement("button");add.className="secondary";add.textContent="＋ Relationship";add.addEventListener("click",()=>{let box=c.content.querySelector(".phone-relationship-tools");if(box){box.remove();return}box=document.createElement("div");box.className="phone-relationship-tools";types.forEach(type=>{const b=document.createElement("button"),accepted=prior[type]==="accepted";b.textContent=(accepted?"✓ ":"＋ ")+"Add as "+type.toLowerCase();b.disabled=accepted;if(accepted)b.classList.add("accepted");b.addEventListener("click",()=>{const all=read(),p=all[c.key]||{},game=window.AbijanLifeGame&&window.AbijanLifeGame.getState(),first=c.name.split(" ")[0].toLowerCase(),score=game&&game.relationships?game.relationships[first]||0:0,ok=Math.random()<(0.55+Math.min(score,5)*0.08);p[type]=ok?"accepted":"declined";all[c.key]=p;write(all);const msg=document.createElement("p");msg.className="phone-demo-note";msg.setAttribute("role","status");msg.textContent=ok?c.name+" accepted your request to be your "+type.toLowerCase()+".":c.name+" declined for now. Get to know them better and ask again later.";box.replaceChildren(msg);if(ok){const label=document.createElement("small");label.className="phone-person-relation";label.textContent="✓ "+type;c.content.querySelector(".phone-thread").append(label)}});box.append(b)});c.content.insertBefore(box,c.content.querySelector(".phone-reply"))});
+actions.append(add);c.content.insertBefore(actions,c.content.querySelector(".phone-reply"));
+const topButton=c.content.querySelector(".phone-primary");if(topButton&&topButton.textContent.toLowerCase().includes("send money"))topButton.classList.add("phone-messages-shortcut");
+Object.entries(prior).filter(([,v])=>v==="accepted").forEach(([type])=>{const label=document.createElement("small");label.className="phone-person-relation";label.textContent="✓ "+type;c.content.querySelector(".phone-thread").append(label)});
+}
+function phoneUI(){const panel=$("phone-panel"),content=$("phone-content");if(!panel||!content||panel.dataset.polished)return;panel.dataset.polished="1";new MutationObserver(()=>{const c=conversation();if(c){const first=c.content.querySelector(".phone-primary");if(first&&first.textContent.toLowerCase().includes("send money"))first.classList.add("phone-messages-shortcut");decorate()}else{const globalSend=Array.from(content.querySelectorAll(".phone-primary")).find(b=>b.textContent.toLowerCase().includes("send money"));if(globalSend)globalSend.classList.add("phone-messages-shortcut")}}).observe(content,{childList:true,subtree:true})}
+function boot(){mapUI();phoneUI();phoneHomeUI();new MutationObserver(()=>{mapUI();phoneUI();phoneHomeUI()}).observe(document.body,{childList:true,subtree:true})}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+})();
