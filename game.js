@@ -8,6 +8,7 @@
   const ENERGY_PACK_COST = 10000;
   const ENERGY_PACK_AMOUNT = 25;
   const DAILY_SHIFT_LIMIT = 2;
+  const HOME_UPGRADES = Object.freeze({ 2: { cost: 250000, title: "Comfortable room" }, 3: { cost: 1000000, title: "Premium coastal home" } });
   const JOBS = Object.freeze({
     beach_cleanup: { title: "Beach clean-up crew", pay: 25000, energy: 18, minutes: 120, description: "Help keep the shoreline welcoming." },
     car_wash: { title: "Lavage assistant", pay: 35000, energy: 25, minutes: 180, description: "Help the team clean cars and organize the wash bay." },
@@ -414,6 +415,27 @@
       actions: [...current.actions, { title: "Bought " + item.name + " for " + item.price.toLocaleString("en-US") + " FCFA", at }].slice(-100)
     };
   }
+  function calculateHomeUpgrade(current, at = new Date().toISOString()) {
+    if (!current || current.home.level >= 3) return null;
+    const nextLevel = current.home.level + 1;
+    const upgrade = HOME_UPGRADES[nextLevel];
+    if (!upgrade || current.balance < upgrade.cost) return null;
+    return {
+      ...current,
+      balance: current.balance - upgrade.cost,
+      home: { ...current.home, level: nextLevel },
+      actions: [...current.actions, { title: "Upgraded home to " + upgrade.title + " for " + upgrade.cost.toLocaleString("en-US") + " FCFA", at }].slice(-100)
+    };
+  }
+  function upgradeHome() {
+    const result = calculateHomeUpgrade(state);
+    if (!result) { showToast(state && state.home.level >= 3 ? "Your home is already at the highest level." : "Not enough simulated FCFA for this home upgrade."); return; }
+    const upgrade = HOME_UPGRADES[result.home.level];
+    if (!window.confirm("Upgrade to " + upgrade.title + " for " + upgrade.cost.toLocaleString("en-US") + " simulated FCFA?")) return;
+    const previous = state; state = result;
+    if (!save()) { state = previous; renderState(); return; }
+    renderState(); showToast("Home upgraded: " + upgrade.title + ".");
+  }
   function calculateHomeSleep(current, at = new Date().toISOString()) {
     if (!current || current.energy >= 100) return null;
     const timed = advanceTime(current, 480, at);
@@ -459,8 +481,16 @@
     const home = document.createElement("article"); home.className = "life-card";
     home.innerHTML = '<span class="life-card-icon">🏡</span><p class="life-card-kicker">YOUR HOME</p><h3>Home & rest</h3><p class="life-card-copy">Return to your home base, slow down, and recover your energy.</p>';
     const homeButton = document.createElement("button"); homeButton.type = "button"; homeButton.className = "life-button"; homeButton.textContent = state.energy >= 100 ? "Energy full" : "Go home & sleep · 8 hours"; homeButton.disabled = state.energy >= 100; homeButton.addEventListener("click", sleepAtHome);
-    const homeNote = document.createElement("small"); homeNote.className = "life-card-note"; homeNote.textContent = "Home level " + state.home.level + " · Sleep restores energy";
-    home.append(homeButton, homeNote); grid.append(home);
+    const homeUpgrade = document.createElement("button"); homeUpgrade.type = "button"; homeUpgrade.className = "life-button life-button-secondary";
+    if (state.home.level >= 3) { homeUpgrade.textContent = "Home fully upgraded"; homeUpgrade.disabled = true; }
+    else {
+      const nextUpgrade = HOME_UPGRADES[state.home.level + 1];
+      homeUpgrade.textContent = "Upgrade home · " + nextUpgrade.cost.toLocaleString("en-US") + " FCFA";
+      homeUpgrade.disabled = state.balance < nextUpgrade.cost;
+      homeUpgrade.addEventListener("click", upgradeHome);
+    }
+    const homeNote = document.createElement("small"); homeNote.className = "life-card-note"; homeNote.textContent = HOME_UPGRADES[state.home.level]?.title || "Starter home" + " · Home level " + state.home.level + " · Sleep restores energy";
+    home.append(homeButton, homeUpgrade, homeNote); grid.append(home);
     const work = document.createElement("article"); work.className = "life-card";
     work.innerHTML = '<span class="life-card-icon">🧰</span><p class="life-card-kicker">EARN FCFA</p><h3>Local jobs</h3><p class="life-card-copy">Take a shift and earn simulated money. Each shift uses time and energy.</p>';
     Object.entries(JOBS).forEach(([key, job]) => {
@@ -607,7 +637,7 @@
     showGame();
     selectLocation("beach");
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, advanceTime, JOBS, SHOP_ITEMS, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT };
+  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, calculateHomeUpgrade, advanceTime, JOBS, SHOP_ITEMS, HOME_UPGRADES, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT };
   if (typeof window !== "undefined") {
     window.AbijanLifeGame = {
       getState: () => state ? { balance: state.balance, transactions: state.transactions.slice() } : null,
