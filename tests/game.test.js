@@ -171,3 +171,17 @@ test("player feedback is compact and the next-update plan is visible", () => {
   assert.doesNotMatch(auth, /welcome-screen.*hidden = false|game-screen.*hidden = true/);
   assert.doesNotMatch(html, /id="first-play-tutorial"/);
 });
+
+
+test("the avatar emoji replaces letter logos and acts as the in-game home control", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const root = path.join(__dirname, "..");
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const game = fs.readFileSync(path.join(root, "game.js"), "utf8");
+  assert.match(html, /id="avatar-home-button"[^>]*>👤<\/button>/);
+  assert.doesNotMatch(html, /class="game-logo"/);
+  assert.doesNotMatch(html, /id="avatar-initial"/);
+  assert.match(game, /avatar-home-button.*addEventListener/);
+  assert.match(game, /Accueil du jeu\./);
+});
