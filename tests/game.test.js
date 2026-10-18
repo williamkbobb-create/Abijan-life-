@@ -213,3 +213,20 @@ test("player district includes clearly fictional neighbor homes for local demo v
  for(const id of ["houseaya","housekoffi","housemariam"]) assert.match(game,new RegExp(id+': \\{ title:'));
  assert.match(game,/personnage fictif/);assert.match(game,/aucun autre joueur réel/);assert.match(css,/\.pin-house-aya/);
 });
+
+
+test("street life layer adds accessible animated pedestrians and vehicles with tap interactions", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const phone = fs.readFileSync(path.join(__dirname, "..", "phone.js"), "utf8");
+  assert.match(html, /id="map-canvas"/);
+  assert.match(html, /src="phone\.js"/);
+  assert.match(phone, /function makeStreetLife\(\)/);
+  assert.match(phone, /street-walker/);
+  assert.match(phone, /street-car/);
+  assert.match(phone, /aria-label.*toucher pour interagir/);
+  assert.match(phone, /is-greeting/);
+  assert.match(phone, /prefers-reduced-motion:reduce/);
+  assert.match(phone, /Tu salues un habitant de Grand-Bassam/);
+});
