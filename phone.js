@@ -24,6 +24,7 @@
   let phoneState = null;
   let activeTab = "messages";
   let activeConversation = null;
+  let activeTransferView = false;
   let callTimer = null;
   function persist() {
     try { localStorage.setItem(PHONE_KEY, JSON.stringify(phoneState)); } catch (_) {}
@@ -76,6 +77,7 @@
   function openTab(tab) {
     activeTab = tab;
     activeConversation = null;
+    activeTransferView = false;
     const title = { messages: "Messages", calls: "Calls", contacts: "Contacts", activities: "Activity", settings: "Settings" }[tab] || "Messages";
     $("phone-title").textContent = title;
     $("phone-panel").querySelectorAll("[data-phone-tab]").forEach((node) => node.classList.toggle("active", node.dataset.phoneTab === tab));
@@ -84,6 +86,7 @@
   function renderTab() {
     const content = $("phone-content");
     content.replaceChildren();
+    if (activeTransferView) { renderTransferForm(content); return; }
     if (activeConversation) { renderConversation(content, activeConversation); return; }
     if (activeTab === "messages") renderMessages(content);
     else if (activeTab === "calls") renderCalls(content);
@@ -103,6 +106,18 @@
   }
   function renderMessages(content) {
     content.append(el("p", "phone-intro", "Catch up with people around Grand-Bassam."));
+    content.append(button("↗  Send Money", "phone-primary", () => { activeTransferView = true; renderTab(); }));
+    const gameState = window.AbijanLifeGame && window.AbijanLifeGame.getState();
+    const transactions = gameState && Array.isArray(gameState.transactions) ? gameState.transactions.slice().reverse() : [];
+    if (transactions.length) {
+      content.append(el("h3", "phone-section-title", "Recent transfers"));
+      transactions.slice(0, 5).forEach((transaction) => {
+        const card = el("article", "phone-transfer-history");
+        card.append(el("b", "", "Sent " + Number(transaction.amount).toLocaleString("en-US") + " FCFA"));
+        card.append(el("small", "", "To " + transaction.recipientName + " · " + new Date(transaction.at).toLocaleString()));
+        content.append(card);
+      });
+    }
     const list = el("div", "phone-list");
     phoneState.messages.forEach((message) => {
       const row = personRow(message, message.text, () => {
@@ -116,6 +131,87 @@
     });
     content.append(list);
     content.append(el("p", "phone-demo-note", "Demo conversations · messages stay on this device"));
+  }
+  function renderTransferForm(content) {
+    const game = window.AbijanLifeGame;
+    const current = game && game.getState();
+    if (!current) {
+      content.append(button("← Messages", "phone-back", () => { activeTransferView = false; renderTab(); }));
+      content.append(el("div", "phone-empty", "The game wallet is not ready yet. Close and reopen the phone."));
+      return;
+    }
+    content.append(button("← Messages", "phone-back", () => { activeTransferView = false; renderTab(); }));
+    content.append(el("p", "phone-intro", "Send simulated FCFA to someone in your Grand-Bassam contacts. No real money moves."));
+    const form = el("form", "phone-transfer-form");
+    const recipientLabel = el("label", "phone-field-label", "Recipient");
+    recipientLabel.htmlFor = "phone-transfer-recipient";
+    const recipient = el("select");
+    recipient.id = "phone-transfer-recipient";
+    recipient.required = true;
+    contacts.forEach((person) => {
+      const option = el("option", "", person.name);
+      option.value = person.id;
+      recipient.append(option);
+    });
+    const amountLabel = el("label", "phone-field-label", "Amount (FCFA)");
+    amountLabel.htmlFor = "phone-transfer-amount";
+    const amount = el("input");
+    amount.id = "phone-transfer-amount";
+    amount.type = "number";
+    amount.min = "1";
+    amount.max = String(current.balance);
+    amount.step = "1";
+    amount.inputMode = "numeric";
+    amount.required = true;
+    amount.placeholder = "Enter a custom amount";
+    const presets = el("div", "phone-transfer-presets");
+    [10000, 1000000, 10000000].forEach((value) => {
+      const preset = button(value.toLocaleString("en-US"), "phone-transfer-preset", () => {
+        amount.value = String(value);
+        updatePreview();
+      });
+      preset.setAttribute("aria-label", "Set amount to " + value.toLocaleString("en-US") + " FCFA");
+      presets.append(preset);
+    });
+    const balance = el("div", "phone-transfer-balance");
+    const preview = el("p", "phone-transfer-preview", "");
+    const status = el("p", "phone-transfer-status", "");
+    status.setAttribute("role", "status");
+    const submit = button("Review and send", "phone-primary", () => {});
+    submit.type = "submit";
+    const note = el("p", "phone-demo-note", "Quick amounts are suggestions. You can enter any positive whole-FCFA amount within your balance.");
+    function updatePreview() {
+      const value = Number(amount.value);
+      balance.textContent = "Available balance: " + Number(current.balance).toLocaleString("en-US") + " FCFA";
+      const valid = Number.isSafeInteger(value) && value > 0 && value <= current.balance;
+      preview.textContent = valid ? "Balance after transfer: " + (current.balance - value).toLocaleString("en-US") + " FCFA" : "Enter an amount greater than zero and no more than your available balance.";
+      submit.disabled = !valid;
+      submit.setAttribute("aria-disabled", String(!valid));
+    }
+    amount.addEventListener("input", updatePreview);
+    form.append(recipientLabel, recipient, amountLabel, amount, presets, balance, preview, status, submit, note);
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const value = Number(amount.value);
+      if (!Number.isSafeInteger(value) || value <= 0 || value > current.balance) { updatePreview(); return; }
+      const contact = contacts.find((person) => person.id === recipient.value);
+      if (!contact) { status.textContent = "Choose a valid recipient."; return; }
+      submit.disabled = true;
+      status.textContent = "Processing transfer…";
+      const result = game.transferMoney({ id: contact.id, name: contact.name }, value);
+      if (!result.ok) {
+        status.textContent = result.error;
+        updatePreview();
+        return;
+      }
+      phoneState.sent.push({ to: contact.id, text: "💸 You sent " + value.toLocaleString("en-US") + " simulated FCFA.", at: result.transaction.at, type: "transfer", transferId: result.transaction.id });
+      phoneState.sent = phoneState.sent.slice(-100);
+      persist();
+      activeTransferView = false;
+      renderTab();
+    });
+    content.append(form);
+    updatePreview();
   }
   function renderConversation(content, id) {
     const message = phoneState.messages.find((item) => item.id === id);
