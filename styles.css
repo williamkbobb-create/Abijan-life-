@@ -215,3 +215,58 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
 @keyframes walk-town{from{translate:-6px 0}to{translate:clamp(15px,5vw,55px) -3px}}
 @media(prefers-reduced-motion:reduce){.traffic-lane,.walker{animation:none}}
 @media(max-width:650px){.traffic-lane-one{top:69%}.traffic-lane-two{top:81%}.street-walkers{top:58%}.walker-four{display:none}.location-dock{z-index:5}.street-life{opacity:.94}}
+
+
+/* Update 1 polish: playable destinations and compact in-map life controls. */
+.world-scene .pin-market{display:grid!important;left:37%;top:68%}
+.world-scene .pin-cafe{display:grid;left:38%;top:27%}
+.world-scene .pin-town{display:grid;left:68%;top:44%}
+.world-scene .pin-restaurant{top:59%;left:66%}
+.world-scene .pin-market,.world-scene .pin-cafe,.world-scene .pin-town{z-index:4}
+.street-life{pointer-events:none!important}
+.life-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;margin:0 0 6px;scrollbar-width:thin}
+.life-tab{flex:0 0 auto;border:1px solid #d8e1d4;background:#fff;color:#244b3e;border-radius:999px;padding:9px 12px;font-size:11px;font-weight:700;white-space:nowrap}
+.life-tab[aria-pressed="true"]{background:#174c40;color:#fff;border-color:#174c40}
+.world-scene .life-drawer .life-panel-heading{align-items:center;margin-bottom:9px}
+.world-scene .life-drawer .life-panel-heading h2{font-size:24px}
+.world-scene .life-drawer .life-eyebrow{margin-bottom:4px;font-size:8px;letter-spacing:1.2px}
+.world-scene .life-drawer .life-clock{font-size:10px;white-space:nowrap}
+.world-scene .life-drawer .life-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.world-scene .life-drawer .life-card{padding:11px;border-radius:10px}
+.world-scene .life-drawer .life-card h3{font-size:17px;margin-bottom:5px}
+.world-scene .life-drawer .life-card-copy{font-size:10px;line-height:1.45;margin-bottom:8px}
+.world-scene .life-drawer .life-card-icon{font-size:21px}
+.world-scene .life-drawer .life-card-kicker{margin:7px 0 4px;font-size:7px;letter-spacing:1px}
+.world-scene .life-drawer .life-button{width:100%;text-align:left;font-size:10px;line-height:1.35;padding:9px 8px;margin-top:5px;border-radius:7px}
+.world-scene .life-drawer .life-card-note,.world-scene .life-drawer .life-inventory{font-size:9px;line-height:1.45}
+.world-scene .life-drawer .life-card[hidden]{display:none!important}
+.world-scene .life-drawer{overscroll-behavior:contain;touch-action:pan-y}
+.world-scene .map-tools{z-index:8}
+.world-scene .location-dock{z-index:6}
+.world-scene .location-dismiss{position:absolute;right:7px;top:7px;z-index:8;width:32px;height:32px;display:grid;place-items:center;border:1px solid #ffffff70;border-radius:50%;background:#092e2bf2;color:white;font-size:23px;line-height:1}
+.world-scene .location-reopen{position:absolute;z-index:7;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:7px;align-items:center;border:1px solid #ffffffaa;border-radius:24px;padding:10px 14px;background:#092e2bf2;color:white;font-size:11px;font-weight:700}
+@media(max-width:760px){
+ .world-scene .pin-beach{left:2%;top:36%}
+ .world-scene .pin-bar{left:auto;right:2%;top:27%}
+ .world-scene .pin-restaurant{left:auto;right:2%;top:48%}
+ .world-scene .pin-lavage{left:auto;right:2%;top:69%}
+ .world-scene .pin-market{left:2%;top:66%}
+ .world-scene .pin-cafe{left:2%;top:25%}
+ .world-scene .pin-town{left:36%;top:43%}
+ .world-scene .world-pin{max-width:43%;min-width:0;grid-template-columns:22px minmax(0,1fr);column-gap:4px;padding:5px;border-radius:7px}
+ .world-scene .world-pin .pin-icon{font-size:14px}
+ .world-scene .world-pin b{font-size:7px;letter-spacing:.2px}
+ .world-scene .world-pin small{font-size:7px}
+ .world-scene .life-drawer{inset:48px 5px 48px}
+ .world-scene .life-drawer .life-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .world-scene .life-drawer .life-card:last-child{grid-column:auto}
+ .world-scene .life-drawer .life-panel-heading h2{font-size:21px}
+ .world-scene .location-dock{max-height:39%;bottom:48px}
+ .world-scene .location-reopen{bottom:9px}
+}
+@media(max-width:380px){
+ .world-scene .life-drawer .life-grid{grid-template-columns:1fr}
+ .world-scene .life-drawer .life-card{padding:10px}
+ .world-scene .world-pin{grid-template-columns:19px minmax(0,1fr)}
+ .world-scene .world-pin small{display:none}
+}
