@@ -100,6 +100,10 @@ test("phone interface is loaded as a compact side panel with the world still pre
   for (const tab of ["messages", "calls", "contacts", "activities", "settings"]) assert.ok(js.includes('data-phone-tab="' + tab + '"'));
   assert.match(css, /\.phone-panel/);
   assert.match(css, /@media\s*\(max-width:\s*650px\)/);
+  assert.match(css, /top:72px/);
+  assert.match(css, /grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+  assert.match(js, /phone-launcher.*Ouvrir le téléphone du jeu/);
+  for (const app of ["💬", "☎️", "👥", "🗓️", "⚙️"]) assert.ok(js.includes(app));
   assert.match(js, /Aucun appel réel ni message en ligne n’est envoyé/);
 });
 
@@ -158,6 +162,12 @@ test("player feedback is compact and the next-update plan is visible", () => {
   assert.match(html, /id="welcome-screen"/);
   assert.match(html, /id="character-form"/);
   assert.match(html, /src="game.js" defer/);
-  assert.doesNotMatch(html, /auth\.js|auth\.css|@supabase\/supabase-js/);
-  assert.doesNotMatch(html, /id="auth-panel"|first-play-tutorial/);
+  assert.match(html, /src="auth\.js" defer/);
+  assert.match(html, /href="auth\.css"/);
+  assert.match(html, /id="auth-toggle"/);
+  assert.match(html, /@supabase\/supabase-js@2/);
+  const auth = fs.readFileSync(path.join(root, "auth.js"), "utf8");
+  assert.match(auth, /Le compte est facultatif/);
+  assert.doesNotMatch(auth, /welcome-screen.*hidden = false|game-screen.*hidden = true/);
+  assert.doesNotMatch(html, /id="first-play-tutorial"/);
 });
