@@ -144,3 +144,14 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
 .hud-avatar{padding:0;appearance:none;-webkit-appearance:none;cursor:pointer;line-height:1;font-family:system-ui,sans-serif;font-size:21px!important}
 .hud-avatar:hover{filter:brightness(1.08);transform:translateY(-1px)}
 .hud-avatar:focus-visible{outline:3px solid #e3a06d;outline-offset:3px}
+
+/* Touch-friendly movable and zoomable in-game map. */
+.map-canvas{position:absolute;inset:-8%;width:116%;height:116%;transform-origin:center center;touch-action:none;cursor:grab;will-change:transform}
+.map-canvas.is-dragging{cursor:grabbing}
+.map-canvas .world-pin{user-select:none;-webkit-user-select:none}
+.scene-controls{touch-action:manipulation}
+.location-dock.is-hidden{opacity:0;visibility:hidden;pointer-events:none;transform:translate(-50%,18px)}
+.location-dock{transition:opacity .18s,transform .18s,visibility .18s}
+.pin-historic{left:38%;top:72%}.pin-nzima{left:7%;top:78%}
+.world-scene.location-historic .scene-town-label,.world-scene.location-nzima .scene-town-label{color:#f9f1d8;background:#154b40;border-radius:6px;padding:7px 9px}
+@media(max-width:760px){.pin-historic{left:35%;top:70%;right:auto}.pin-nzima{left:3%;top:77%;right:auto}.scene-controls{z-index:8}}
