@@ -14,7 +14,9 @@
 - Skills, courses, job catalogue, shifts, performance, promotions, and side gigs.
 - Housing, rent, furniture, property, vehicles, and simulated transport.
 - Virtual FCFA banking, savings, businesses, taxes, and player-to-player transfers.
+- Relationship requests to local NPCs: ask to become a sister, brother, mother, father, best friend, or cousin; NPCs can accept or decline, with relationship labels changing only after acceptance. Include consent, request status, and safeguards against assigning family roles without agreement.
 - Friendships, relationships, opt-in presence, chat, blocking/reporting/moderation, home visits, and multiplayer.
+- Vehicle fuel: buy simulated fuel, track fuel level, and require sufficient fuel for owned-car trips.
 - Additional Grand-Bassam districts and later Abidjan/other city environments.
 - Local cultural activities and events, rankings, rewards, governance, and phone hub.
 - Potential Lavage Tracker and SOTRA integrations only after separate requirements, data access, privacy, and approval review.
