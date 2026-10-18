@@ -155,3 +155,22 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
 .pin-historic{left:38%;top:72%}.pin-nzima{left:7%;top:78%}
 .world-scene.location-historic .scene-town-label,.world-scene.location-nzima .scene-town-label{color:#f9f1d8;background:#154b40;border-radius:6px;padding:7px 9px}
 @media(max-width:760px){.pin-historic{left:35%;top:70%;right:auto}.pin-nzima{left:3%;top:77%;right:auto}.scene-controls{z-index:8}}
+
+/* Map discovery filters and additional Grand-Bassam-inspired destinations. */
+.map-category-bar{position:absolute;z-index:9;top:12px;left:12px;right:12px;display:flex;gap:6px;align-items:center;overflow-x:auto;padding:5px;border-radius:14px;background:rgba(15,48,43,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);scrollbar-width:none}
+.map-category-bar::-webkit-scrollbar{display:none}
+.map-category-bar button{flex:0 0 auto;border:1px solid #ffffff2b;border-radius:999px;padding:7px 10px;background:#ffffff12;color:#fff8e9;font:600 11px/1.2 system-ui,sans-serif;white-space:nowrap;cursor:pointer}
+.map-category-bar button[aria-pressed=true]{background:#f4d79c;color:#203d34;border-color:#f4d79c}
+.world-pin.filter-hidden{display:none!important}
+.world-pin[hidden]{display:none!important}
+.pin-museum{left:48%;top:52%}.pin-artisans{left:53%;top:76%}.pin-azuretti{left:20%;top:68%}.pin-lighthouse{left:75%;top:43%}.pin-homes{left:70%;top:79%}.pin-my-home{left:43%;top:83%;border-color:#f4d79c}
+.pin-museum .pin-icon{background:linear-gradient(145deg,#fff0d4,#e9c78b)}
+.pin-artisans .pin-icon{background:linear-gradient(145deg,#fce8c7,#d6ad78)}
+.pin-azuretti .pin-icon{background:linear-gradient(145deg,#d9f4f5,#8bc9cb)}
+.pin-lighthouse .pin-icon{background:linear-gradient(145deg,#fff5d9,#e6d3a0)}
+.pin-homes .pin-icon,.pin-my-home .pin-icon{background:linear-gradient(145deg,#e2f0da,#9fc69d)}
+@media(max-width:760px){
+ .map-category-bar{top:8px;left:7px;right:7px;gap:4px;padding:4px}
+ .map-category-bar button{font-size:10px;padding:7px 9px}
+ .pin-museum{left:48%;top:49%}.pin-artisans{left:50%;top:79%}.pin-azuretti{left:13%;top:65%}.pin-lighthouse{left:74%;top:42%}.pin-homes{left:69%;top:80%}.pin-my-home{left:42%;top:85%}
+}
