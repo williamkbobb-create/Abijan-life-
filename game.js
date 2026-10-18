@@ -489,7 +489,7 @@
       homeUpgrade.disabled = state.balance < nextUpgrade.cost;
       homeUpgrade.addEventListener("click", upgradeHome);
     }
-    const homeNote = document.createElement("small"); homeNote.className = "life-card-note"; homeNote.textContent = HOME_UPGRADES[state.home.level]?.title || "Starter home" + " · Home level " + state.home.level + " · Sleep restores energy";
+    const homeNote = document.createElement("small"); homeNote.className = "life-card-note"; homeNote.textContent = (HOME_UPGRADES[state.home.level]?.title || "Starter home") + " · Home level " + state.home.level + " · Sleep restores energy";
     home.append(homeButton, homeUpgrade, homeNote); grid.append(home);
     const work = document.createElement("article"); work.className = "life-card";
     work.innerHTML = '<span class="life-card-icon">🧰</span><p class="life-card-kicker">EARN FCFA</p><h3>Local jobs</h3><p class="life-card-copy">Take a shift and earn simulated money. Each shift uses time and energy.</p>';
