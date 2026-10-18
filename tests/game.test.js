@@ -100,7 +100,7 @@ test("phone interface is loaded as a compact side panel with the world still pre
   for (const tab of ["messages", "calls", "contacts", "activities", "settings"]) assert.ok(js.includes('data-phone-tab="' + tab + '"'));
   assert.match(css, /\.phone-panel/);
   assert.match(css, /@media\s*\(max-width:\s*650px\)/);
-  assert.match(css, /top:72px/);
+  assert.match(css, /top:132px/);
   assert.match(css, /grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
   assert.match(js, /phone-launcher.*Ouvrir le téléphone du jeu/);
   for (const app of ["💬", "☎️", "👥", "🗓️", "⚙️"]) assert.ok(js.includes(app));
