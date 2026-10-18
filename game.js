@@ -105,7 +105,7 @@
       Number.isInteger(value.day) && value.day >= 1 && value.day <= 1000000 &&
       Number.isInteger(value.timeMinutes) && value.timeMinutes >= 0 && value.timeMinutes < 1440 &&
       ["beach", "bar", "restaurant", "lavage"].includes(value.location) &&
-      (value.version < 4 || ["walk", "gbaka", "moto", "car", "owned_car"].includes(value.transportMode)) &&
+      (value.version < 4 || (value.version < 5 ? ["walk", "gbaka", "moto", "car"].includes(value.transportMode) : ["walk", "gbaka", "moto", "car", "owned_car"].includes(value.transportMode))) &&
       value.home && Number.isInteger(value.home.level) && value.home.level >= 1 && value.home.level <= 3 &&
       value.work && Number.isInteger(value.work.day) && value.work.day >= 1 && value.work.day <= value.day &&
       Number.isInteger(value.work.shifts) && value.work.shifts >= 0 && value.work.shifts <= DAILY_SHIFT_LIMIT;
