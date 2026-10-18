@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, advanceTime, JOBS, SHOP_ITEMS, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT } = require("../game.js");
+const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, calculateHomeUpgrade, advanceTime, JOBS, SHOP_ITEMS, HOME_UPGRADES, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT } = require("../game.js");
 test("new character starts with the documented demo balance and energy", () => {
   const state = freshState("Aya Kouassi", "Coastal creative");
   assert.equal(state.name, "Aya Kouassi");
@@ -219,4 +219,18 @@ test("sleeping at home restores energy and advances eight in-game hours", () => 
   assert.match(next.actions[0].title, /sleep/);
   assert.equal(initial.energy, 21);
   assert.equal(calculateHomeSleep({ ...initial, energy: 100 }), null);
+});
+
+test("home upgrades charge the correct simulated price and progress up to level three", () => {
+  const initial = freshState("Aya", "Coastal creative");
+  const level2 = calculateHomeUpgrade(initial, "2026-10-18T12:00:00.000Z");
+  assert.equal(level2.home.level, 2);
+  assert.equal(level2.balance, STARTING_BALANCE - HOME_UPGRADES[2].cost);
+  assert.match(level2.actions[0].title, /Comfortable room/);
+  const level3 = calculateHomeUpgrade(level2, "2026-10-18T12:01:00.000Z");
+  assert.equal(level3.home.level, 3);
+  assert.equal(level3.balance, STARTING_BALANCE - HOME_UPGRADES[2].cost - HOME_UPGRADES[3].cost);
+  assert.equal(calculateHomeUpgrade(level3), null);
+  assert.equal(calculateHomeUpgrade({ ...initial, balance: HOME_UPGRADES[2].cost - 1 }), null);
+  assert.equal(initial.home.level, 1);
 });
