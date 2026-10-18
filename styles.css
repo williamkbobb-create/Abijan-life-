@@ -174,3 +174,8 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
  .map-category-bar button{font-size:10px;padding:7px 9px}
  .pin-museum{left:48%;top:49%}.pin-artisans{left:50%;top:79%}.pin-azuretti{left:13%;top:65%}.pin-lighthouse{left:74%;top:42%}.pin-homes{left:69%;top:80%}.pin-my-home{left:42%;top:85%}
 }
+
+/* Fictional demo neighbors in the player-home district. */
+.pin-house-aya{left:82%;top:66%}.pin-house-koffi{left:78%;top:88%}.pin-house-mariam{left:57%;top:88%}
+.pin-house-aya .pin-icon,.pin-house-koffi .pin-icon,.pin-house-mariam .pin-icon{background:linear-gradient(145deg,#e2f0da,#9fc69d)}
+@media(max-width:760px){.pin-house-aya{left:80%;top:64%}.pin-house-koffi{left:75%;top:88%}.pin-house-mariam{left:53%;top:88%}}
