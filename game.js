@@ -8,6 +8,7 @@
   const ENERGY_PACK_COST = 10000;
   const ENERGY_PACK_AMOUNT = 25;
   const DAILY_SHIFT_LIMIT = 2;
+  const TRANSPORT = Object.freeze({ walk: { title: "Walk", fare: 0, minutes: 25, energy: 3, description: "Free, but takes longer." }, gbaka: { title: "Shared minibus (gbaka)", fare: 500, minutes: 20, energy: 1, description: "A familiar budget-friendly town ride." }, moto: { title: "Moto-taxi", fare: 1500, minutes: 12, energy: 1, description: "A quicker ride through town." }, car: { title: "Private car", fare: 5000, minutes: 10, energy: 0, description: "A more comfortable ride." } });
   const HOME_UPGRADES = Object.freeze({ 2: { cost: 250000, title: "Comfortable room" }, 3: { cost: 1000000, title: "Premium coastal home" } });
   const JOBS = Object.freeze({
     beach_cleanup: { title: "Beach clean-up crew", pay: 25000, energy: 18, minutes: 120, description: "Help keep the shoreline welcoming." },
@@ -76,10 +77,10 @@
   let currentLocation = "beach";
   let selectedPerson = null;
   function freshState(name, style) {
-    return { version: 3, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, transactions: [], inventory: [], day: 1, timeMinutes: 480, location: "beach", home: { level: 1 }, work: { day: 1, shifts: 0 }, createdAt: new Date().toISOString() };
+    return { version: 4, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, transactions: [], inventory: [], day: 1, timeMinutes: 480, location: "beach", transportMode: "gbaka", home: { level: 1 }, work: { day: 1, shifts: 0 }, createdAt: new Date().toISOString() };
   }
   function validState(value) {
-    if (!value || ![1, 2, 3].includes(value.version) || typeof value.name !== "string" ||
+    if (!value || ![1, 2, 3, 4].includes(value.version) || typeof value.name !== "string" ||
       value.name.trim().length < 2 || value.name.length > 24 ||
       !["Coastal creative", "Ambitious newcomer"].includes(value.style) ||
       !Number.isSafeInteger(value.balance) || value.balance < 0 ||
@@ -100,6 +101,7 @@
       Number.isInteger(value.day) && value.day >= 1 && value.day <= 1000000 &&
       Number.isInteger(value.timeMinutes) && value.timeMinutes >= 0 && value.timeMinutes < 1440 &&
       ["beach", "bar", "restaurant", "lavage"].includes(value.location) &&
+      (value.version < 4 || ["walk", "gbaka", "moto", "car"].includes(value.transportMode)) &&
       value.home && Number.isInteger(value.home.level) && value.home.level >= 1 && value.home.level <= 3 &&
       value.work && Number.isInteger(value.work.day) && value.work.day >= 1 && value.work.day <= value.day &&
       Number.isInteger(value.work.shifts) && value.work.shifts >= 0 && value.work.shifts <= DAILY_SHIFT_LIMIT;
@@ -109,9 +111,10 @@
     const base = value.version === 1
       ? { ...value, relationships: value.relationships && typeof value.relationships === "object" ? value.relationships : {}, transactions: [] }
       : { ...value, transactions: value.transactions.slice(-200) };
-    if (value.version === 3) return { ...base, inventory: base.inventory.slice(-100) };
+    if (value.version === 4) return { ...base, inventory: base.inventory.slice(-100) };
     return {
-      ...base, version: 3, inventory: Array.isArray(base.inventory) ? base.inventory : [],
+      ...base, version: 4, inventory: Array.isArray(base.inventory) ? base.inventory : [],
+      transportMode: ["walk", "gbaka", "moto", "car"].includes(base.transportMode) ? base.transportMode : "gbaka",
       day: Number.isInteger(base.day) && base.day > 0 ? base.day : 1,
       timeMinutes: Number.isInteger(base.timeMinutes) && base.timeMinutes >= 0 && base.timeMinutes < 1440 ? base.timeMinutes : 480,
       location: ["beach", "bar", "restaurant", "lavage"].includes(base.location) ? base.location : "beach",
@@ -133,7 +136,7 @@
         try { localStorage.setItem(STORAGE_KEY + "-recovery", raw); } catch (_) {}
         return null;
       }
-      if (migrated.version !== parsed.version || !parsed.transactions || !parsed.inventory || !Number.isInteger(parsed.day)) {
+      if (migrated.version !== parsed.version || !parsed.transactions || !parsed.inventory || !Number.isInteger(parsed.day) || !parsed.transportMode) {
         state = migrated;
         save();
       }
