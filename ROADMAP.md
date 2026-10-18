@@ -25,3 +25,13 @@
 - No Supabase schema, authentication, migrations, production secrets, paid resources, or deployment are configured by this change.
 - Before real accounts/social play: design server-side authorization, persistence, abuse controls, privacy defaults, moderation/reporting, and integration tests.
 - Keep Lagos Life as a systems reference, not a template for Nigerian identity. Build Côte d’Ivoire-specific environments and cultural detail deliberately.
+
+
+## Update 1: connected daily-life systems (in progress)
+- New characters start with 100,000,000 simulated FCFA; the accepted wallet ceiling is 1,000,000,000 FCFA.
+- Versioned local-save migration preserves existing version 1 balances, energy, activities, and relationships; invalid saves are backed up under a recovery key before a fresh state is created.
+- The in-game phone Messages tab includes a simulated Send Money flow with 10,000, 1,000,000, and 10,000,000 FCFA shortcuts plus custom whole-FCFA amounts.
+- Transfers validate recipient and available balance, record a transaction and activity, and reject repeated transaction identifiers.
+- Transfer history is displayed in the phone; no real money, payments, or online accounts are involved.
+- Next work: finish energy recovery/purchase, home base, job/earning loop, shops/inventory, time and travel, then run the full test suite and mobile regression checks.
+- Release gate: no production deployment or merge until tests and review are complete.
