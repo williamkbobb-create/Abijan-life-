@@ -106,7 +106,7 @@ test("phone interface is loaded as a compact side panel with the world still pre
   assert.match(js, /window\.AbijanLifeGame/);
   assert.match(html, /id="buy-energy-button"/);
   assert.match(html, /id="life-panel"/);
-  assert.match(css, /\.life-grid/);
+  assert.match(fs.readFileSync(require("node:path").join(__dirname, "..", "styles.css"), "utf8"), /\.life-grid/);
   assert.match(css, /\.phone-transfer-form/);
 });
 
