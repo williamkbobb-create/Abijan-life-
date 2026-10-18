@@ -8,7 +8,7 @@
   const ENERGY_PACK_COST = 10000;
   const ENERGY_PACK_AMOUNT = 25;
   const DAILY_SHIFT_LIMIT = 2;
-  const TRANSPORT = Object.freeze({ walk: { title: "Walk", fare: 0, minutes: 25, energy: 3, description: "Free, but takes longer." }, gbaka: { title: "Shared minibus (gbaka)", fare: 500, minutes: 20, energy: 1, description: "A familiar budget-friendly town ride." }, moto: { title: "Moto-taxi", fare: 1500, minutes: 12, energy: 1, description: "A quicker ride through town." }, car: { title: "Private car", fare: 5000, minutes: 10, energy: 0, description: "A more comfortable ride." } });
+  const TRANSPORT = Object.freeze({ walk: { title: "Walk", fare: 0, minutes: 25, energy: 3, description: "Free, but takes longer." }, gbaka: { title: "Shared minibus (gbaka)", fare: 500, minutes: 20, energy: 1, description: "A familiar budget-friendly town ride." }, moto: { title: "Moto-taxi", fare: 1500, minutes: 12, energy: 1, description: "A quicker ride through town." }, car: { title: "Private car taxi", fare: 5000, minutes: 10, energy: 0, description: "A private car ride without owning the vehicle." }, owned_car: { title: "Your own car", fare: 0, minutes: 10, energy: 0, description: "Free travel in Update 1; fuel costs arrive in Update 2." } });
   const HOME_UPGRADES = Object.freeze({ 2: { cost: 250000, title: "Comfortable room" }, 3: { cost: 1000000, title: "Premium coastal home" } });
   const JOBS = Object.freeze({
     beach_cleanup: { title: "Beach clean-up crew", pay: 25000, energy: 18, minutes: 120, description: "Help keep the shoreline welcoming." },
@@ -20,7 +20,10 @@
     local_snack: { name: "Local snack", price: 1500, description: "Something tasty for the road." },
     coastal_outfit: { name: "Coastal outfit", price: 25000, description: "A fresh look for your next outing." },
     bassam_souvenir: { name: "Grand-Bassam souvenir", price: 5000, description: "A keepsake from the coast." },
-    phone_charger: { name: "Phone charger", price: 3000, description: "Keep your pocket world powered." }
+    phone_charger: { name: "Phone charger", price: 3000, description: "Keep your pocket world powered." },
+    sofa: { name: "Living-room sofa", price: 150000, description: "A comfortable place to relax at home." },
+    bed: { name: "Bedroom bed", price: 200000, description: "A better bed for your home." },
+    dining_table: { name: "Dining table", price: 100000, description: "A table for meals and visitors." }
   });
   const ACTIVITY_MINUTES = Object.freeze({ swim: 30, explore: 30, beach: 20, bar: 30, restaurant: 30, lavage: 20, drink: 10, food: 30, dance: 30, freestyle: 30, photo: 5, sit: 15, game: 20, inspect: 15, washcar: 45, chat: 15, greet: 5, friend: 15, invite: 10, meet: 10 });
   const COSTS = Object.freeze({ beach: 0, swim: 0, bar: 500, drink: 500, dance: 0, freestyle: 0, food: 750, meet: 0, restaurant: 0, lavage: 0, explore: 0, photo: 0, sit: 0, game: 0, inspect: 0, washcar: 0, chat: 0, greet: 0, friend: 0, invite: 0 });
@@ -77,10 +80,10 @@
   let currentLocation = "beach";
   let selectedPerson = null;
   function freshState(name, style) {
-    return { version: 4, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, transactions: [], inventory: [], day: 1, timeMinutes: 480, location: "beach", transportMode: "gbaka", home: { level: 1 }, work: { day: 1, shifts: 0 }, createdAt: new Date().toISOString() };
+    return { version: 5, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, transactions: [], inventory: [], day: 1, timeMinutes: 480, location: "beach", transportMode: "gbaka", ownsCar: false, home: { level: 1 }, work: { day: 1, shifts: 0 }, createdAt: new Date().toISOString() };
   }
   function validState(value) {
-    if (!value || ![1, 2, 3, 4].includes(value.version) || typeof value.name !== "string" ||
+    if (!value || ![1, 2, 3, 4, 5].includes(value.version) || typeof value.name !== "string" ||
       value.name.trim().length < 2 || value.name.length > 24 ||
       !["Coastal creative", "Ambitious newcomer"].includes(value.style) ||
       !Number.isSafeInteger(value.balance) || value.balance < 0 ||
@@ -98,10 +101,11 @@
     if (value.version === 2) return true;
     return Array.isArray(value.inventory) && value.inventory.length <= 100 &&
       value.inventory.every((item) => item && typeof item.id === "string" && Object.prototype.hasOwnProperty.call(SHOP_ITEMS, item.id) && Number.isInteger(item.quantity) && item.quantity > 0 && item.quantity <= 999) &&
+      (value.version < 5 || typeof value.ownsCar === "boolean") &&
       Number.isInteger(value.day) && value.day >= 1 && value.day <= 1000000 &&
       Number.isInteger(value.timeMinutes) && value.timeMinutes >= 0 && value.timeMinutes < 1440 &&
       ["beach", "bar", "restaurant", "lavage"].includes(value.location) &&
-      (value.version < 4 || ["walk", "gbaka", "moto", "car"].includes(value.transportMode)) &&
+      (value.version < 4 || ["walk", "gbaka", "moto", "car", "owned_car"].includes(value.transportMode)) &&
       value.home && Number.isInteger(value.home.level) && value.home.level >= 1 && value.home.level <= 3 &&
       value.work && Number.isInteger(value.work.day) && value.work.day >= 1 && value.work.day <= value.day &&
       Number.isInteger(value.work.shifts) && value.work.shifts >= 0 && value.work.shifts <= DAILY_SHIFT_LIMIT;
@@ -111,10 +115,11 @@
     const base = value.version === 1
       ? { ...value, relationships: value.relationships && typeof value.relationships === "object" ? value.relationships : {}, transactions: [] }
       : { ...value, transactions: value.transactions.slice(-200) };
-    if (value.version === 4) return { ...base, inventory: base.inventory.slice(-100) };
+    if (value.version === 5) return { ...base, inventory: base.inventory.slice(-100), ownsCar: Boolean(base.ownsCar) };
     return {
-      ...base, version: 4, inventory: Array.isArray(base.inventory) ? base.inventory : [],
-      transportMode: ["walk", "gbaka", "moto", "car"].includes(base.transportMode) ? base.transportMode : "gbaka",
+      ...base, version: 5, inventory: Array.isArray(base.inventory) ? base.inventory.slice(-100) : [],
+      transportMode: ["walk", "gbaka", "moto", "car", "owned_car"].includes(base.transportMode) ? base.transportMode : "gbaka",
+      ownsCar: typeof base.ownsCar === "boolean" ? base.ownsCar : false,
       day: Number.isInteger(base.day) && base.day > 0 ? base.day : 1,
       timeMinutes: Number.isInteger(base.timeMinutes) && base.timeMinutes >= 0 && base.timeMinutes < 1440 ? base.timeMinutes : 480,
       location: ["beach", "bar", "restaurant", "lavage"].includes(base.location) ? base.location : "beach",
@@ -136,7 +141,7 @@
         try { localStorage.setItem(STORAGE_KEY + "-recovery", raw); } catch (_) {}
         return null;
       }
-      if (migrated.version !== parsed.version || !parsed.transactions || !parsed.inventory || !Number.isInteger(parsed.day) || !parsed.transportMode) {
+      if (migrated.version !== parsed.version || !parsed.transactions || !parsed.inventory || !Number.isInteger(parsed.day) || !parsed.transportMode || typeof parsed.ownsCar !== "boolean") {
         state = migrated;
         save();
       }
@@ -271,6 +276,7 @@
   function calculateTravel(current, destination, modeKey, at = new Date().toISOString()) {
     const mode = TRANSPORT[modeKey];
     if (!current || !mode || !["beach", "bar", "restaurant", "lavage"].includes(destination)) return null;
+    if (modeKey === "owned_car" && !current.ownsCar) return null;
     if (destination === current.location) return { ...current, transportMode: modeKey };
     if (current.balance < mode.fare || current.energy < mode.energy) return null;
     const timed = advanceTime(current, mode.minutes, at);
@@ -282,6 +288,7 @@
   }
   function chooseTransport(modeKey) {
     if (!TRANSPORT[modeKey] || !state) return;
+    if (modeKey === "owned_car" && !state.ownsCar) { showToast("Visit Home & Furniture to buy your own car first."); return; }
     state = { ...state, transportMode: modeKey };
     if (!save()) return;
     renderState();
@@ -429,6 +436,21 @@
       actions: [...current.actions, { title: "Worked as " + job.title + " and earned " + job.pay.toLocaleString("en-US") + " FCFA", at }].slice(-100)
     };
   }
+  const HOME_STORE_ITEMS = Object.freeze(["sofa", "bed", "dining_table"]);
+  const CAR_PRICE = 5000000;
+  function calculateCarPurchase(current, at = new Date().toISOString()) {
+    if (!current || current.ownsCar || current.balance < CAR_PRICE) return null;
+    return { ...current, balance: current.balance - CAR_PRICE, ownsCar: true,
+      actions: [...current.actions, { title: "Bought a personal car for " + CAR_PRICE.toLocaleString("en-US") + " simulated FCFA", at }].slice(-100) };
+  }
+  function buyCar() {
+    if (!state || state.ownsCar) return;
+    if (state.balance < CAR_PRICE) { showToast("Not enough simulated FCFA to buy this car."); return; }
+    if (!window.confirm("Buy your own car for " + CAR_PRICE.toLocaleString("en-US") + " simulated FCFA? Fuel will be added in Update 2.")) return;
+    const previous = state; state = calculateCarPurchase(state);
+    if (!save()) { state = previous; renderState(); return; }
+    renderState(); showToast("Car purchased! Choose Your own car in Transport for free trips in Update 1.");
+  }
   function calculatePurchase(current, itemKey, at = new Date().toISOString()) {
     const item = SHOP_ITEMS[itemKey];
     if (!current || !item || current.balance < item.price || current.inventory.length >= 100) return null;
@@ -544,14 +566,30 @@
     if (!state.inventory.length) { const empty = document.createElement("small"); empty.textContent = "Nothing collected yet."; inventory.append(empty); }
     else state.inventory.forEach((owned) => { const row = document.createElement("small"); row.textContent = SHOP_ITEMS[owned.id].name + " × " + owned.quantity; inventory.append(row); });
     shop.append(inventory); grid.append(shop);
+    const homeStore = document.createElement("article"); homeStore.className = "life-card";
+    homeStore.innerHTML = '<span class="life-card-icon">🛋️</span><p class="life-card-kicker">HOME & FURNITURE</p><h3>Furnish your home</h3><p class="life-card-copy">Buy furniture for your home, or purchase a personal car here. Car travel is free in Update 1; fuel is planned for Update 2.</p>';
+    HOME_STORE_ITEMS.forEach((key) => {
+      const item = SHOP_ITEMS[key]; const button = document.createElement("button"); button.type = "button"; button.className = "life-button life-button-secondary";
+      button.textContent = item.name + " · " + item.price.toLocaleString("en-US") + " FCFA";
+      button.disabled = state.balance < item.price || state.inventory.length >= 100 || (state.inventory.find((owned) => owned.id === key)?.quantity || 0) >= 999;
+      button.addEventListener("click", () => buyItem(key)); homeStore.append(button);
+    });
+    const carButton = document.createElement("button"); carButton.type = "button"; carButton.className = "life-button";
+    carButton.textContent = state.ownsCar ? "✓ Personal car owned" : "🚗 Buy a personal car · " + CAR_PRICE.toLocaleString("en-US") + " FCFA";
+    carButton.disabled = state.ownsCar || state.balance < CAR_PRICE;
+    carButton.addEventListener("click", buyCar); homeStore.append(carButton);
+    const homeStoreNote = document.createElement("small"); homeStoreNote.className = "life-card-note";
+    homeStoreNote.textContent = state.ownsCar ? "You own a car. Select it in Transport for free travel; fuel is not charged yet." : "Your car will be saved with your character. Fuel is planned for Update 2.";
+    homeStore.append(homeStoreNote); grid.append(homeStore);
     const travel = document.createElement("article"); travel.className = "life-card";
     travel.innerHTML = '<span class="life-card-icon">🛺</span><p class="life-card-kicker">GET AROUND BASSAM</p><h3>Transport</h3><p class="life-card-copy">Choose how you want to reach your next destination. Fares are simulated.</p>';
     Object.entries(TRANSPORT).forEach(([key, mode]) => {
+      if (key === "owned_car" && !state.ownsCar) { /* shown as locked below */ }
       const button = document.createElement("button"); button.type = "button";
       button.className = "life-button " + (state.transportMode === key ? "" : "life-button-secondary");
       button.textContent = (state.transportMode === key ? "✓ " : "") + mode.title + " · " + (mode.fare ? mode.fare.toLocaleString("en-US") + " FCFA" : "Free") + " · " + mode.minutes + " min";
-      button.disabled = state.transportMode === key;
-      button.title = mode.description + " Energy cost: " + mode.energy + ".";
+      button.disabled = state.transportMode === key || (key === "owned_car" && !state.ownsCar);
+      button.title = (key === "owned_car" && !state.ownsCar ? "Buy a car in Home & Furniture to unlock this option. " : mode.description + " ") + "Energy cost: " + mode.energy + ".";
       button.addEventListener("click", () => chooseTransport(key)); travel.append(button);
     });
     const travelNote = document.createElement("small"); travelNote.className = "life-card-note";
@@ -677,7 +715,7 @@
     showGame();
     selectLocation("beach");
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, calculateHomeUpgrade, calculateTravel, advanceTime, JOBS, SHOP_ITEMS, HOME_UPGRADES, TRANSPORT, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT };
+  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, calculateHomeUpgrade, calculateTravel, calculateCarPurchase, advanceTime, JOBS, SHOP_ITEMS, HOME_UPGRADES, TRANSPORT, HOME_STORE_ITEMS, CAR_PRICE, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT };
   if (typeof window !== "undefined") {
     window.AbijanLifeGame = {
       getState: () => state ? { balance: state.balance, transactions: state.transactions.slice() } : null,
