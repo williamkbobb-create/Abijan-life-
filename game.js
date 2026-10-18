@@ -178,6 +178,9 @@
     azuretti: { title: "Plage d’Azuretti", description: "Une sortie côtière inspirée d’Azuretti pour se détendre, prendre des photos et rencontrer des personnages de la démo.", cover: "beach-cover", icon: "🌅", kicker: "CÔTE · LOISIRS", actions: ["swim", "explore", "photo", "game", "meet", "sit"] },
     lighthouse: { title: "Phare et littoral", description: "Point d’exploration fictif inspiré du patrimoine côtier. Débloque des souvenirs et des photos de découverte.", cover: "historic-cover", icon: "🗼", kicker: "EXPLORATION · LITTORAL", actions: ["explore", "photo", "meet", "chat", "sit"] },
     homes: { title: "Quartier des joueurs", description: "Quartier de maisons fictives pour cette démo locale. Les visites et voisins sont simulés : aucun autre joueur réel n’est connecté ici.", cover: "historic-cover", icon: "🏘️", kicker: "QUARTIER · MODE DÉMO", actions: ["explore", "photo", "meet", "chat", "sit"] },
+    houseaya: { title: "Maison d’Aya", description: "Aya est un personnage fictif de la démo. Tu peux explorer sa maison de jeu et essayer une interaction sociale simulée. Aucun joueur réel ni profil personnel n’est affiché.", cover: "historic-cover", icon: "🏡", kicker: "VOISINE FICTIVE · MODE DÉMO", actions: ["explore", "photo", "meet", "chat", "sit"] },
+    housekoffi: { title: "Maison de Koffi", description: "Koffi est un personnage fictif. Cette visite sert à tester les interactions de voisinage avant la mise en place d’un vrai système multijoueur.", cover: "historic-cover", icon: "🏠", kicker: "VOISIN FICTIF · MODE DÉMO", actions: ["explore", "photo", "meet", "chat", "sit"] },
+    housemariam: { title: "Maison de Mariam", description: "Mariam est une voisine fictive de la démo. Les visites, rencontres et échanges sont simulés localement : aucun compte d’un autre joueur n’est connecté.", cover: "historic-cover", icon: "🏘️", kicker: "VOISINE FICTIVE · MODE DÉMO", actions: ["explore", "photo", "meet", "chat", "sit"] },
     myhome: { title: "Ma maison", description: "Ta maison de jeu est affichée dans le quartier uniquement sur cet appareil de démo. Ce réglage ne publie rien en ligne et n’est pas synchronisé avec d’autres joueurs.", cover: "historic-cover", icon: "🏠", kicker: "TON ESPACE · VISIBILITÉ LOCALE", actions: ["explore", "photo", "chat", "sit"] }
   };
   const ACTION_LABELS = {
@@ -205,7 +208,7 @@
     if (dock) dock.classList.remove("is-hidden");
     currentLocation = key;
     if (scene) {
-      scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage", "location-historic", "location-nzima", "location-museum", "location-artisans", "location-azuretti", "location-lighthouse", "location-homes", "location-myhome");
+      scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage", "location-historic", "location-nzima", "location-museum", "location-artisans", "location-azuretti", "location-lighthouse", "location-homes", "location-myhome", "location-houseaya", "location-housekoffi", "location-housemariam");
       scene.classList.add("location-" + key);
     }
     document.querySelectorAll("[data-location]").forEach((pin) => {
