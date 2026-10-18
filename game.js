@@ -95,7 +95,6 @@
     $("game-screen").hidden = false;
     $("profile-name").textContent = state.name;
     $("profile-style").textContent = state.style;
-    $("avatar-initial").textContent = state.name.trim().charAt(0).toUpperCase();
     renderState();
   }
   function renderState() {
@@ -327,6 +326,11 @@
     $("character-name").addEventListener("input", () => $("character-name").setCustomValidity(""));
     document.querySelectorAll("[data-location]").forEach((button) => button.addEventListener("click", () => selectLocation(button.dataset.location)));
     $("reset-button").addEventListener("click", resetGame);
+    $("avatar-home-button").addEventListener("click", () => {
+      closeOverlays();
+      selectLocation("beach");
+      showToast("Accueil du jeu.");
+    });
     $("rest-button").addEventListener("click", rest);
     $("map-view-button").addEventListener("click", () => {
       const scene = document.querySelector(".world-scene");
