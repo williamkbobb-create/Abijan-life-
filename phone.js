@@ -221,8 +221,72 @@
     }));
     content.append(el("p", "phone-demo-note", "Ceci est un téléphone intégré au jeu, pas un vrai service mobile. Aucun appel réel ni message en ligne n’est envoyé."));
   }
+  function makeStreetLife() {
+    const canvas = $("map-canvas");
+    if (!canvas || canvas.querySelector(".street-life-layer")) return;
+    const style = document.createElement("style");
+    style.id = "street-life-styles";
+    style.textContent = `
+      .street-life-layer{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+      .street-actor{position:absolute;display:grid;place-items:center;border:0;padding:0;background:transparent;pointer-events:auto;cursor:pointer;line-height:1;filter:drop-shadow(0 2px 2px #173d3650);will-change:left,top;user-select:none;-webkit-tap-highlight-color:transparent}
+      .street-walker{width:clamp(25px,4vw,39px);height:clamp(25px,4vw,39px);font-size:clamp(20px,3.2vw,30px);border-radius:50%;background:#fff9e8d9;box-shadow:0 2px 8px #123b3228;animation-duration:18s;animation-timing-function:linear;animation-iteration-count:infinite}
+      .street-car{width:clamp(28px,4.6vw,44px);height:clamp(23px,3.8vw,35px);font-size:clamp(21px,3.5vw,32px);animation-duration:21s;animation-timing-function:linear;animation-iteration-count:infinite}
+      .walker-a{animation-name:street-walk-a}.walker-b{animation-name:street-walk-b;animation-duration:23s;animation-delay:-8s}.walker-c{animation-name:street-walk-c;animation-duration:27s;animation-delay:-14s}
+      .car-a{animation-name:street-car-a}.car-b{animation-name:street-car-b;animation-duration:25s;animation-delay:-12s}
+      .street-actor:focus-visible{outline:3px solid #f4d79c;outline-offset:3px;border-radius:50%}
+      .street-actor.is-greeting{z-index:8;animation-play-state:paused;transform:scale(1.12)}
+      .street-actor.is-greeting::after{content:attr(data-bubble);position:absolute;left:50%;bottom:calc(100% + 5px);transform:translateX(-50%);padding:6px 8px;border-radius:12px;background:#fffdf4;color:#173d36;font:700 10px/1.2 system-ui,sans-serif;white-space:nowrap;box-shadow:0 3px 12px #173d3633}
+      @keyframes street-walk-a{0%{left:13%;top:52%}25%{left:27%;top:48%}50%{left:43%;top:55%}75%{left:29%;top:61%}100%{left:13%;top:52%}}
+      @keyframes street-walk-b{0%{left:73%;top:47%}25%{left:60%;top:53%}50%{left:47%;top:49%}75%{left:61%;top:43%}100%{left:73%;top:47%}}
+      @keyframes street-walk-c{0%{left:38%;top:76%}25%{left:48%;top:69%}50%{left:62%;top:74%}75%{left:50%;top:81%}100%{left:38%;top:76%}}
+      @keyframes street-car-a{0%{left:-7%;top:39%}48%{left:53%;top:42%}50%{left:57%;top:42%}100%{left:108%;top:45%}}
+      @keyframes street-car-b{0%{left:107%;top:65%}48%{left:49%;top:62%}50%{left:45%;top:62%}100%{left:-8%;top:59%}}
+      @media(prefers-reduced-motion:reduce){.street-walker,.street-car{animation:none!important}.street-actor.is-greeting{transform:none}}
+      @media(max-width:760px){.street-life-layer{z-index:4}.street-walker{width:29px;height:29px;font-size:22px}.street-car{font-size:23px}}
+    `;
+    document.head.append(style);
+    const layer = document.createElement("div");
+    layer.className = "street-life-layer";
+    layer.setAttribute("aria-label", "Personnages et véhicules animés dans les rues");
+    const actors = [
+      { className: "street-actor street-walker walker-a", emoji: "🚶🏾", label: "Passant dans la rue", bubble: "👋 Salut !" },
+      { className: "street-actor street-walker walker-b", emoji: "🚶🏿‍♀️", label: "Passante dans la rue", bubble: "😊 Bonjour !" },
+      { className: "street-actor street-walker walker-c", emoji: "🧍🏾", label: "Habitant de Grand-Bassam", bubble: "Ça va ?" },
+      { className: "street-actor street-car car-a", emoji: "🚕", label: "Taxi de démonstration", bubble: "🚕 Taxi !" },
+      { className: "street-actor street-car car-b", emoji: "🚗", label: "Voiture de démonstration", bubble: "🚗 Vroum !" }
+    ];
+    actors.forEach((actor) => {
+      const node = document.createElement("button");
+      node.type = "button";
+      node.className = actor.className;
+      node.textContent = actor.emoji;
+      node.setAttribute("aria-label", actor.label + " — toucher pour interagir");
+      node.dataset.bubble = actor.bubble;
+      node.addEventListener("click", () => {
+        const wasOpen = node.classList.contains("is-greeting");
+        layer.querySelectorAll(".is-greeting").forEach((item) => item.classList.remove("is-greeting"));
+        if (!wasOpen) {
+          node.classList.add("is-greeting");
+          window.clearTimeout(node.greetingTimer);
+          node.greetingTimer = window.setTimeout(() => node.classList.remove("is-greeting"), 2200);
+          const toast = $("toast");
+          if (toast) {
+            toast.textContent = actor.className.includes("street-walker")
+              ? "👋 Tu salues un habitant de Grand-Bassam !"
+              : "🚗 Un véhicule passe dans la rue.";
+            toast.hidden = false;
+            window.clearTimeout(toast.streetLifeTimer);
+            toast.streetLifeTimer = window.setTimeout(() => { toast.hidden = true; }, 2200);
+          }
+        }
+      });
+      layer.append(node);
+    });
+    canvas.append(layer);
+  }
   function init() {
     phoneState = loadPhone();
+    makeStreetLife();
     makePhone();
     const activityList = $("activity-list");
     if (activityList && typeof MutationObserver !== "undefined") new MutationObserver(() => { if (activeTab === "activities" && $("phone-panel") && !$("phone-panel").hidden) renderTab(); }).observe(activityList, { childList: true, subtree: true, characterData: true });
