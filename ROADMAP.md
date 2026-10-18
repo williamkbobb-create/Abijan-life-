@@ -33,5 +33,5 @@
 - The in-game phone Messages tab includes a simulated Send Money flow with 10,000, 1,000,000, and 10,000,000 FCFA shortcuts plus custom whole-FCFA amounts.
 - Transfers validate recipient and available balance, record a transaction and activity, and reject repeated transaction identifiers.
 - Transfer history is displayed in the phone; no real money, payments, or online accounts are involved.
-- Next work: finish energy recovery/purchase, home base, job/earning loop, shops/inventory, time and travel, then run the full test suite and mobile regression checks.
+- Added home sleep, a basic in-game day/clock, local job shifts with simulated pay and energy costs, daily shift limits, a small local shop catalogue, and persisted inventory. Travel costs and richer home/room upgrades remain to be implemented.
 - Release gate: no production deployment or merge until tests and review are complete.
