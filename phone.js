@@ -47,13 +47,13 @@
     if (!game || $("phone-launcher")) return;
     const launcher = button("▣", "phone-launcher", togglePhone, "Ouvrir le téléphone du jeu");
     launcher.id = "phone-launcher";
-    launcher.innerHTML = '<span class="phone-glyph" aria-hidden="true">▰</span><span class="phone-launcher-label">PHONE</span><i class="phone-notification-dot" aria-hidden="true"></i>';
+    launcher.innerHTML = '<span class="phone-glyph" aria-hidden="true">▰</span><i class="phone-notification-dot" aria-hidden="true"></i>';
     const panel = el("aside", "phone-panel");
     panel.id = "phone-panel";
     panel.hidden = true;
     panel.setAttribute("aria-label", "Téléphone du jeu");
-    panel.innerHTML = '<div class="phone-top"><div class="phone-camera"></div><div class="phone-status"><span>● BASSAM MOBILE</span><span id="phone-clock">21:39</span></div></div><header class="phone-header"><div><small>TON MONDE DE POCHE</small><h2 id="phone-title">Messages</h2></div><button id="phone-close" type="button" aria-label="Ranger le téléphone">−</button></header><nav class="phone-tabs" aria-label="Applications du téléphone"><button type="button" data-phone-tab="messages">Messages <i id="phone-unread">2</i></button><button type="button" data-phone-tab="calls">Appels</button><button type="button" data-phone-tab="contacts">Contacts</button><button type="button" data-phone-tab="activities">Activités</button><button type="button" data-phone-tab="settings">Réglages</button></nav><div id="phone-content" class="phone-content"></div><footer class="phone-footer"><span>●</span> ABJ MOBILE <span>·</span> MONDE SIMULÉ</footer>';
-    game.append(launcher, panel);
+    panel.innerHTML = '<div class="phone-top"><div class="phone-camera"></div><div class="phone-status"><span>● BASSAM MOBILE</span><span id="phone-clock">21:39</span></div></div><header class="phone-header"><div><small>TON MONDE DE POCHE</small><h2 id="phone-title">Messages</h2></div><button id="phone-close" type="button" aria-label="Ranger le téléphone">−</button></header><nav class="phone-tabs" aria-label="Applications du téléphone"><button type="button" data-phone-tab="messages"><span aria-hidden="true">💬</span><small>Messages</small><i id="phone-unread">2</i></button><button type="button" data-phone-tab="calls"><span aria-hidden="true">☎️</span><small>Appels</small></button><button type="button" data-phone-tab="contacts"><span aria-hidden="true">👥</span><small>Contacts</small></button><button type="button" data-phone-tab="activities"><span aria-hidden="true">🗓️</span><small>Activités</small></button><button type="button" data-phone-tab="settings"><span aria-hidden="true">⚙️</span><small>Réglages</small></button></nav><div id="phone-content" class="phone-content"></div><footer class="phone-footer"><span>●</span> ABJ MOBILE <span>·</span> MONDE SIMULÉ</footer>';
+    const hud = game.querySelector(".game-hud");\n    if (hud) hud.append(launcher); else game.append(launcher);\n    game.append(panel);
     $("phone-close").addEventListener("click", togglePhone);
     panel.querySelectorAll("[data-phone-tab]").forEach((tab) => tab.addEventListener("click", () => openTab(tab.dataset.phoneTab)));
     document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !panel.hidden) togglePhone(); });
