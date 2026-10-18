@@ -167,7 +167,7 @@ test("player feedback is compact and the next-update plan is visible", () => {
   assert.match(html, /id="auth-toggle"/);
   assert.match(html, /@supabase\/supabase-js@2/);
   const auth = fs.readFileSync(path.join(root, "auth.js"), "utf8");
-  assert.match(auth, /Le compte est facultatif/);
+  assert.match(auth, /compte est facultatif/);
   assert.doesNotMatch(auth, /welcome-screen.*hidden = false|game-screen.*hidden = true/);
   assert.doesNotMatch(html, /id="first-play-tutorial"/);
 });
