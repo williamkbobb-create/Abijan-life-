@@ -194,3 +194,24 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
 .phone-app-icon span{display:grid;place-items:center;width:54px;height:54px;border-radius:17px;background:linear-gradient(145deg,#d7e9d6,#a6c9b1);box-shadow:0 5px 12px #1a493019;font-size:25px}
 .phone-app-icon[data-app="messages"] span{background:linear-gradient(145deg,#a6e4c0,#4ba77b);color:#fff}
 .phone-app-icon:active span{transform:scale(.94)}
+
+
+/* Living streets: lightweight animated traffic and pedestrians, contained inside the map. */
+.street-life{position:absolute;inset:0;z-index:2;overflow:hidden;pointer-events:none}
+.traffic-lane{position:absolute;left:-35%;width:170%;height:clamp(22px,3.8vw,38px);display:flex;align-items:center;gap:clamp(90px,17vw,210px);white-space:nowrap}
+.traffic-lane-one{top:67%;animation:traffic-east 24s linear infinite}
+.traffic-lane-two{top:79%;animation:traffic-west 30s linear infinite}
+.traffic-car{display:inline-block;font-size:clamp(19px,2.7vw,30px);filter:drop-shadow(0 3px 2px #173a2d45);line-height:1}
+.car-orange{filter:sepia(.25) saturate(1.2) drop-shadow(0 3px 2px #173a2d45)}
+.car-blue{filter:hue-rotate(155deg) saturate(.9) drop-shadow(0 3px 2px #173a2d45)}
+.car-white{filter:grayscale(.3) drop-shadow(0 3px 2px #173a2d45)}
+.car-green{filter:hue-rotate(55deg) saturate(.8) drop-shadow(0 3px 2px #173a2d45)}
+.car-yellow{filter:sepia(.6) saturate(1.6) drop-shadow(0 3px 2px #173a2d45)}
+.street-walkers{position:absolute;left:0;right:0;top:57%;height:20%;z-index:2}
+.walker{position:absolute;display:inline-block;font-size:clamp(17px,2.2vw,25px);filter:drop-shadow(0 2px 2px #173a2d3b);animation:walk-town 13s ease-in-out infinite alternate}
+.walker-one{left:8%;top:8%;animation-delay:-3s}.walker-two{left:40%;top:35%;animation-delay:-8s}.walker-three{left:68%;top:2%;animation-delay:-5s}.walker-four{left:88%;top:45%;animation-delay:-10s}
+@keyframes traffic-east{from{transform:translateX(-8%)}to{transform:translateX(38%)}}
+@keyframes traffic-west{from{transform:translateX(32%)}to{transform:translateX(-12%)}}
+@keyframes walk-town{from{translate:-6px 0}to{translate:clamp(15px,5vw,55px) -3px}}
+@media(prefers-reduced-motion:reduce){.traffic-lane,.walker{animation:none}}
+@media(max-width:650px){.traffic-lane-one{top:69%}.traffic-lane-two{top:81%}.street-walkers{top:58%}.walker-four{display:none}.location-dock{z-index:5}.street-life{opacity:.94}}
