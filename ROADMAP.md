@@ -33,5 +33,6 @@
 - The in-game phone Messages tab includes a simulated Send Money flow with 10,000, 1,000,000, and 10,000,000 FCFA shortcuts plus custom whole-FCFA amounts.
 - Transfers validate recipient and available balance, record a transaction and activity, and reject repeated transaction identifiers.
 - Transfer history is displayed in the phone; no real money, payments, or online accounts are involved.
-- Added home sleep and three home levels, a basic in-game day/clock, location persistence, four transport modes (walking, shared minibus/gbaka, moto-taxi, private car) with simulated fares/time/energy costs, local job shifts with simulated pay and energy costs, daily shift limits, a small local shop catalogue, and persisted inventory.
+- Added home sleep and three home levels, a basic in-game day/clock, location persistence, four public transport modes with simulated fares/time/energy costs, local job shifts with simulated pay and energy costs, daily shift limits, everyday shops, a dedicated Home & Furniture shop, sofa/bed/dining-table purchases, and persisted inventory.
+- Personal car purchase costs 5,000,000 simulated FCFA and is saved on the character; owning it unlocks free travel in Update 1. Fuel purchasing and fuel consumption are intentionally deferred to Update 2.
 - Release gate: no production deployment or merge until tests and review are complete.
