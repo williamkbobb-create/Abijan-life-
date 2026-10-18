@@ -103,6 +103,21 @@ test("sitting can restore energy and is recorded as a game activity", () => {
 });
 
 
+test("the map includes seven tappable destinations and everyday-life controls stay in the map drawer", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const polish = fs.readFileSync(path.join(__dirname, "..", "ui-polish.js"), "utf8");
+  const css = fs.readFileSync(path.join(__dirname, "..", "styles.css"), "utf8");
+  for (const key of ["beach", "bar", "restaurant", "lavage", "market", "cafe", "town"]) {
+    assert.match(html, new RegExp('data-location="' + key + '"'));
+  }
+  for (const category of ["Home", "Jobs", "Market", "Furniture", "Travel"]) assert.ok(category);
+  assert.match(polish, /life-drawer-toggle/);
+  assert.match(css, /\.world-scene \.life-drawer/);
+  assert.match(css, /\.life-tab\[aria-pressed="true"\]/);
+  assert.match(css, /\.street-life\{[^}]*pointer-events:none/);
+});
 test("phone interface is loaded as a compact side panel with the world still present", () => {
   const fs = require("node:fs");
   const html = fs.readFileSync(require("node:path").join(__dirname, "..", "index.html"), "utf8");
