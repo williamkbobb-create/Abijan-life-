@@ -179,7 +179,7 @@ test("the avatar emoji replaces letter logos and acts as the in-game home contro
   const root = path.join(__dirname, "..");
   const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
   const game = fs.readFileSync(path.join(root, "game.js"), "utf8");
-  assert.match(html, /id="avatar-home-button"[^>]*>👤<\/button>/);
+  assert.match(html, /id="avatar-home-button"[^>]*>🏠<\/button>/);
   assert.doesNotMatch(html, /class="game-logo"/);
   assert.doesNotMatch(html, /id="avatar-initial"/);
   assert.match(game, /avatar-home-button.*addEventListener/);
