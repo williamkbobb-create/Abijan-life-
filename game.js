@@ -5,6 +5,8 @@
   const MAX_BALANCE = 1000000000;
   const STARTING_ENERGY = 80;
   const REST_RECOVERY = 25;
+  const ENERGY_PACK_COST = 10000;
+  const ENERGY_PACK_AMOUNT = 25;
   const COSTS = Object.freeze({ beach: 0, swim: 0, bar: 500, drink: 500, dance: 0, freestyle: 0, food: 750, meet: 0, restaurant: 0, lavage: 0, explore: 0, photo: 0, sit: 0, game: 0, inspect: 0, washcar: 0, chat: 0, greet: 0, friend: 0, invite: 0 });
   const ACTIVITIES = Object.freeze({
     beach: { title: "Explored Grand-Bassam Beach", energy: -5, message: "You took a walk along the coast. Energy -5." },
@@ -135,6 +137,13 @@
     restButton.disabled = state.energy >= 100;
     restButton.setAttribute("aria-disabled", String(restButton.disabled));
     restButton.style.opacity = restButton.disabled ? ".55" : "1";
+    const energyShopButton = $("buy-energy-button");
+    if (energyShopButton) {
+      energyShopButton.disabled = state.energy >= 100 || state.balance < ENERGY_PACK_COST;
+      energyShopButton.title = "Buy up to " + ENERGY_PACK_AMOUNT + " energy for " + ENERGY_PACK_COST.toLocaleString("en-US") + " simulated FCFA";
+      energyShopButton.setAttribute("aria-disabled", String(energyShopButton.disabled));
+      energyShopButton.style.opacity = energyShopButton.disabled ? ".55" : "1";
+    }
     const list = $("activity-list");
     list.replaceChildren();
     state.actions.slice().reverse().forEach((action) => {
@@ -355,6 +364,38 @@
     showToast("Sent " + amount.toLocaleString("en-US") + " simulated FCFA to " + recipient.name + ".");
     return { ok: true, transaction: result.transaction, balance: state.balance };
   }
+  function calculateEnergyPurchase(current, at = new Date().toISOString()) {
+    if (!current || current.energy >= 100 || current.balance < ENERGY_PACK_COST) return null;
+    const recovered = Math.min(ENERGY_PACK_AMOUNT, 100 - current.energy);
+    return {
+      state: {
+        ...current,
+        balance: current.balance - ENERGY_PACK_COST,
+        energy: current.energy + recovered,
+        actions: [...current.actions, { title: "Bought " + recovered + " energy for " + ENERGY_PACK_COST.toLocaleString("en-US") + " FCFA", at }].slice(-100)
+      },
+      cost: ENERGY_PACK_COST,
+      recovered
+    };
+  }
+  function buyEnergy() {
+    if (!state) return;
+    const result = calculateEnergyPurchase(state);
+    if (!result) {
+      showToast(state.energy >= 100 ? "Your energy is already full." : "Not enough simulated FCFA to buy an energy pack.");
+      return;
+    }
+    if (!window.confirm("Buy up to " + ENERGY_PACK_AMOUNT + " energy for " + ENERGY_PACK_COST.toLocaleString("en-US") + " simulated FCFA?")) return;
+    const previous = state;
+    state = result.state;
+    if (!save()) {
+      state = previous;
+      renderState();
+      return;
+    }
+    renderState();
+    showToast("Energy +" + result.recovered + ". " + result.cost.toLocaleString("en-US") + " simulated FCFA spent.");
+  }
   function calculateRest(current, at = new Date().toISOString()) {
     if (!current || current.energy >= 100) return null;
     const recovered = Math.min(REST_RECOVERY, 100 - current.energy);
@@ -386,6 +427,7 @@
     document.querySelectorAll("[data-location]").forEach((button) => button.addEventListener("click", () => selectLocation(button.dataset.location)));
     $("reset-button").addEventListener("click", resetGame);
     $("rest-button").addEventListener("click", rest);
+    if ($("buy-energy-button")) $("buy-energy-button").addEventListener("click", buyEnergy);
     $("map-view-button").addEventListener("click", () => {
       const scene = document.querySelector(".world-scene");
       const active = scene.classList.toggle("map-focus");
@@ -406,7 +448,7 @@
     showGame();
     selectLocation("beach");
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateTransfer, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY };
+  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT };
   if (typeof window !== "undefined") {
     window.AbijanLifeGame = {
       getState: () => state ? { balance: state.balance, transactions: state.transactions.slice() } : null,
