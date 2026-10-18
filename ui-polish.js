@@ -13,6 +13,21 @@ const hide=()=>{dock.hidden=true;reopen.hidden=false},show=()=>{dock.hidden=fals
 document.querySelectorAll("[data-location]").forEach(pin=>pin.addEventListener("click",()=>{show();drawer.hidden=true;$("life-drawer-toggle").setAttribute("aria-expanded","false");$("life-drawer-toggle").textContent="☰ Everyday life"}));
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){drawer.hidden=true;$("life-drawer-toggle").setAttribute("aria-expanded","false");$("life-drawer-toggle").textContent="☰ Everyday life";if(!dock.hidden)hide()}});
 }
+function phoneHomeUI(){
+const panel=$("phone-panel"),launcher=$("phone-launcher");
+if(!panel||!launcher||panel.dataset.homeReady)return;
+panel.dataset.homeReady="1";
+const nav=panel.querySelector(".phone-tabs"),content=$("phone-content"),header=panel.querySelector(".phone-header");
+const home=document.createElement("div");home.className="phone-app-home";home.hidden=true;
+home.innerHTML='<button class="phone-app-icon" data-app="messages" type="button"><span>💬</span>Messages</button><button class="phone-app-icon" data-app="calls" type="button"><span>📞</span>Calls</button><button class="phone-app-icon" data-app="contacts" type="button"><span>👥</span>Contacts</button><button class="phone-app-icon" data-app="activities" type="button"><span>🧾</span>Activity</button><button class="phone-app-icon" data-app="settings" type="button"><span>⚙️</span>Settings</button><button class="phone-app-icon" data-app="wallet" type="button"><span>💸</span>Wallet</button>';
+panel.insertBefore(home,nav);
+const title=header&&header.querySelector("h2");
+function showHome(){home.hidden=false;nav.hidden=true;content.hidden=true;if(title)title.textContent="Your apps";panel.dataset.onHome="1";}
+function showApp(app){home.hidden=true;nav.hidden=false;content.hidden=false;panel.dataset.onHome="0";const tab=panel.querySelector('[data-phone-tab="'+app+'"]');if(tab)tab.click();else if(app==="wallet"){const t=panel.querySelector('[data-phone-tab="messages"]');if(t)t.click();setTimeout(()=>{const b=content.querySelector(".phone-primary");if(b)b.click();},0);}}
+home.querySelectorAll("[data-app]").forEach(b=>b.addEventListener("click",()=>showApp(b.dataset.app)));
+const close=$("phone-close");if(close)close.addEventListener("click",()=>{home.hidden=true;nav.hidden=false;content.hidden=false;panel.dataset.onHome="0";});
+launcher.addEventListener("click",()=>setTimeout(()=>{if(!panel.hidden)showHome();else{home.hidden=true;nav.hidden=false;content.hidden=false;}},0));
+}
 function conversation(){const panel=$("phone-panel"),content=$("phone-content");if(!panel||panel.hidden||!content)return null;const h=content.querySelector(".phone-thread h3");return h?{content,name:h.textContent.trim(),key:h.textContent.trim().toLowerCase()}:null}
 function decorate(){const c=conversation();if(!c||c.content.querySelector(".phone-person-actions"))return;const saved=read(),prior=saved[c.key]||{},actions=document.createElement("div");actions.className="phone-person-actions";
 const money=document.createElement("button");money.textContent="↗ Send money";money.addEventListener("click",()=>{const tab=document.querySelector('[data-phone-tab="messages"]');if(tab)tab.click();const btn=$("phone-content")&&$("phone-content").querySelector(".phone-primary");if(btn)btn.click()});
@@ -22,6 +37,6 @@ const topButton=c.content.querySelector(".phone-primary");if(topButton&&topButto
 Object.entries(prior).filter(([,v])=>v==="accepted").forEach(([type])=>{const label=document.createElement("small");label.className="phone-person-relation";label.textContent="✓ "+type;c.content.querySelector(".phone-thread").append(label)});
 }
 function phoneUI(){const panel=$("phone-panel"),content=$("phone-content");if(!panel||!content||panel.dataset.polished)return;panel.dataset.polished="1";new MutationObserver(()=>{const c=conversation();if(c){const first=c.content.querySelector(".phone-primary");if(first&&first.textContent.toLowerCase().includes("send money"))first.classList.add("phone-messages-shortcut");decorate()}}).observe(content,{childList:true,subtree:true})}
-function boot(){mapUI();phoneUI();new MutationObserver(()=>{mapUI();phoneUI()}).observe(document.body,{childList:true,subtree:true})}
+function boot(){mapUI();phoneUI();phoneHomeUI();new MutationObserver(()=>{mapUI();phoneUI();phoneHomeUI()}).observe(document.body,{childList:true,subtree:true})}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
 })();
