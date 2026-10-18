@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateTransfer, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY } = require("../game.js");
+const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT } = require("../game.js");
 test("new character starts with the documented demo balance and energy", () => {
   const state = freshState("Aya Kouassi", "Coastal creative");
   assert.equal(state.name, "Aya Kouassi");
@@ -104,6 +104,7 @@ test("phone interface is loaded as a compact side panel with the world still pre
   assert.match(js, /Send Money/);
   assert.match(js, /10000000/);
   assert.match(js, /window\.AbijanLifeGame/);
+  assert.match(html, /id="buy-energy-button"/);
   assert.match(css, /\.phone-transfer-form/);
 });
 
@@ -145,4 +146,16 @@ test("simulated transfers reject invalid, unsafe, and unaffordable amounts", () 
   assert.equal(calculateTransfer(initial, recipient, STARTING_BALANCE + 1, undefined, "too-much"), null);
   assert.equal(calculateTransfer(initial, recipient, 1.5, undefined, "fraction"), null);
   assert.equal(calculateTransfer(initial, null, 1000, undefined, "no-recipient"), null);
+});
+
+test("buying energy deducts simulated FCFA and caps energy at 100", () => {
+  const initial = { ...freshState("Aya", "Coastal creative"), energy: 90 };
+  const result = calculateEnergyPurchase(initial, "2026-10-18T12:00:00.000Z");
+  assert.equal(result.cost, ENERGY_PACK_COST);
+  assert.equal(result.recovered, 10);
+  assert.equal(result.state.energy, 100);
+  assert.equal(result.state.balance, STARTING_BALANCE - ENERGY_PACK_COST);
+  assert.equal(initial.balance, STARTING_BALANCE);
+  assert.equal(calculateEnergyPurchase({ ...initial, energy: 100 }), null);
+  assert.equal(calculateEnergyPurchase({ ...initial, balance: ENERGY_PACK_COST - 1 }), null);
 });
