@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { freshState, validState, calculateActivity, calculateRest, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, STARTING_ENERGY } = require("../game.js");
+const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateTransfer, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY } = require("../game.js");
 test("new character starts with the documented demo balance and energy", () => {
   const state = freshState("Aya Kouassi", "Coastal creative");
   assert.equal(state.name, "Aya Kouassi");
@@ -39,10 +39,10 @@ test("activity catalog has a non-negative cost for every activity", () => {
 test("activity transition deducts cost, updates energy, and records history", () => {
   const initial = freshState("Aya", "Coastal creative");
   const next = calculateActivity(initial, "bar", "2026-10-17T12:00:00.000Z");
-  assert.equal(next.balance, 4500);
+  assert.equal(next.balance, STARTING_BALANCE - 500);
   assert.equal(next.energy, 77);
   assert.deepEqual(next.actions, [{ title: ACTIVITIES.bar.title, at: "2026-10-17T12:00:00.000Z" }]);
-  assert.equal(initial.balance, 5000, "transition must not mutate previous state");
+  assert.equal(initial.balance, STARTING_BALANCE, "transition must not mutate previous state");
 });
 test("activity transition refuses unknown actions, exhausted energy, and insufficient funds", () => {
   const initial = freshState("Aya", "Coastal creative");
@@ -69,8 +69,8 @@ test("rest is unavailable when energy is already full", () => {
 });
 test("buying drinks and local food deduct only simulated FCFA", () => {
   const initial = freshState("Aya", "Coastal creative");
-  assert.equal(calculateActivity(initial, "drink").balance, 4500);
-  assert.equal(calculateActivity(initial, "food").balance, 4250);
+  assert.equal(calculateActivity(initial, "drink").balance, STARTING_BALANCE - 500);
+  assert.equal(calculateActivity(initial, "food").balance, STARTING_BALANCE - 750);
 });
 test("each playable location has a local crowd grouped into sections", () => {
   for (const location of ["beach", "bar", "restaurant", "lavage"]) {
@@ -101,4 +101,44 @@ test("phone interface is loaded as a compact side panel with the world still pre
   assert.match(css, /\.phone-panel/);
   assert.match(css, /@media\s*\(max-width:\s*650px\)/);
   assert.match(js, /No real calls or online messages are sent/);
+});
+
+
+test("new characters start with 100 million simulated FCFA and state accepts the new cap", () => {
+  const state = freshState("Aya", "Coastal creative");
+  assert.equal(STARTING_BALANCE, 100000000);
+  assert.equal(state.balance, 100000000);
+  assert.equal(validState({ ...state, balance: MAX_BALANCE }), true);
+  assert.equal(validState({ ...state, balance: MAX_BALANCE + 1 }), false);
+});
+test("legacy version 1 saves migrate without changing the player's existing balance or progress", () => {
+  const legacy = { version: 1, name: "Aya", style: "Coastal creative", balance: 42000, energy: 44, actions: [{ title: "Old activity", at: "2026-10-17T12:00:00.000Z" }], relationships: { aya: 3 }, createdAt: "2026-10-17T11:00:00.000Z" };
+  const migrated = migrateState(legacy);
+  assert.equal(migrated.version, 2);
+  assert.equal(migrated.balance, 42000);
+  assert.equal(migrated.energy, 44);
+  assert.equal(migrated.relationships.aya, 3);
+  assert.equal(migrated.actions[0].title, "Old activity");
+  assert.deepEqual(migrated.transactions, []);
+  assert.equal(validState(migrated), true);
+});
+test("simulated transfers deduct once and preserve transaction history", () => {
+  const initial = freshState("Aya", "Coastal creative");
+  const result = calculateTransfer(initial, { id: "koffi", name: "Koffi Yao" }, 10000000, "2026-10-18T12:00:00.000Z", "transfer-test-1");
+  assert.ok(result);
+  assert.equal(result.state.balance, STARTING_BALANCE - 10000000);
+  assert.equal(result.transaction.recipientName, "Koffi Yao");
+  assert.equal(result.state.transactions.length, 1);
+  assert.equal(result.state.actions.length, 1);
+  assert.equal(initial.balance, STARTING_BALANCE, "transfer calculation must not mutate prior state");
+  assert.equal(calculateTransfer(result.state, { id: "koffi", name: "Koffi Yao" }, 10000000, "2026-10-18T12:00:01.000Z", "transfer-test-1"), null, "duplicate transfer ID must be rejected");
+});
+test("simulated transfers reject invalid, unsafe, and unaffordable amounts", () => {
+  const initial = freshState("Aya", "Coastal creative");
+  const recipient = { id: "aya", name: "Aya Kouassi" };
+  assert.equal(calculateTransfer(initial, recipient, 0, undefined, "zero"), null);
+  assert.equal(calculateTransfer(initial, recipient, -10, undefined, "negative"), null);
+  assert.equal(calculateTransfer(initial, recipient, STARTING_BALANCE + 1, undefined, "too-much"), null);
+  assert.equal(calculateTransfer(initial, recipient, 1.5, undefined, "fraction"), null);
+  assert.equal(calculateTransfer(initial, null, 1000, undefined, "no-recipient"), null);
 });
