@@ -274,7 +274,16 @@
     if (mapButton) mapButton.setAttribute("aria-pressed", "false");
     const location = LOCATION_DETAILS[key];
     if (!location) return;
+    const previousLocation = state ? state.location : key;
     currentLocation = key;
+    if (state && previousLocation !== key) {
+      const at = new Date().toISOString();
+      const timed = advanceTime(state, 15, at);
+      state = { ...timed, location: key, actions: [...state.actions, { title: "Travelled to " + location.title, at }].slice(-100) };
+      save();
+    } else if (state) {
+      state.location = key;
+    }
     if (scene) {
       scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage");
       scene.classList.add("location-" + key);
@@ -569,7 +578,7 @@
     save();
     closeOverlays();
     showGame();
-    selectLocation("beach");
+    selectLocation(state.location || "beach");
   }
   function init() {
     $("character-form").addEventListener("submit", startGame);
