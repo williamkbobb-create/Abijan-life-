@@ -10,3 +10,22 @@
 @media(max-width:650px){.phone-launcher{top:53px;right:9px;padding:9px 10px;gap:6px}.phone-launcher-label{font-size:9px}.phone-panel{top:47px;right:7px;bottom:57px;width:min(310px,48%);min-width:0;border-radius:17px}.phone-header{padding:10px 11px}.phone-header h2{font-size:22px}.phone-header small{font-size:7px;letter-spacing:1px}.phone-tabs{padding:0 6px 8px;gap:1px}.phone-tabs button{font-size:9px;padding:8px 7px}.phone-content{padding:9px 8px}.phone-person-row{gap:7px;padding:9px 6px}.phone-person-avatar{width:31px;height:31px;font-size:17px}.phone-person-info b{font-size:10px}.phone-person-info small{font-size:9px;max-width:calc(100% - 4px)}.phone-message-time{font-size:7px}.phone-footer{font-size:7px;letter-spacing:.7px}.phone-bubble{font-size:10px}.phone-status{display:none}}
 @media(max-width:390px){.phone-launcher{top:51px;right:7px;padding:8px}.phone-launcher-label{display:none}.phone-panel{width:53%;right:5px;top:45px;bottom:53px}.phone-tabs button{padding:8px 6px;font-size:8px}.phone-person-info small{white-space:normal;max-height:2.7em}.phone-message-time{display:none}}
 @media(prefers-reduced-motion:reduce){.phone-panel{animation:none}}
+/* Phone is launched from the HUD; its drawer stays below the energy and wallet row. */
+.phone-launcher{position:relative;top:auto;right:auto;z-index:36;flex:0 0 36px;width:36px;height:36px;justify-content:center;padding:6px;border-radius:50%;gap:0;letter-spacing:0}
+.phone-glyph{font-size:20px}.phone-launcher-label{display:none}
+.phone-panel{top:72px;right:12px;bottom:auto;width:min(320px,calc(100% - 24px));min-width:0;height:min(540px,calc(100% - 90px));max-height:calc(100% - 90px);z-index:45;border-radius:20px}
+.phone-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:8px 8px 9px}
+.phone-tabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;padding:7px 2px;border-radius:9px;font-size:9px;line-height:1.1}
+.phone-tabs button>span{font-size:18px;line-height:1.1}
+.phone-tabs button>small{font-size:8px;white-space:nowrap}
+.phone-tabs i{position:absolute;top:1px;right:2px;font-size:7px;padding:2px 4px;margin:0}
+.phone-tabs button{position:relative}
+@media(max-width:650px){
+ .phone-launcher{position:relative;top:auto;right:auto;width:34px;height:34px;flex-basis:34px;padding:5px}
+ .phone-panel{top:64px;right:8px;bottom:auto;width:min(300px,calc(100% - 16px));height:min(500px,calc(100% - 82px));max-height:calc(100% - 82px);min-width:0;border-radius:18px}
+ .phone-tabs{grid-template-columns:repeat(5,minmax(0,1fr));padding:7px 5px}
+ .phone-tabs button{padding:7px 1px}
+ .phone-tabs button>span{font-size:17px}
+ .phone-tabs button>small{font-size:7px}
+}
+@media(max-width:390px){.phone-panel{width:min(290px,calc(100% - 14px));right:7px;top:62px;bottom:auto;height:min(470px,calc(100% - 78px));max-height:calc(100% - 78px)}}
