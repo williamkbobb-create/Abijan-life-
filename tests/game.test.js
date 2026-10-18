@@ -101,6 +101,10 @@ test("phone interface is loaded as a compact side panel with the world still pre
   assert.match(css, /\.phone-panel/);
   assert.match(css, /@media\s*\(max-width:\s*650px\)/);
   assert.match(js, /No real calls or online messages are sent/);
+  assert.match(js, /Send Money/);
+  assert.match(js, /10000000/);
+  assert.match(js, /window\.AbijanLifeGame/);
+  assert.match(css, /\.phone-transfer-form/);
 });
 
 
