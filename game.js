@@ -265,6 +265,25 @@
     meet: ["👋", "Meet people", "Social"], photo: ["📸", "Take photo", "−1 energy"], sit: ["🪑", "Sit & rest", "+8 energy"],
     game: ["⚽", "Play a game", "−4 energy"], inspect: ["🚘", "Inspect car queue", "−2 energy"], washcar: ["🧽", "Help wash a car", "−6 energy"], chat: ["💬", "Chat", "−2 energy"]
   };
+  function calculateTravel(current, destination, modeKey, at = new Date().toISOString()) {
+    const mode = TRANSPORT[modeKey];
+    if (!current || !mode || !["beach", "bar", "restaurant", "lavage"].includes(destination)) return null;
+    if (destination === current.location) return { ...current, transportMode: modeKey };
+    if (current.balance < mode.fare || current.energy < mode.energy) return null;
+    const timed = advanceTime(current, mode.minutes, at);
+    return {
+      ...timed, balance: current.balance - mode.fare, energy: current.energy - mode.energy,
+      location: destination, transportMode: modeKey,
+      actions: [...current.actions, { title: "Travelled to " + LOCATION_DETAILS[destination].title + " by " + mode.title + (mode.fare ? " for " + mode.fare.toLocaleString("en-US") + " FCFA" : " for free"), at }].slice(-100)
+    };
+  }
+  function chooseTransport(modeKey) {
+    if (!TRANSPORT[modeKey] || !state) return;
+    state = { ...state, transportMode: modeKey };
+    if (!save()) return;
+    renderState();
+    showToast(TRANSPORT[modeKey].title + " selected for your next trip.");
+  }
   function selectLocation(key) {
     const scene = document.querySelector(".world-scene");
     if (scene) scene.classList.remove("map-focus", "club-mode");
@@ -276,15 +295,20 @@
     const location = LOCATION_DETAILS[key];
     if (!location) return;
     const previousLocation = state ? state.location : key;
-    currentLocation = key;
     if (state && previousLocation !== key) {
-      const at = new Date().toISOString();
-      const timed = advanceTime(state, 15, at);
-      state = { ...timed, location: key, actions: [...state.actions, { title: "Travelled to " + location.title, at }].slice(-100) };
-      save();
+      const result = calculateTravel(state, key, state.transportMode || "gbaka");
+      if (!result) {
+        const mode = TRANSPORT[state.transportMode] || TRANSPORT.gbaka;
+        showToast(state.balance < mode.fare ? "Not enough simulated FCFA for this ride. Choose a cheaper transport option." : "You need more energy to make this trip. Rest first.");
+        return;
+      }
+      const previousState = state;
+      state = result;
+      if (!save()) { state = previousState; return; }
     } else if (state) {
-      state.location = key;
+      state = { ...state, location: key };
     }
+    currentLocation = key;
     if (scene) {
       scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage");
       scene.classList.add("location-" + key);
@@ -516,7 +540,20 @@
     inventory.append(inventoryTitle);
     if (!state.inventory.length) { const empty = document.createElement("small"); empty.textContent = "Nothing collected yet."; inventory.append(empty); }
     else state.inventory.forEach((owned) => { const row = document.createElement("small"); row.textContent = SHOP_ITEMS[owned.id].name + " × " + owned.quantity; inventory.append(row); });
-    shop.append(inventory); grid.append(shop); root.append(grid);
+    shop.append(inventory); grid.append(shop);
+    const travel = document.createElement("article"); travel.className = "life-card";
+    travel.innerHTML = '<span class="life-card-icon">🛺</span><p class="life-card-kicker">GET AROUND BASSAM</p><h3>Transport</h3><p class="life-card-copy">Choose how you want to reach your next destination. Fares are simulated.</p>';
+    Object.entries(TRANSPORT).forEach(([key, mode]) => {
+      const button = document.createElement("button"); button.type = "button";
+      button.className = "life-button " + (state.transportMode === key ? "" : "life-button-secondary");
+      button.textContent = (state.transportMode === key ? "✓ " : "") + mode.title + " · " + (mode.fare ? mode.fare.toLocaleString("en-US") + " FCFA" : "Free") + " · " + mode.minutes + " min";
+      button.disabled = state.transportMode === key;
+      button.title = mode.description + " Energy cost: " + mode.energy + ".";
+      button.addEventListener("click", () => chooseTransport(key)); travel.append(button);
+    });
+    const travelNote = document.createElement("small"); travelNote.className = "life-card-note";
+    travelNote.textContent = "Selected: " + TRANSPORT[state.transportMode || "gbaka"].title + ". Tap a map destination to travel; the fare, time and energy cost are applied.";
+    travel.append(travelNote); grid.append(travel); root.append(grid);
   }
   function calculateTransfer(current, recipient, amount, at = new Date().toISOString(), id) {
     if (!current || !recipient || typeof recipient.id !== "string" || !recipient.id ||
@@ -637,7 +674,7 @@
     showGame();
     selectLocation("beach");
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, calculateHomeUpgrade, advanceTime, JOBS, SHOP_ITEMS, HOME_UPGRADES, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT };
+  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, calculateHomeUpgrade, calculateTravel, advanceTime, JOBS, SHOP_ITEMS, HOME_UPGRADES, TRANSPORT, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT };
   if (typeof window !== "undefined") {
     window.AbijanLifeGame = {
       getState: () => state ? { balance: state.balance, transactions: state.transactions.slice() } : null,
