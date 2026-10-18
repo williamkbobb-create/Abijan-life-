@@ -55,7 +55,7 @@
   const $ = (id) => document.getElementById(id);
   let state = null;
   let toastTimer = null;
-  let currentLocation = "beach";
+  let currentLocation = null;
   let selectedPerson = null;
   function freshState(name, style) {
     return { version: 1, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, createdAt: new Date().toISOString() };
@@ -170,7 +170,9 @@
     beach: { title: "Plage de Grand-Bassam", description: "Baignade, détente et loisirs au bord de l’océan.", cover: "beach-cover", icon: "🏝️", kicker: "GRAND-BASSAM · CÔTE", actions: ["swim", "explore", "photo", "game", "dance", "meet"] },
     bar: { title: "Bar de plage Les Palmiers", description: "Profite de la musique, danse ou détends-toi dans l’espace lounge.", cover: "bar-cover", icon: "🍹", kicker: "GRAND-BASSAM · VIE NOCTURNE", actions: ["drink", "dance", "freestyle", "sit", "food", "meet"] },
     restaurant: { title: "Restaurant Chez Bassam", description: "Savoure un plat local, prends une photo et profite d’un moment de détente.", cover: "restaurant-cover", icon: "🍽️", kicker: "GRAND-BASSAM · RESTAURATION", actions: ["food", "drink", "sit", "photo", "chat", "meet"] },
-    lavage: { title: "Lavage International", description: "Découvre la zone de lavage et observe les voitures dans la file d’attente.", cover: "lavage-cover", icon: "🚘", kicker: "GRAND-BASSAM · VILLE", actions: ["inspect", "washcar", "explore", "photo", "sit", "chat", "meet"] }
+    lavage: { title: "Lavage International", description: "Découvre la zone de lavage et observe les voitures dans la file d’attente.", cover: "lavage-cover", icon: "🚘", kicker: "GRAND-BASSAM · VILLE", actions: ["inspect", "washcar", "explore", "photo", "sit", "chat", "meet"] },
+    historic: { title: "Ville historique de Grand-Bassam", description: "Explore les rues patrimoniales et l’architecture de l’ancienne capitale. Point de découverte inspiré du site classé à l’UNESCO.", cover: "historic-cover", icon: "🏛️", kicker: "PATRIMOINE · UNESCO", actions: ["explore", "photo", "meet", "chat", "sit"] },
+    nzima: { title: "Village N’zima", description: "Découvre la culture, les traditions et l’histoire de la communauté N’zima à travers une étape de jeu fictive.", cover: "nzima-cover", icon: "🛶", kicker: "CULTURE · GRAND-BASSAM", actions: ["explore", "photo", "meet", "chat", "sit"] }
   };
   const ACTION_LABELS = {
     swim: ["🏊", "Se baigner", "−12 points d’énergie"], explore: ["🚶", "Explorer", "−5 points d’énergie"], drink: ["🍹", "Acheter une boisson", "500 FCFA"],
@@ -178,7 +180,7 @@
     meet: ["👋", "Rencontrer des gens", "Social"], photo: ["📸", "Prendre une photo", "−1 point d’énergie"], sit: ["🪑", "S’asseoir", "+8 points d’énergie"],
     game: ["⚽", "Jouer", "−4 points d’énergie"], inspect: ["🚘", "Observer la file", "−2 points d’énergie"], washcar: ["🧽", "Aider au lavage", "−6 points d’énergie"], chat: ["", "Discuter", "−2 points d’énergie"]
   };
-  function selectLocation(key) {
+  function selectLocation(key, toggleIfSelected = false) {
     const scene = document.querySelector(".world-scene");
     if (scene) scene.classList.remove("map-focus", "club-mode");
     $("club-screen")?.setAttribute("hidden", "");
@@ -188,9 +190,16 @@
     if (mapButton) mapButton.setAttribute("aria-pressed", "false");
     const location = LOCATION_DETAILS[key];
     if (!location) return;
+    const dock = document.querySelector(".location-dock");
+    if (toggleIfSelected && currentLocation === key && dock && !dock.classList.contains("is-hidden")) {
+      dock.classList.add("is-hidden");
+      document.querySelectorAll("[data-location]").forEach((pin) => pin.setAttribute("aria-pressed", String(pin.dataset.location === key)));
+      return;
+    }
+    if (dock) dock.classList.remove("is-hidden");
     currentLocation = key;
     if (scene) {
-      scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage");
+      scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage", "location-historic", "location-nzima");
       scene.classList.add("location-" + key);
     }
     document.querySelectorAll("[data-location]").forEach((pin) => {
@@ -321,10 +330,39 @@
     showGame();
     selectLocation("beach");
   }
+  function initMapPanZoom() {
+    const canvas = $("map-canvas");
+    if (!canvas) return;
+    let scale = 1, x = 0, y = 0, moved = false, suppressClick = false;
+    const pointers = new Map();
+    let startDistance = 0, startScale = 1, startX = 0, startY = 0, pointerStartX = 0, pointerStartY = 0;
+    const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+    const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+    function paint() { canvas.style.transform = "translate(" + x + "px," + y + "px) scale(" + scale + ")"; canvas.classList.toggle("is-dragging", pointers.size > 0); }
+    function reset() { scale = 1; x = 0; y = 0; paint(); }
+    canvas.addEventListener("pointerdown", (e) => {
+      pointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); pointerStartX=e.clientX;pointerStartY=e.clientY;moved=false;startX=x;startY=y;startScale=scale;
+      if(pointers.size===2){const pts=[...pointers.values()];startDistance=distance(pts[0],pts[1]);startScale=scale;}
+      try{canvas.setPointerCapture(e.pointerId)}catch(_){}
+    });
+    canvas.addEventListener("pointermove",(e)=>{
+      if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+      if(pointers.size===2){const pts=[...pointers.values()];if(startDistance>0)scale=clamp(startScale*distance(pts[0],pts[1])/startDistance,1,2.5);moved=true;}
+      else if(pointers.size===1){const dx=e.clientX-pointerStartX,dy=e.clientY-pointerStartY;if(Math.abs(dx)+Math.abs(dy)>7)moved=true;if(moved){x=startX+dx;y=startY+dy;}}
+      if(moved){e.preventDefault();paint();}
+    });
+    function finish(e){if(pointers.has(e.pointerId))pointers.delete(e.pointerId);if(moved)suppressClick=true;if(!pointers.size){startDistance=0;canvas.classList.remove("is-dragging");}else if(pointers.size===1){const p=[...pointers.values()][0];pointerStartX=p.x;pointerStartY=p.y;startX=x;startY=y;}}
+    canvas.addEventListener("pointerup",finish);canvas.addEventListener("pointercancel",finish);
+    canvas.addEventListener("click",(e)=>{if(suppressClick){e.preventDefault();e.stopPropagation();suppressClick=false;}},true);
+    $("map-zoom-in")?.addEventListener("click",()=>{scale=clamp(scale+.25,1,2.5);paint();});
+    $("map-zoom-out")?.addEventListener("click",()=>{scale=clamp(scale-.25,1,2.5);if(scale===1){x=0;y=0;}paint();});
+    $("map-reset-view")?.addEventListener("click",reset);paint();
+  }
   function init() {
     $("character-form").addEventListener("submit", startGame);
     $("character-name").addEventListener("input", () => $("character-name").setCustomValidity(""));
-    document.querySelectorAll("[data-location]").forEach((button) => button.addEventListener("click", () => selectLocation(button.dataset.location)));
+    document.querySelectorAll("[data-location]").forEach((button) => button.addEventListener("click", () => selectLocation(button.dataset.location, true)));
+    initMapPanZoom();
     $("reset-button").addEventListener("click", resetGame);
     $("avatar-home-button").addEventListener("click", () => {
       closeOverlays();
