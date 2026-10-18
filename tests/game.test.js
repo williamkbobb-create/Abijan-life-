@@ -211,5 +211,5 @@ test("player district includes clearly fictional neighbor homes for local demo v
  const html=fs.readFileSync(path.join(root,"index.html"),"utf8"),game=fs.readFileSync(path.join(root,"game.js"),"utf8"),css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
  for(const id of ["houseaya","housekoffi","housemariam"]) assert.match(html,new RegExp('data-location="'+id+'"'));
  for(const id of ["houseaya","housekoffi","housemariam"]) assert.match(game,new RegExp(id+': \\{ title:'));
- assert.match(game,/personnage fictif/);assert.match(game,/aucun joueur réel/);assert.match(css,/\.pin-house-aya/);
+ assert.match(game,/personnage fictif/);assert.match(game,/aucun autre joueur réel/);assert.match(css,/\.pin-house-aya/);
 });
