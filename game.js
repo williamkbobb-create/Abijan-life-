@@ -7,6 +7,20 @@
   const REST_RECOVERY = 25;
   const ENERGY_PACK_COST = 10000;
   const ENERGY_PACK_AMOUNT = 25;
+  const DAILY_SHIFT_LIMIT = 2;
+  const JOBS = Object.freeze({
+    beach_cleanup: { title: "Beach clean-up crew", pay: 25000, energy: 18, minutes: 120, description: "Help keep the shoreline welcoming." },
+    car_wash: { title: "Lavage assistant", pay: 35000, energy: 25, minutes: 180, description: "Help the team clean cars and organize the wash bay." },
+    cafe_shift: { title: "Café assistant", pay: 30000, energy: 20, minutes: 150, description: "Serve customers during a busy coastal shift." }
+  });
+  const SHOP_ITEMS = Object.freeze({
+    bottled_water: { name: "Bottled water", price: 500, description: "A small everyday essential." },
+    local_snack: { name: "Local snack", price: 1500, description: "Something tasty for the road." },
+    coastal_outfit: { name: "Coastal outfit", price: 25000, description: "A fresh look for your next outing." },
+    bassam_souvenir: { name: "Grand-Bassam souvenir", price: 5000, description: "A keepsake from the coast." },
+    phone_charger: { name: "Phone charger", price: 3000, description: "Keep your pocket world powered." }
+  });
+  const ACTIVITY_MINUTES = Object.freeze({ swim: 30, explore: 30, beach: 20, bar: 30, restaurant: 30, lavage: 20, drink: 10, food: 30, dance: 30, freestyle: 30, photo: 5, sit: 15, game: 20, inspect: 15, washcar: 45, chat: 15, greet: 5, friend: 15, invite: 10, meet: 10 });
   const COSTS = Object.freeze({ beach: 0, swim: 0, bar: 500, drink: 500, dance: 0, freestyle: 0, food: 750, meet: 0, restaurant: 0, lavage: 0, explore: 0, photo: 0, sit: 0, game: 0, inspect: 0, washcar: 0, chat: 0, greet: 0, friend: 0, invite: 0 });
   const ACTIVITIES = Object.freeze({
     beach: { title: "Explored Grand-Bassam Beach", energy: -5, message: "You took a walk along the coast. Energy -5." },
@@ -61,10 +75,10 @@
   let currentLocation = "beach";
   let selectedPerson = null;
   function freshState(name, style) {
-    return { version: 2, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, transactions: [], createdAt: new Date().toISOString() };
+    return { version: 3, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, transactions: [], inventory: [], day: 1, timeMinutes: 480, location: "beach", home: { level: 1 }, work: { day: 1, shifts: 0 }, createdAt: new Date().toISOString() };
   }
   function validState(value) {
-    if (!value || ![1, 2].includes(value.version) || typeof value.name !== "string" ||
+    if (!value || ![1, 2, 3].includes(value.version) || typeof value.name !== "string" ||
       value.name.trim().length < 2 || value.name.length > 24 ||
       !["Coastal creative", "Ambitious newcomer"].includes(value.style) ||
       !Number.isSafeInteger(value.balance) || value.balance < 0 ||
@@ -73,19 +87,36 @@
       !Array.isArray(value.actions) || value.actions.length > 100 ||
       !value.actions.every((a) => a && typeof a.title === "string" && a.title.length <= 160 && typeof a.at === "string" && !Number.isNaN(Date.parse(a.at)))) return false;
     if (value.version === 1) return true;
-    return Array.isArray(value.transactions) && value.transactions.length <= 200 &&
+    if (!Array.isArray(value.transactions) || value.transactions.length > 200 ||
       value.transactions.every((t) => t && typeof t.id === "string" && t.id.length <= 120 &&
         typeof t.recipientId === "string" && typeof t.recipientName === "string" &&
         Number.isSafeInteger(t.amount) && t.amount > 0 &&
         typeof t.at === "string" && !Number.isNaN(Date.parse(t.at)) &&
-        Number.isSafeInteger(t.balanceAfter) && t.balanceAfter >= 0 && t.balanceAfter <= MAX_BALANCE);
+        Number.isSafeInteger(t.balanceAfter) && t.balanceAfter >= 0 && t.balanceAfter <= MAX_BALANCE)) return false;
+    if (value.version === 2) return true;
+    return Array.isArray(value.inventory) && value.inventory.length <= 100 &&
+      value.inventory.every((item) => item && typeof item.id === "string" && Object.prototype.hasOwnProperty.call(SHOP_ITEMS, item.id) && Number.isInteger(item.quantity) && item.quantity > 0 && item.quantity <= 999) &&
+      Number.isInteger(value.day) && value.day >= 1 && value.day <= 1000000 &&
+      Number.isInteger(value.timeMinutes) && value.timeMinutes >= 0 && value.timeMinutes < 1440 &&
+      ["beach", "bar", "restaurant", "lavage"].includes(value.location) &&
+      value.home && Number.isInteger(value.home.level) && value.home.level >= 1 && value.home.level <= 3 &&
+      value.work && Number.isInteger(value.work.day) && value.work.day >= 1 && value.work.day <= value.day &&
+      Number.isInteger(value.work.shifts) && value.work.shifts >= 0 && value.work.shifts <= DAILY_SHIFT_LIMIT;
   }
   function migrateState(value) {
     if (!validState(value)) return null;
-    if (value.version === 1) {
-      return { ...value, version: 2, relationships: value.relationships && typeof value.relationships === "object" ? value.relationships : {}, transactions: [] };
-    }
-    return { ...value, transactions: value.transactions.slice(-200) };
+    const base = value.version === 1
+      ? { ...value, relationships: value.relationships && typeof value.relationships === "object" ? value.relationships : {}, transactions: [] }
+      : { ...value, transactions: value.transactions.slice(-200) };
+    if (value.version === 3) return { ...base, inventory: base.inventory.slice(-100) };
+    return {
+      ...base, version: 3, inventory: Array.isArray(base.inventory) ? base.inventory : [],
+      day: Number.isInteger(base.day) && base.day > 0 ? base.day : 1,
+      timeMinutes: Number.isInteger(base.timeMinutes) && base.timeMinutes >= 0 && base.timeMinutes < 1440 ? base.timeMinutes : 480,
+      location: ["beach", "bar", "restaurant", "lavage"].includes(base.location) ? base.location : "beach",
+      home: base.home && Number.isInteger(base.home.level) && base.home.level >= 1 && base.home.level <= 3 ? base.home : { level: 1 },
+      work: base.work && Number.isInteger(base.work.day) && Number.isInteger(base.work.shifts) ? base.work : { day: Number.isInteger(base.day) && base.day > 0 ? base.day : 1, shifts: 0 }
+    };
   }
   function save() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); return true; }
@@ -101,7 +132,7 @@
         try { localStorage.setItem(STORAGE_KEY + "-recovery", raw); } catch (_) {}
         return null;
       }
-      if (migrated.version !== parsed.version || !parsed.transactions) {
+      if (migrated.version !== parsed.version || !parsed.transactions || !parsed.inventory || !Number.isInteger(parsed.day)) {
         state = migrated;
         save();
       }
@@ -158,6 +189,9 @@
     });
     $("activity-empty").hidden = state.actions.length > 0;
     $("activity-count").textContent = state.actions.length + (state.actions.length === 1 ? " action" : " actions");
+    const clock = $("game-clock");
+    if (clock) clock.textContent = "DAY " + state.day + " · " + formatGameTime(state.timeMinutes);
+    renderLifePanel();
   }
   function startGame(event) {
     event.preventDefault();
@@ -173,6 +207,22 @@
     showGame();
     if (saved) showToast("Welcome to Grand-Bassam, " + name + "!");
   }
+  function formatGameTime(minutes) {
+    const hour24 = Math.floor(minutes / 60);
+    const minute = minutes % 60;
+    const hour = hour24 % 12 || 12;
+    return hour + ":" + String(minute).padStart(2, "0") + (hour24 >= 12 ? " PM" : " AM");
+  }
+  function advanceTime(current, minutes, at = new Date().toISOString()) {
+    const total = current.timeMinutes + minutes;
+    const daysPassed = Math.floor(total / 1440);
+    const day = current.day + daysPassed;
+    return {
+      ...current, day, timeMinutes: total % 1440,
+      work: daysPassed > 0 ? { day, shifts: 0 } : { ...current.work },
+      actions: [...current.actions].slice(-100)
+    };
+  }
   function calculateActivity(current, key, at = new Date().toISOString()) {
     const activity = ACTIVITIES[key];
     if (!current || !activity || current.energy <= 0 || current.balance < COSTS[key]) return null;
@@ -181,6 +231,9 @@
       ...current,
       balance: current.balance - COSTS[key],
       energy: Math.max(0, Math.min(100, nextEnergy)),
+      day: advanceTime(current, ACTIVITY_MINUTES[key] || 15, at).day,
+      timeMinutes: advanceTime(current, ACTIVITY_MINUTES[key] || 15, at).timeMinutes,
+      work: advanceTime(current, ACTIVITY_MINUTES[key] || 15, at).work,
       actions: [...current.actions, { title: activity.title, at }].slice(-100)
     };
   }
@@ -329,6 +382,103 @@
     $("person-screen").hidden = true;
     $("club-screen").hidden = true;
   }
+  function calculateWorkShift(current, jobKey, at = new Date().toISOString()) {
+    const job = JOBS[jobKey];
+    if (!current || !job || current.energy < job.energy || current.work.shifts >= DAILY_SHIFT_LIMIT || current.balance > MAX_BALANCE - job.pay) return null;
+    const timed = advanceTime(current, job.minutes, at);
+    const nextWork = timed.day !== current.day ? { day: timed.day, shifts: 1 } : { day: timed.day, shifts: current.work.shifts + 1 };
+    return {
+      ...timed, balance: current.balance + job.pay, energy: Math.max(0, current.energy - job.energy), work: nextWork,
+      actions: [...current.actions, { title: "Worked as " + job.title + " and earned " + job.pay.toLocaleString("en-US") + " FCFA", at }].slice(-100)
+    };
+  }
+  function calculatePurchase(current, itemKey, at = new Date().toISOString()) {
+    const item = SHOP_ITEMS[itemKey];
+    if (!current || !item || current.balance < item.price || current.inventory.length >= 100) return null;
+    const found = current.inventory.find((owned) => owned.id === itemKey);
+    const inventory = found
+      ? current.inventory.map((owned) => owned.id === itemKey ? { ...owned, quantity: owned.quantity + 1 } : owned)
+      : [...current.inventory, { id: itemKey, quantity: 1 }];
+    if (found && found.quantity >= 999) return null;
+    return {
+      ...current, balance: current.balance - item.price, inventory,
+      actions: [...current.actions, { title: "Bought " + item.name + " for " + item.price.toLocaleString("en-US") + " FCFA", at }].slice(-100)
+    };
+  }
+  function calculateHomeSleep(current, at = new Date().toISOString()) {
+    if (!current || current.energy >= 100) return null;
+    const timed = advanceTime(current, 480, at);
+    return {
+      ...timed, energy: 100, location: "beach",
+      actions: [...current.actions, { title: "Went home to sleep and restored energy", at }].slice(-100)
+    };
+  }
+  function workShift(jobKey) {
+    const result = calculateWorkShift(state, jobKey);
+    if (!result) { showToast("You need more energy, a free shift slot, or enough wallet capacity to take this job."); return; }
+    const previous = state; state = result;
+    if (!save()) { state = previous; renderState(); return; }
+    renderState(); showToast("Shift complete. You earned simulated FCFA.");
+  }
+  function buyItem(itemKey) {
+    const result = calculatePurchase(state, itemKey);
+    if (!result) { showToast("You cannot buy this item right now. Check your balance and inventory space."); return; }
+    const previous = state; state = result;
+    if (!save()) { state = previous; renderState(); return; }
+    renderState(); showToast("Item added to your inventory.");
+  }
+  function sleepAtHome() {
+    const result = calculateHomeSleep(state);
+    if (!result) { showToast("Your energy is already full."); return; }
+    if (!window.confirm("Go home and sleep for 8 in-game hours? Your energy will be restored.")) return;
+    const previous = state; state = result;
+    if (!save()) { state = previous; renderState(); return; }
+    renderState(); showToast("You rested at home. Energy restored to 100.");
+  }
+  function renderLifePanel() {
+    const root = $("life-panel");
+    if (!root || !state) return;
+    root.replaceChildren();
+    const heading = document.createElement("div"); heading.className = "life-panel-heading";
+    const title = document.createElement("div");
+    const eyebrow = document.createElement("p"); eyebrow.className = "life-eyebrow"; eyebrow.textContent = "YOUR EVERYDAY LIFE";
+    const h = document.createElement("h2"); h.textContent = "Make a day of it";
+    title.append(eyebrow, h);
+    const clock = document.createElement("span"); clock.className = "life-clock"; clock.textContent = "DAY " + state.day + " · " + formatGameTime(state.timeMinutes);
+    heading.append(title, clock); root.append(heading);
+    const grid = document.createElement("div"); grid.className = "life-grid";
+    const home = document.createElement("article"); home.className = "life-card";
+    home.innerHTML = '<span class="life-card-icon">🏡</span><p class="life-card-kicker">YOUR HOME</p><h3>Home & rest</h3><p class="life-card-copy">Return to your home base, slow down, and recover your energy.</p>';
+    const homeButton = document.createElement("button"); homeButton.type = "button"; homeButton.className = "life-button"; homeButton.textContent = state.energy >= 100 ? "Energy full" : "Go home & sleep · 8 hours"; homeButton.disabled = state.energy >= 100; homeButton.addEventListener("click", sleepAtHome);
+    const homeNote = document.createElement("small"); homeNote.className = "life-card-note"; homeNote.textContent = "Home level " + state.home.level + " · Sleep restores energy";
+    home.append(homeButton, homeNote); grid.append(home);
+    const work = document.createElement("article"); work.className = "life-card";
+    work.innerHTML = '<span class="life-card-icon">🧰</span><p class="life-card-kicker">EARN FCFA</p><h3>Local jobs</h3><p class="life-card-copy">Take a shift and earn simulated money. Each shift uses time and energy.</p>';
+    Object.entries(JOBS).forEach(([key, job]) => {
+      const button = document.createElement("button"); button.type = "button"; button.className = "life-button life-button-secondary";
+      button.textContent = job.title + " · +" + job.pay.toLocaleString("en-US") + " FCFA";
+      button.disabled = state.work.shifts >= DAILY_SHIFT_LIMIT || state.energy < job.energy || state.balance > MAX_BALANCE - job.pay;
+      button.title = job.description + " " + job.minutes + " in-game minutes; energy -" + job.energy + ".";
+      button.addEventListener("click", () => workShift(key)); work.append(button);
+    });
+    const workNote = document.createElement("small"); workNote.className = "life-card-note"; workNote.textContent = "Shifts today: " + state.work.shifts + "/" + DAILY_SHIFT_LIMIT;
+    work.append(workNote); grid.append(work);
+    const shop = document.createElement("article"); shop.className = "life-card";
+    shop.innerHTML = '<span class="life-card-icon">🛍️</span><p class="life-card-kicker">LOCAL MARKET</p><h3>Shops & inventory</h3><p class="life-card-copy">Pick up everyday essentials and keepsakes for your story.</p>';
+    Object.entries(SHOP_ITEMS).forEach(([key, item]) => {
+      const button = document.createElement("button"); button.type = "button"; button.className = "life-button life-button-secondary";
+      button.textContent = item.name + " · " + item.price.toLocaleString("en-US") + " FCFA";
+      button.disabled = state.balance < item.price || state.inventory.length >= 100 || (state.inventory.find((owned) => owned.id === key)?.quantity || 0) >= 999;
+      button.title = item.description;
+      button.addEventListener("click", () => buyItem(key)); shop.append(button);
+    });
+    const inventory = document.createElement("div"); inventory.className = "life-inventory";
+    const inventoryTitle = document.createElement("b"); inventoryTitle.textContent = "Your inventory";
+    inventory.append(inventoryTitle);
+    if (!state.inventory.length) { const empty = document.createElement("small"); empty.textContent = "Nothing collected yet."; inventory.append(empty); }
+    else state.inventory.forEach((owned) => { const row = document.createElement("small"); row.textContent = SHOP_ITEMS[owned.id].name + " × " + owned.quantity; inventory.append(row); });
+    shop.append(inventory); grid.append(shop); root.append(grid);
+  }
   function calculateTransfer(current, recipient, amount, at = new Date().toISOString(), id) {
     if (!current || !recipient || typeof recipient.id !== "string" || !recipient.id ||
       typeof recipient.name !== "string" || !recipient.name.trim() ||
@@ -448,11 +598,12 @@
     showGame();
     selectLocation("beach");
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT };
+  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, advanceTime, JOBS, SHOP_ITEMS, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT };
   if (typeof window !== "undefined") {
     window.AbijanLifeGame = {
       getState: () => state ? { balance: state.balance, transactions: state.transactions.slice() } : null,
-      transferMoney
+      transferMoney,
+      getPlayerState: () => state ? JSON.parse(JSON.stringify(state)) : null
     };
   }
   if (typeof document !== "undefined") {
