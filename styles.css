@@ -139,3 +139,27 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
 .wash-car-four{background:linear-gradient(180deg,#f4f1e7 0 27%,#7c9b70 28% 100%);transform:translateY(-12px) rotate(3deg)}
 .location-lavage .pin-lavage{box-shadow:0 0 0 7px #f8e9bf55,0 8px 20px #173d3650}
 @media(max-width:760px){.lavage-car-lineup{left:17%;top:31%;width:53%;height:21%;gap:3px}.wash-car{min-height:18px}.wash-car:before{top:-29%;height:42%}}
+
+
+/* Update 1: everyday-life systems */
+.life-panel{max-width:1100px;margin:24px auto 42px;padding:0 2px;color:#18392f}
+.life-panel-heading{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:16px}
+.life-eyebrow{margin:0 0 5px;color:#758779;font-size:9px;font-weight:800;letter-spacing:1.8px}
+.life-panel-heading h2{margin:0;font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:clamp(25px,3vw,34px)}
+.life-clock{flex-shrink:0;border:1px solid #dbe5d9;border-radius:30px;background:#f0f5ec;padding:9px 12px;color:#315b43;font-size:10px;font-weight:800;letter-spacing:.5px}
+.life-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;align-items:start}
+.life-card{min-width:0;background:#fff;border:1px solid #e0e6dc;border-radius:8px;padding:17px;box-shadow:0 10px 30px #213a2d08}
+.life-card-icon{font-size:25px}
+.life-card-kicker{margin:12px 0 5px;color:#819183;font-size:8px;font-weight:800;letter-spacing:1.6px}
+.life-card h3{margin:0 0 7px;font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:22px}
+.life-card-copy{min-height:45px;margin:0 0 13px;color:#718076;font-size:11px;line-height:1.65}
+.life-button{display:block;width:100%;border:1px solid #235b45;border-radius:5px;background:#1b5541;color:#fff;text-align:left;padding:10px 11px;margin:7px 0;font-size:10px;font-weight:700;line-height:1.45}
+.life-button-secondary{border-color:#dce6db;background:#f7f9f4;color:#24513d}
+.life-button:hover:not(:disabled){filter:brightness(.96)}
+.life-button:disabled{opacity:.48;cursor:not-allowed}
+.life-card-note{display:block;margin-top:10px;color:#7b897d;font-size:9px;line-height:1.5}
+.life-inventory{display:grid;gap:6px;margin-top:13px;padding-top:12px;border-top:1px solid #e7ece4}
+.life-inventory b{font-size:10px;color:#365c46}
+.life-inventory small{font-size:10px;color:#718076;line-height:1.4}
+@media(max-width:850px){.life-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.life-card:last-child{grid-column:1/-1}}
+@media(max-width:560px){.life-panel{margin:18px auto 30px;padding:0 3px}.life-grid{grid-template-columns:1fr;gap:10px}.life-card:last-child{grid-column:auto}.life-card{padding:15px}.life-card-copy{min-height:0}.life-panel-heading{align-items:start}.life-clock{font-size:9px;padding:8px}.life-panel-heading h2{font-size:25px}}
