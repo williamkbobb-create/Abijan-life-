@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT } = require("../game.js");
+const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, advanceTime, JOBS, SHOP_ITEMS, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT } = require("../game.js");
 test("new character starts with the documented demo balance and energy", () => {
   const state = freshState("Aya Kouassi", "Coastal creative");
   assert.equal(state.name, "Aya Kouassi");
@@ -105,6 +105,8 @@ test("phone interface is loaded as a compact side panel with the world still pre
   assert.match(js, /10000000/);
   assert.match(js, /window\.AbijanLifeGame/);
   assert.match(html, /id="buy-energy-button"/);
+  assert.match(html, /id="life-panel"/);
+  assert.match(css, /\.life-grid/);
   assert.match(css, /\.phone-transfer-form/);
 });
 
@@ -119,12 +121,16 @@ test("new characters start with 100 million simulated FCFA and state accepts the
 test("legacy version 1 saves migrate without changing the player's existing balance or progress", () => {
   const legacy = { version: 1, name: "Aya", style: "Coastal creative", balance: 42000, energy: 44, actions: [{ title: "Old activity", at: "2026-10-17T12:00:00.000Z" }], relationships: { aya: 3 }, createdAt: "2026-10-17T11:00:00.000Z" };
   const migrated = migrateState(legacy);
-  assert.equal(migrated.version, 2);
+  assert.equal(migrated.version, 3);
   assert.equal(migrated.balance, 42000);
   assert.equal(migrated.energy, 44);
   assert.equal(migrated.relationships.aya, 3);
   assert.equal(migrated.actions[0].title, "Old activity");
   assert.deepEqual(migrated.transactions, []);
+  assert.deepEqual(migrated.inventory, []);
+  assert.equal(migrated.day, 1);
+  assert.equal(migrated.timeMinutes, 480);
+  assert.equal(migrated.location, "beach");
   assert.equal(validState(migrated), true);
 });
 test("simulated transfers deduct once and preserve transaction history", () => {
@@ -158,4 +164,59 @@ test("buying energy deducts simulated FCFA and caps energy at 100", () => {
   assert.equal(initial.balance, STARTING_BALANCE);
   assert.equal(calculateEnergyPurchase({ ...initial, energy: 100 }), null);
   assert.equal(calculateEnergyPurchase({ ...initial, balance: ENERGY_PACK_COST - 1 }), null);
+});
+
+test("version 2 saves migrate to version 3 without changing existing wallet and history", () => {
+  const v2 = { ...freshState("Aya", "Coastal creative"), version: 2, balance: 654321, energy: 37, actions: [{ title: "Existing progress", at: "2026-10-17T12:00:00.000Z" }] };
+  delete v2.inventory; delete v2.day; delete v2.timeMinutes; delete v2.location; delete v2.home; delete v2.work;
+  const migrated = migrateState(v2);
+  assert.equal(migrated.version, 3);
+  assert.equal(migrated.balance, 654321);
+  assert.equal(migrated.energy, 37);
+  assert.equal(migrated.actions[0].title, "Existing progress");
+  assert.equal(migrated.day, 1);
+  assert.equal(migrated.timeMinutes, 480);
+  assert.equal(validState(migrated), true);
+});
+test("in-game time advances and starts a new day with fresh job shifts", () => {
+  const initial = { ...freshState("Aya", "Coastal creative"), timeMinutes: 1380, work: { day: 1, shifts: 2 } };
+  const next = advanceTime(initial, 90, "2026-10-18T12:00:00.000Z");
+  assert.equal(next.day, 2);
+  assert.equal(next.timeMinutes, 30);
+  assert.deepEqual(next.work, { day: 2, shifts: 0 });
+  assert.equal(initial.day, 1);
+});
+test("local jobs pay simulated FCFA, cost energy and obey the daily shift limit", () => {
+  const initial = { ...freshState("Aya", "Ambitious newcomer"), energy: 90 };
+  const next = calculateWorkShift(initial, "beach_cleanup", "2026-10-18T12:00:00.000Z");
+  assert.equal(next.balance, STARTING_BALANCE + JOBS.beach_cleanup.pay);
+  assert.equal(next.energy, 72);
+  assert.equal(next.work.shifts, 1);
+  assert.match(next.actions[0].title, /earned/);
+  const second = calculateWorkShift(next, "cafe_shift", "2026-10-18T14:00:00.000Z");
+  assert.equal(second.work.shifts, DAILY_SHIFT_LIMIT);
+  assert.equal(calculateWorkShift(second, "car_wash"), null);
+  assert.equal(calculateWorkShift({ ...initial, energy: 10 }, "beach_cleanup"), null);
+  assert.equal(initial.balance, STARTING_BALANCE);
+});
+test("shop purchases update wallet and inventory without mutating the old save", () => {
+  const initial = freshState("Aya", "Coastal creative");
+  const next = calculatePurchase(initial, "bottled_water", "2026-10-18T12:00:00.000Z");
+  assert.equal(next.balance, STARTING_BALANCE - SHOP_ITEMS.bottled_water.price);
+  assert.deepEqual(next.inventory, [{ id: "bottled_water", quantity: 1 }]);
+  assert.equal(initial.inventory.length, 0);
+  const second = calculatePurchase(next, "bottled_water", "2026-10-18T12:01:00.000Z");
+  assert.equal(second.inventory[0].quantity, 2);
+  assert.equal(calculatePurchase(initial, "unknown-item"), null);
+  assert.equal(calculatePurchase({ ...initial, balance: 0 }, "bottled_water"), null);
+});
+test("sleeping at home restores energy and advances eight in-game hours", () => {
+  const initial = { ...freshState("Aya", "Coastal creative"), energy: 21, timeMinutes: 600 };
+  const next = calculateHomeSleep(initial, "2026-10-18T12:00:00.000Z");
+  assert.equal(next.energy, 100);
+  assert.equal(next.timeMinutes, 1080);
+  assert.equal(next.location, "beach");
+  assert.match(next.actions[0].title, /sleep/);
+  assert.equal(initial.energy, 21);
+  assert.equal(calculateHomeSleep({ ...initial, energy: 100 }), null);
 });
