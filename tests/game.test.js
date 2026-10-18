@@ -121,7 +121,7 @@ test("new characters start with 100 million simulated FCFA and state accepts the
 test("legacy version 1 saves migrate without changing the player's existing balance or progress", () => {
   const legacy = { version: 1, name: "Aya", style: "Coastal creative", balance: 42000, energy: 44, actions: [{ title: "Old activity", at: "2026-10-17T12:00:00.000Z" }], relationships: { aya: 3 }, createdAt: "2026-10-17T11:00:00.000Z" };
   const migrated = migrateState(legacy);
-  assert.equal(migrated.version, 4);
+  assert.equal(migrated.version, 5);
   assert.equal(migrated.balance, 42000);
   assert.equal(migrated.energy, 44);
   assert.equal(migrated.relationships.aya, 3);
@@ -237,7 +237,7 @@ test("home upgrades charge the correct simulated price and progress up to level 
 
 test("new characters have a default transport mode and travel charges fare, time, and energy", () => {
   const initial = freshState("Aya", "Coastal creative");
-  assert.equal(initial.version, 4);
+  assert.equal(initial.version, 5);
   assert.equal(initial.transportMode, "gbaka");
   assert.equal(validState(initial), true);
   const trip = calculateTravel(initial, "bar", "gbaka", "2026-10-18T12:00:00.000Z");
