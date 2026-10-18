@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, calculateHomeUpgrade, advanceTime, JOBS, SHOP_ITEMS, HOME_UPGRADES, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT } = require("../game.js");
+const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, calculateHomeUpgrade, calculateTravel, advanceTime, JOBS, SHOP_ITEMS, HOME_UPGRADES, TRANSPORT, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT } = require("../game.js");
 test("new character starts with the documented demo balance and energy", () => {
   const state = freshState("Aya Kouassi", "Coastal creative");
   assert.equal(state.name, "Aya Kouassi");
@@ -121,7 +121,7 @@ test("new characters start with 100 million simulated FCFA and state accepts the
 test("legacy version 1 saves migrate without changing the player's existing balance or progress", () => {
   const legacy = { version: 1, name: "Aya", style: "Coastal creative", balance: 42000, energy: 44, actions: [{ title: "Old activity", at: "2026-10-17T12:00:00.000Z" }], relationships: { aya: 3 }, createdAt: "2026-10-17T11:00:00.000Z" };
   const migrated = migrateState(legacy);
-  assert.equal(migrated.version, 3);
+  assert.equal(migrated.version, 4);
   assert.equal(migrated.balance, 42000);
   assert.equal(migrated.energy, 44);
   assert.equal(migrated.relationships.aya, 3);
@@ -170,7 +170,7 @@ test("version 2 saves migrate to version 3 without changing existing wallet and 
   const v2 = { ...freshState("Aya", "Coastal creative"), version: 2, balance: 654321, energy: 37, actions: [{ title: "Existing progress", at: "2026-10-17T12:00:00.000Z" }] };
   delete v2.inventory; delete v2.day; delete v2.timeMinutes; delete v2.location; delete v2.home; delete v2.work;
   const migrated = migrateState(v2);
-  assert.equal(migrated.version, 3);
+  assert.equal(migrated.version, 4);
   assert.equal(migrated.balance, 654321);
   assert.equal(migrated.energy, 37);
   assert.equal(migrated.actions[0].title, "Existing progress");
@@ -233,4 +233,34 @@ test("home upgrades charge the correct simulated price and progress up to level 
   assert.equal(calculateHomeUpgrade(level3), null);
   assert.equal(calculateHomeUpgrade({ ...initial, balance: HOME_UPGRADES[2].cost - 1 }), null);
   assert.equal(initial.home.level, 1);
+});
+
+test("new characters have a default transport mode and travel charges fare, time, and energy", () => {
+  const initial = freshState("Aya", "Coastal creative");
+  assert.equal(initial.version, 4);
+  assert.equal(initial.transportMode, "gbaka");
+  assert.equal(validState(initial), true);
+  const trip = calculateTravel(initial, "bar", "gbaka", "2026-10-18T12:00:00.000Z");
+  assert.equal(trip.location, "bar");
+  assert.equal(trip.balance, STARTING_BALANCE - TRANSPORT.gbaka.fare);
+  assert.equal(trip.energy, STARTING_ENERGY - TRANSPORT.gbaka.energy);
+  assert.equal(trip.timeMinutes, 480 + TRANSPORT.gbaka.minutes);
+  assert.equal(trip.transportMode, "gbaka");
+  assert.match(trip.actions[0].title, /Travelled to/);
+  assert.equal(calculateTravel(initial, "unknown", "walk"), null);
+  assert.equal(calculateTravel({ ...initial, balance: 0 }, "bar", "car"), null);
+  assert.equal(calculateTravel({ ...initial, energy: 0 }, "bar", "walk"), null);
+});
+test("version 3 saves migrate to version 4 and keep their existing wallet and progress", () => {
+  const v3 = { ...freshState("Aya", "Coastal creative"), version: 3, balance: 876543, energy: 41, day: 3, timeMinutes: 900, location: "restaurant" };
+  delete v3.transportMode;
+  const migrated = migrateState(v3);
+  assert.equal(migrated.version, 4);
+  assert.equal(migrated.transportMode, "gbaka");
+  assert.equal(migrated.balance, 876543);
+  assert.equal(migrated.energy, 41);
+  assert.equal(migrated.day, 3);
+  assert.equal(migrated.timeMinutes, 900);
+  assert.equal(migrated.location, "restaurant");
+  assert.equal(validState(migrated), true);
 });
