@@ -88,7 +88,7 @@
       !value.actions.every((a) => a && typeof a.title === "string" && a.title.length <= 160 && typeof a.at === "string" && !Number.isNaN(Date.parse(a.at)))) return false;
     if (value.version === 1) return true;
     if (!Array.isArray(value.transactions) || value.transactions.length > 200 ||
-      value.transactions.every((t) => t && typeof t.id === "string" && t.id.length <= 120 &&
+      !value.transactions.every((t) => t && typeof t.id === "string" && t.id.length <= 120 &&
         typeof t.recipientId === "string" && typeof t.recipientName === "string" &&
         Number.isSafeInteger(t.amount) && t.amount > 0 &&
         typeof t.at === "string" && !Number.isNaN(Date.parse(t.at)) &&
