@@ -1,7 +1,8 @@
 (function () {
   "use strict";
   const STORAGE_KEY = "abijan-life-demo-v1";
-  const STARTING_BALANCE = 5000;
+  const STARTING_BALANCE = 100000000;
+  const MAX_BALANCE = 1000000000;
   const STARTING_ENERGY = 80;
   const REST_RECOVERY = 25;
   const COSTS = Object.freeze({ beach: 0, swim: 0, bar: 500, drink: 500, dance: 0, freestyle: 0, food: 750, meet: 0, restaurant: 0, lavage: 0, explore: 0, photo: 0, sit: 0, game: 0, inspect: 0, washcar: 0, chat: 0, greet: 0, friend: 0, invite: 0 });
@@ -58,16 +59,31 @@
   let currentLocation = "beach";
   let selectedPerson = null;
   function freshState(name, style) {
-    return { version: 1, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, createdAt: new Date().toISOString() };
+    return { version: 2, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, transactions: [], createdAt: new Date().toISOString() };
   }
   function validState(value) {
-    return Boolean(value && value.version === 1 && typeof value.name === "string" &&
-      value.name.trim().length >= 2 && value.name.length <= 24 &&
-      ["Coastal creative", "Ambitious newcomer"].includes(value.style) &&
-      Number.isInteger(value.balance) && value.balance >= 0 && value.balance <= 1000000 &&
-      Number.isInteger(value.energy) && value.energy >= 0 && value.energy <= 100 &&
-      Array.isArray(value.actions) && value.actions.length <= 100 &&
-      value.actions.every((a) => a && typeof a.title === "string" && a.title.length <= 160 && typeof a.at === "string" && !Number.isNaN(Date.parse(a.at))));
+    if (!value || ![1, 2].includes(value.version) || typeof value.name !== "string" ||
+      value.name.trim().length < 2 || value.name.length > 24 ||
+      !["Coastal creative", "Ambitious newcomer"].includes(value.style) ||
+      !Number.isSafeInteger(value.balance) || value.balance < 0 ||
+      value.balance > (value.version === 1 ? 1000000 : MAX_BALANCE) ||
+      !Number.isInteger(value.energy) || value.energy < 0 || value.energy > 100 ||
+      !Array.isArray(value.actions) || value.actions.length > 100 ||
+      !value.actions.every((a) => a && typeof a.title === "string" && a.title.length <= 160 && typeof a.at === "string" && !Number.isNaN(Date.parse(a.at)))) return false;
+    if (value.version === 1) return true;
+    return Array.isArray(value.transactions) && value.transactions.length <= 200 &&
+      value.transactions.every((t) => t && typeof t.id === "string" && t.id.length <= 120 &&
+        typeof t.recipientId === "string" && typeof t.recipientName === "string" &&
+        Number.isSafeInteger(t.amount) && t.amount > 0 &&
+        typeof t.at === "string" && !Number.isNaN(Date.parse(t.at)) &&
+        Number.isSafeInteger(t.balanceAfter) && t.balanceAfter >= 0 && t.balanceAfter <= MAX_BALANCE);
+  }
+  function migrateState(value) {
+    if (!validState(value)) return null;
+    if (value.version === 1) {
+      return { ...value, version: 2, relationships: value.relationships && typeof value.relationships === "object" ? value.relationships : {}, transactions: [] };
+    }
+    return { ...value, transactions: value.transactions.slice(-200) };
   }
   function save() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); return true; }
@@ -78,9 +94,16 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
       const parsed = JSON.parse(raw);
-      if (!validState(parsed)) { localStorage.removeItem(STORAGE_KEY); return null; }
-      if (!parsed.relationships || typeof parsed.relationships !== "object") parsed.relationships = {};
-      return parsed;
+      const migrated = migrateState(parsed);
+      if (!migrated) {
+        try { localStorage.setItem(STORAGE_KEY + "-recovery", raw); } catch (_) {}
+        return null;
+      }
+      if (migrated.version !== parsed.version || !parsed.transactions) {
+        state = migrated;
+        save();
+      }
+      return migrated;
     } catch (_) { return null; }
   }
   function showToast(message) {
@@ -297,6 +320,41 @@
     $("person-screen").hidden = true;
     $("club-screen").hidden = true;
   }
+  function calculateTransfer(current, recipient, amount, at = new Date().toISOString(), id) {
+    if (!current || !recipient || typeof recipient.id !== "string" || !recipient.id ||
+      typeof recipient.name !== "string" || !recipient.name.trim() ||
+      !Number.isSafeInteger(amount) || amount <= 0 || amount > current.balance ||
+      !Array.isArray(current.transactions)) return null;
+    const transferId = id || ("transfer-" + at + "-" + recipient.id + "-" + amount);
+    if (current.transactions.some((item) => item.id === transferId)) return null;
+    const balanceAfter = current.balance - amount;
+    const transaction = { id: transferId, recipientId: recipient.id, recipientName: recipient.name.trim(), amount, at, balanceAfter };
+    return {
+      state: {
+        ...current,
+        balance: balanceAfter,
+        transactions: [...current.transactions, transaction].slice(-200),
+        actions: [...current.actions, { title: "Sent " + amount.toLocaleString("en-US") + " FCFA to " + recipient.name.trim(), at }].slice(-100)
+      },
+      transaction
+    };
+  }
+  function transferMoney(recipient, amount) {
+    if (!state) return { ok: false, error: "Game state is not ready." };
+    const id = "transfer-" + Date.now() + "-" + Math.random().toString(36).slice(2, 10);
+    const result = calculateTransfer(state, recipient, amount, new Date().toISOString(), id);
+    if (!result) return { ok: false, error: "Check the recipient, amount, and available balance. This transfer may already have been processed." };
+    const previous = state;
+    state = result.state;
+    if (!save()) {
+      state = previous;
+      renderState();
+      return { ok: false, error: "Transfer cancelled because your game could not save the transaction." };
+    }
+    renderState();
+    showToast("Sent " + amount.toLocaleString("en-US") + " simulated FCFA to " + recipient.name + ".");
+    return { ok: true, transaction: result.transaction, balance: state.balance };
+  }
   function calculateRest(current, at = new Date().toISOString()) {
     if (!current || current.energy >= 100) return null;
     const recovered = Math.min(REST_RECOVERY, 100 - current.energy);
@@ -348,7 +406,13 @@
     showGame();
     selectLocation("beach");
   }
-  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, calculateActivity, calculateRest, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, STARTING_ENERGY, REST_RECOVERY };
+  if (typeof module !== "undefined" && module.exports) module.exports = { freshState, validState, migrateState, calculateActivity, calculateRest, calculateTransfer, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, REST_RECOVERY };
+  if (typeof window !== "undefined") {
+    window.AbijanLifeGame = {
+      getState: () => state ? { balance: state.balance, transactions: state.transactions.slice() } : null,
+      transferMoney
+    };
+  }
   if (typeof document !== "undefined") {
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
     else init();
