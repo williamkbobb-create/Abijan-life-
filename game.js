@@ -72,6 +72,21 @@
       { id: "ibrahim", name: "Ibrahim Touré", role: "Car enthusiast", mood: "Focused", section: "Wash bay", emoji: "🧑🏾‍🦱", line: "That paintwork deserves a proper shine." },
       { id: "solange", name: "Solange Koffi", role: "Business owner", mood: "Confident", section: "Waiting area", emoji: "👩🏾", line: "A good network is everything." },
       { id: "patrick", name: "Patrick Guei", role: "Mechanic", mood: "Easygoing", section: "Parking area", emoji: "🧔🏿", line: "Cars always have a story to tell." }
+    ],
+    market: [
+      { id: "adjoua-market", name: "Adjoua N’Dri", role: "Market seller", mood: "Welcoming", section: "Fresh produce", emoji: "👩🏾‍🦱", line: "Come closer, I have something fresh today." },
+      { id: "kouame-market", name: "Kouamé Koffi", role: "Craft maker", mood: "Proud", section: "Craft stalls", emoji: "🧑🏾", line: "These pieces are made right here in Bassam." },
+      { id: "mariam-market", name: "Mariam Yao", role: "Clothing seller", mood: "Cheerful", section: "Clothing lane", emoji: "👩🏿", line: "Looking for a new look?" }
+    ],
+    cafe: [
+      { id: "awa-cafe", name: "Awa Koné", role: "Café barista", mood: "Friendly", section: "Counter", emoji: "👩🏾", line: "Would you like something cool to drink?" },
+      { id: "elie-cafe", name: "Élie Bamba", role: "Student", mood: "Thoughtful", section: "Window seats", emoji: "🧑🏿", line: "This is my favourite place to take a break." },
+      { id: "sali-cafe", name: "Sali Gnahoré", role: "Local artist", mood: "Curious", section: "Patio", emoji: "👩🏿‍🦱", line: "The town always gives me a new idea." }
+    ],
+    town: [
+      { id: "nana-town", name: "Nana Kouassi", role: "Local guide", mood: "Helpful", section: "Town square", emoji: "🧑🏾", line: "There is always something happening around here." },
+      { id: "yves-town", name: "Yves Assi", role: "Football fan", mood: "Playful", section: "By the benches", emoji: "🧔🏾", line: "Are you joining the game later?" },
+      { id: "celine-town", name: "Céline Aka", role: "Photographer", mood: "Curious", section: "Heritage lane", emoji: "👩🏾‍🦱", line: "The old town has beautiful corners to photograph." }
     ]
   });
   const $ = (id) => document.getElementById(id);
@@ -104,7 +119,7 @@
       (value.version < 5 || (typeof value.ownsCar === "boolean" && (value.transportMode !== "owned_car" || value.ownsCar))) &&
       Number.isInteger(value.day) && value.day >= 1 && value.day <= 1000000 &&
       Number.isInteger(value.timeMinutes) && value.timeMinutes >= 0 && value.timeMinutes < 1440 &&
-      ["beach", "bar", "restaurant", "lavage"].includes(value.location) &&
+      ["beach", "bar", "restaurant", "lavage", "market", "cafe", "town"].includes(value.location) &&
       (value.version < 4 || (value.version < 5 ? ["walk", "gbaka", "moto", "car"].includes(value.transportMode) : ["walk", "gbaka", "moto", "car", "owned_car"].includes(value.transportMode))) &&
       value.home && Number.isInteger(value.home.level) && value.home.level >= 1 && value.home.level <= 3 &&
       value.work && Number.isInteger(value.work.day) && value.work.day >= 1 && value.work.day <= value.day &&
@@ -122,7 +137,7 @@
       ownsCar: typeof base.ownsCar === "boolean" ? base.ownsCar : false,
       day: Number.isInteger(base.day) && base.day > 0 ? base.day : 1,
       timeMinutes: Number.isInteger(base.timeMinutes) && base.timeMinutes >= 0 && base.timeMinutes < 1440 ? base.timeMinutes : 480,
-      location: ["beach", "bar", "restaurant", "lavage"].includes(base.location) ? base.location : "beach",
+      location: ["beach", "bar", "restaurant", "lavage", "market", "cafe", "town"].includes(base.location) ? base.location : "beach",
       home: base.home && Number.isInteger(base.home.level) && base.home.level >= 1 && base.home.level <= 3 ? base.home : { level: 1 },
       work: base.work && Number.isInteger(base.work.day) && Number.isInteger(base.work.shifts) ? base.work : { day: Number.isInteger(base.day) && base.day > 0 ? base.day : 1, shifts: 0 }
     };
@@ -265,7 +280,10 @@
     beach: { title: "Grand-Bassam Beach", description: "Swim, relax, play games and meet people all around the beach.", cover: "beach-cover", icon: "🏝️", kicker: "GRAND-BASSAM · COAST", actions: ["swim", "explore", "photo", "game", "dance", "meet"] },
     bar: { title: "Les Palmiers Beach Bar", description: "Dance, sit in the lounge, meet the crowd and enjoy the music.", cover: "bar-cover", icon: "🍹", kicker: "GRAND-BASSAM · NIGHTLIFE", actions: ["drink", "dance", "freestyle", "sit", "food", "meet"] },
     restaurant: { title: "Chez Bassam Restaurant", description: "Eat local food, sit at a table, take a photo and meet people.", cover: "restaurant-cover", icon: "🍽️", kicker: "GRAND-BASSAM · DINING", actions: ["food", "drink", "sit", "photo", "chat", "meet"] },
-    lavage: { title: "Lavage International", description: "Explore the wash bay, inspect cars and meet people in the waiting area.", cover: "lavage-cover", icon: "🚘", kicker: "GRAND-BASSAM · TOWN", actions: ["inspect", "washcar", "explore", "photo", "sit", "chat", "meet"] }
+    lavage: { title: "Lavage International", description: "Explore the wash bay, inspect cars and meet people in the waiting area.", cover: "lavage-cover", icon: "🚘", kicker: "GRAND-BASSAM · TOWN", actions: ["inspect", "washcar", "explore", "photo", "sit", "chat", "meet"] },
+    market: { title: "Marché de Grand-Bassam", description: "Browse colourful stalls, pick up essentials and meet local sellers.", cover: "market-cover", icon: "🛍️", kicker: "GRAND-BASSAM · MARKET", actions: ["food", "drink", "photo", "explore", "meet"] },
+    cafe: { title: "Café des Palmiers", description: "Take a café break, enjoy a local bite and chat with people passing through.", cover: "cafe-cover", icon: "☕", kicker: "GRAND-BASSAM · CAFÉ", actions: ["food", "drink", "sit", "chat", "photo", "meet"] },
+    town: { title: "Old Town & Town Square", description: "Explore the heritage streets, take photos and meet neighbours around the square.", cover: "town-cover", icon: "🏘️", kicker: "GRAND-BASSAM · OLD TOWN", actions: ["explore", "photo", "game", "chat", "meet"] }
   };
   const ACTION_LABELS = {
     swim: ["🏊", "Swim", "−12 energy"], explore: ["🚶", "Explore", "−5 energy"], drink: ["🍹", "Buy a drink", "500 FCFA"],
@@ -275,7 +293,7 @@
   };
   function calculateTravel(current, destination, modeKey, at = new Date().toISOString()) {
     const mode = TRANSPORT[modeKey];
-    if (!current || !mode || !["beach", "bar", "restaurant", "lavage"].includes(destination)) return null;
+    if (!current || !mode || !["beach", "bar", "restaurant", "lavage", "market", "cafe", "town"].includes(destination)) return null;
     if (modeKey === "owned_car" && !current.ownsCar) return null;
     if (destination === current.location) return { ...current, transportMode: modeKey };
     if (current.balance < mode.fare || current.energy < mode.energy) return null;
@@ -320,7 +338,7 @@
     }
     currentLocation = key;
     if (scene) {
-      scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage");
+      scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage", "location-market", "location-cafe", "location-town");
       scene.classList.add("location-" + key);
     }
     document.querySelectorAll("[data-location]").forEach((pin) => {
@@ -526,9 +544,10 @@
     title.append(eyebrow, h);
     const clock = document.createElement("span"); clock.className = "life-clock"; clock.textContent = "DAY " + state.day + " · " + formatGameTime(state.timeMinutes);
     heading.append(title, clock); root.append(heading);
+    const tabs = document.createElement("div"); tabs.className = "life-tabs"; tabs.setAttribute("role", "group"); tabs.setAttribute("aria-label", "Everyday life categories");
     const grid = document.createElement("div"); grid.className = "life-grid";
     const home = document.createElement("article"); home.className = "life-card";
-    home.innerHTML = '<span class="life-card-icon">🏡</span><p class="life-card-kicker">YOUR HOME</p><h3>Home & rest</h3><p class="life-card-copy">Return to your home base, slow down, and recover your energy.</p>';
+    home.dataset.lifeCategory = "home"; home.innerHTML = '<span class="life-card-icon">🏡</span><p class="life-card-kicker">YOUR HOME</p><h3>Home & rest</h3><p class="life-card-copy">Return to your home base, slow down, and recover your energy.</p>';
     const homeButton = document.createElement("button"); homeButton.type = "button"; homeButton.className = "life-button"; homeButton.textContent = state.energy >= 100 ? "Energy full" : "Go home & sleep · 8 hours"; homeButton.disabled = state.energy >= 100; homeButton.addEventListener("click", sleepAtHome);
     const homeUpgrade = document.createElement("button"); homeUpgrade.type = "button"; homeUpgrade.className = "life-button life-button-secondary";
     if (state.home.level >= 3) { homeUpgrade.textContent = "Home fully upgraded"; homeUpgrade.disabled = true; }
@@ -541,7 +560,7 @@
     const homeNote = document.createElement("small"); homeNote.className = "life-card-note"; homeNote.textContent = (HOME_UPGRADES[state.home.level]?.title || "Starter home") + " · Home level " + state.home.level + " · Sleep restores energy";
     home.append(homeButton, homeUpgrade, homeNote); grid.append(home);
     const work = document.createElement("article"); work.className = "life-card";
-    work.innerHTML = '<span class="life-card-icon">🧰</span><p class="life-card-kicker">EARN FCFA</p><h3>Local jobs</h3><p class="life-card-copy">Take a shift and earn simulated money. Each shift uses time and energy.</p>';
+    work.dataset.lifeCategory = "jobs"; work.innerHTML = '<span class="life-card-icon">🧰</span><p class="life-card-kicker">EARN FCFA</p><h3>Local jobs</h3><p class="life-card-copy">Take a shift and earn simulated money. Each shift uses time and energy.</p>';
     Object.entries(JOBS).forEach(([key, job]) => {
       const button = document.createElement("button"); button.type = "button"; button.className = "life-button life-button-secondary";
       button.textContent = job.title + " · +" + job.pay.toLocaleString("en-US") + " FCFA";
@@ -552,7 +571,7 @@
     const workNote = document.createElement("small"); workNote.className = "life-card-note"; workNote.textContent = "Shifts today: " + state.work.shifts + "/" + DAILY_SHIFT_LIMIT;
     work.append(workNote); grid.append(work);
     const shop = document.createElement("article"); shop.className = "life-card";
-    shop.innerHTML = '<span class="life-card-icon">🛍️</span><p class="life-card-kicker">LOCAL MARKET</p><h3>Shops & inventory</h3><p class="life-card-copy">Pick up everyday essentials and keepsakes for your story.</p>';
+    shop.dataset.lifeCategory = "market"; shop.innerHTML = '<span class="life-card-icon">🛍️</span><p class="life-card-kicker">LOCAL MARKET</p><h3>Shops & inventory</h3><p class="life-card-copy">Pick up everyday essentials and keepsakes for your story.</p>';
     Object.entries(SHOP_ITEMS).filter(([key]) => !HOME_STORE_ITEMS.includes(key)).forEach(([key, item]) => {
       const button = document.createElement("button"); button.type = "button"; button.className = "life-button life-button-secondary";
       button.textContent = item.name + " · " + item.price.toLocaleString("en-US") + " FCFA";
@@ -567,7 +586,7 @@
     else state.inventory.forEach((owned) => { const row = document.createElement("small"); row.textContent = SHOP_ITEMS[owned.id].name + " × " + owned.quantity; inventory.append(row); });
     shop.append(inventory); grid.append(shop);
     const homeStore = document.createElement("article"); homeStore.className = "life-card";
-    homeStore.innerHTML = '<span class="life-card-icon">🛋️</span><p class="life-card-kicker">HOME & FURNITURE</p><h3>Furnish your home</h3><p class="life-card-copy">Buy furniture for your home, or purchase a personal car here. Car travel is free in Update 1; fuel is planned for Update 2.</p>';
+    homeStore.dataset.lifeCategory = "furniture"; homeStore.innerHTML = '<span class="life-card-icon">🛋️</span><p class="life-card-kicker">HOME & FURNITURE</p><h3>Furnish your home</h3><p class="life-card-copy">Buy furniture for your home, or purchase a personal car here. Car travel is free in Update 1; fuel is planned for Update 2.</p>';
     HOME_STORE_ITEMS.forEach((key) => {
       const item = SHOP_ITEMS[key]; const button = document.createElement("button"); button.type = "button"; button.className = "life-button life-button-secondary";
       button.textContent = item.name + " · " + item.price.toLocaleString("en-US") + " FCFA";
@@ -582,7 +601,7 @@
     homeStoreNote.textContent = state.ownsCar ? "You own a car. Select it in Transport for free travel; fuel is not charged yet." : "Your car will be saved with your character. Fuel is planned for Update 2.";
     homeStore.append(homeStoreNote); grid.append(homeStore);
     const travel = document.createElement("article"); travel.className = "life-card";
-    travel.innerHTML = '<span class="life-card-icon">🛺</span><p class="life-card-kicker">GET AROUND BASSAM</p><h3>Transport</h3><p class="life-card-copy">Choose how you want to reach your next destination. Fares are simulated.</p>';
+    travel.dataset.lifeCategory = "travel"; travel.innerHTML = '<span class="life-card-icon">🛺</span><p class="life-card-kicker">GET AROUND BASSAM</p><h3>Transport</h3><p class="life-card-copy">Choose how you want to reach your next destination. Fares are simulated.</p>';
     Object.entries(TRANSPORT).forEach(([key, mode]) => {
       if (key === "owned_car" && !state.ownsCar) { /* shown as locked below */ }
       const button = document.createElement("button"); button.type = "button";
@@ -594,7 +613,17 @@
     });
     const travelNote = document.createElement("small"); travelNote.className = "life-card-note";
     travelNote.textContent = "Selected: " + TRANSPORT[state.transportMode || "gbaka"].title + ". Tap a map destination to travel; the fare, time and energy cost are applied.";
-    travel.append(travelNote); grid.append(travel); root.append(grid);
+    travel.append(travelNote); grid.append(travel);
+    const lifeCategories = [["home", "🏡 Home"], ["jobs", "🧰 Jobs"], ["market", "🛍️ Market"], ["furniture", "🛋️ Furniture"], ["travel", "🛺 Travel"]];
+    lifeCategories.forEach(([key, label], index) => {
+      const tab = document.createElement("button"); tab.type = "button"; tab.className = "life-tab"; tab.textContent = label;
+      tab.setAttribute("aria-pressed", String(index === 0)); tab.addEventListener("click", () => {
+        tabs.querySelectorAll(".life-tab").forEach((item) => item.setAttribute("aria-pressed", String(item === tab)));
+        grid.querySelectorAll(".life-card").forEach((card) => { card.hidden = card.dataset.lifeCategory !== key; });
+      }); tabs.append(tab);
+    });
+    grid.querySelectorAll(".life-card").forEach((card) => { card.hidden = card.dataset.lifeCategory !== "home"; });
+    root.append(tabs, grid);
   }
   function calculateTransfer(current, recipient, amount, at = new Date().toISOString(), id) {
     if (!current || !recipient || typeof recipient.id !== "string" || !recipient.id ||
