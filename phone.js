@@ -25,6 +25,7 @@
   let activeTab = "messages";
   let activeConversation = null;
   let activeTransferView = false;
+  let transferRecipient = null;
   let callTimer = null;
   function persist() {
     try { localStorage.setItem(PHONE_KEY, JSON.stringify(phoneState)); } catch (_) {}
@@ -106,7 +107,6 @@
   }
   function renderMessages(content) {
     content.append(el("p", "phone-intro", "Catch up with people around Grand-Bassam."));
-    content.append(button("↗  Send Money", "phone-primary", () => { activeTransferView = true; renderTab(); }));
     const gameState = window.AbijanLifeGame && window.AbijanLifeGame.getState();
     const transactions = gameState && Array.isArray(gameState.transactions) ? gameState.transactions.slice().reverse() : [];
     if (transactions.length) {
@@ -153,6 +153,7 @@
       option.value = person.id;
       recipient.append(option);
     });
+    if (transferRecipient && contacts.some((person) => person.id === transferRecipient)) recipient.value = transferRecipient;
     const amountLabel = el("label", "phone-field-label", "Amount (FCFA)");
     amountLabel.htmlFor = "phone-transfer-amount";
     const amount = el("input");
@@ -208,6 +209,7 @@
       phoneState.sent = phoneState.sent.slice(-100);
       persist();
       activeTransferView = false;
+      transferRecipient = null;
       renderTab();
     });
     content.append(form);
@@ -217,6 +219,13 @@
     const message = phoneState.messages.find((item) => item.id === id);
     if (!message) { activeConversation = null; renderMessages(content); return; }
     content.append(button("← All messages", "phone-back", () => { activeConversation = null; renderTab(); }));
+    content.append(button("↗ Send money", "phone-primary", () => {
+      const contact = contacts.find((person) => person.name === message.name);
+      if (!contact) return;
+      transferRecipient = contact.id;
+      activeTransferView = true;
+      renderTab();
+    }));
     const thread = el("div", "phone-thread");
     thread.append(el("div", "phone-chat-avatar", message.avatar), el("h3", "", message.name), el("p", "phone-demo-note", "Local demo conversation"));
     thread.append(el("div", "phone-bubble incoming", message.text));
