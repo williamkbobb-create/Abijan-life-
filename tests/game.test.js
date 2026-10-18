@@ -78,8 +78,8 @@ test("each playable location has a local crowd grouped into sections", () => {
     assert.ok(PEOPLE[location].every((person) => person.id && person.name && person.section && person.line));
   }
   assert.ok(PEOPLE.beach.some((person) => person.section !== PEOPLE.beach[0].section));
-  assert.ok(PEOPLE.lavage.some((person) => person.section === "Wash bay"));
-  assert.ok(PEOPLE.lavage.some((person) => person.section === "Parking area"));
+  assert.ok(PEOPLE.lavage.some((person) => person.section === "Zone de lavage"));
+  assert.ok(PEOPLE.lavage.some((person) => person.section === "Parking"));
 });
 test("sitting can restore energy and is recorded as a game activity", () => {
   const initial = { ...freshState("Aya", "Coastal creative"), energy: 60 };
@@ -100,5 +100,133 @@ test("phone interface is loaded as a compact side panel with the world still pre
   for (const tab of ["messages", "calls", "contacts", "activities", "settings"]) assert.ok(js.includes('data-phone-tab="' + tab + '"'));
   assert.match(css, /\.phone-panel/);
   assert.match(css, /@media\s*\(max-width:\s*650px\)/);
-  assert.match(js, /No real calls or online messages are sent/);
+  assert.match(css, /top:132px/);
+  assert.match(css, /grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
+  assert.match(js, /phone-launcher.*Ouvrir le téléphone du jeu/);
+  for (const app of ["💬", "☎️", "👥", "🗓️", "⚙️"]) assert.ok(js.includes(app));
+  assert.match(js, /Aucun appel réel ni message en ligne n’est envoyé/);
+});
+
+
+test("French preview UI avoids untranslated map and action labels", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const game = fs.readFileSync(path.join(__dirname, "..", "game.js"), "utf8");
+  const phone = fs.readFileSync(path.join(__dirname, "..", "phone.js"), "utf8");
+  assert.ok(html.includes("<span>ÉNERGIE</span>"));
+  assert.ok(html.includes("GOLFE DE GUINÉE"));
+  assert.ok(!html.includes("GULF OF GUINEA"));
+  assert.ok(!html.includes("TOUCHE UN LIEU POUR EXPLORERR"));
+  assert.ok(!html.includes("💬 Discuter"));
+  assert.match(game, /talk.textContent = "Discuter"/);
+  assert.match(game, /wave.textContent = "Dire bonjour"/);
+  assert.match(phone, /Les appels sont simulés/);
+});
+
+
+ test("branded favicon is linked and exists as an SVG asset", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const favicon = fs.readFileSync(path.join(__dirname, "..", "favicon.svg"), "utf8");
+  assert.ok(html.includes('rel="icon" type="image/svg+xml" href="favicon.svg"'));
+  assert.match(favicon, /<svg[\s>]/);
+  assert.match(favicon, /#092e2c/);
+});
+
+
+test("player feedback is compact and the next-update plan is visible", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const css = fs.readFileSync(path.join(__dirname, "..", "feedback.css"), "utf8");
+  const roadmap = fs.readFileSync(path.join(__dirname, "..", "ROADMAP.md"), "utf8");
+  assert.ok(html.includes('id="next-update"'));
+  assert.ok(html.includes("Un avis rapide suffit."));
+  assert.ok(html.includes('maxlength="300"'));
+  assert.ok(!html.includes('id="feedback-name"'));
+  assert.ok(html.includes('id="feedback-category"'));
+  assert.ok(html.includes('id="feedback-message"'));
+  assert.ok(css.includes(".next-update-list"));
+  assert.ok(roadmap.includes("Tutoriel de première visite"));
+  assert.ok(roadmap.includes("URL officielle de NouchiLink doit être confirmée"));
+});
+
+
+ test("preview enters through character creation without an account gate or tutorial", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const root = path.join(__dirname, "..");
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  assert.match(html, /id="welcome-screen"/);
+  assert.match(html, /id="character-form"/);
+  assert.match(html, /src="game.js" defer/);
+  assert.match(html, /src="auth\.js" defer/);
+  assert.match(html, /href="auth\.css"/);
+  assert.match(html, /id="auth-toggle"/);
+  assert.match(html, /@supabase\/supabase-js@2/);
+  const auth = fs.readFileSync(path.join(root, "auth.js"), "utf8");
+  assert.match(auth, /compte est facultatif/);
+  assert.doesNotMatch(auth, /welcome-screen.*hidden = false|game-screen.*hidden = true/);
+  assert.doesNotMatch(html, /id="first-play-tutorial"/);
+});
+
+
+test("the avatar emoji replaces letter logos and acts as the in-game home control", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const root = path.join(__dirname, "..");
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const game = fs.readFileSync(path.join(root, "game.js"), "utf8");
+  assert.match(html, /id="avatar-home-button"[^>]*>🏠<\/button>/);
+  assert.doesNotMatch(html, /class="game-logo"/);
+  assert.doesNotMatch(html, /id="avatar-initial"/);
+  assert.match(game, /avatar-home-button.*addEventListener/);
+  assert.match(game, /Accueil du jeu\./);
+});
+
+
+test("interactive map has zoom controls, heritage pins, and repeat-tap close behavior", () => {
+  const fs=require("node:fs"), path=require("node:path"), root=path.join(__dirname,"..");
+  const html=fs.readFileSync(path.join(root,"index.html"),"utf8"), game=fs.readFileSync(path.join(root,"game.js"),"utf8"), css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
+  assert.match(html,/id="map-canvas"/);assert.match(html,/id="map-zoom-in"/);assert.match(html,/id="map-zoom-out"/);assert.match(html,/id="map-reset-view"/);assert.match(html,/class="scene-road scene-road-c"/);assert.match(html,/class="scene-road scene-road-f"/);assert.match(html,/class="scene-road scene-road-g"/);assert.match(html,/class="scene-road scene-road-h"/);for(const label of ["RUE DES PALMIERS","AVENUE DU LITTORAL","RUE DU MARCHÉ","RUE DU PORT","RUE DES ARTISANS","CARREFOUR CENTRAL"]) assert.match(html,new RegExp(label));assert.match(css,/\.street-label/);
+  assert.match(html,/data-location="historic"/);assert.match(html,/data-location="nzima"/);assert.match(game,/function initMapPanZoom/);
+  assert.match(game,/toggleIfSelected && currentLocation === key/);assert.match(css,/touch-action:none/);assert.match(css,/\.location-dock\.is-hidden/);
+});
+
+
+test("map discovery includes culture and beach destinations, category filters, and local-only house visibility", () => {
+ const fs=require("node:fs"),path=require("node:path"),root=path.join(__dirname,"..");
+ const html=fs.readFileSync(path.join(root,"index.html"),"utf8"),game=fs.readFileSync(path.join(root,"game.js"),"utf8"),css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
+ for(const id of ["museum","artisans","azuretti","lighthouse","homes","myhome"]) assert.match(html,new RegExp('data-location="'+id+'"'));
+ for(const category of ["all","popular","culture","services","homes"]) assert.match(html,new RegExp('data-map-filter="'+category+'"'));
+ assert.match(html,/id="house-visibility-toggle"/);assert.match(game,/Ta maison est visible sur cette carte de démo uniquement/);
+ assert.match(game,/aucun autre joueur réel n’est connecté ici/);assert.match(css,/\.world-pin\.filter-hidden/);
+});
+
+
+test("player district includes clearly fictional neighbor homes for local demo visits", () => {
+ const fs=require("node:fs"),path=require("node:path"),root=path.join(__dirname,"..");
+ const html=fs.readFileSync(path.join(root,"index.html"),"utf8"),game=fs.readFileSync(path.join(root,"game.js"),"utf8"),css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
+ for(const id of ["houseaya","housekoffi","housemariam"]) assert.match(html,new RegExp('data-location="'+id+'"'));
+ for(const id of ["houseaya","housekoffi","housemariam"]) assert.match(game,new RegExp(id+': \\{ title:'));
+ assert.match(game,/personnage fictif/);assert.match(game,/aucun autre joueur réel/);assert.match(css,/\.pin-house-aya/);
+});
+
+
+test("street life layer adds accessible animated pedestrians and vehicles with tap interactions", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const html = fs.readFileSync(path.join(__dirname, "..", "index.html"), "utf8");
+  const phone = fs.readFileSync(path.join(__dirname, "..", "phone.js"), "utf8");
+  assert.match(html, /id="map-canvas"/);
+  assert.match(html, /src="phone\.js"/);
+  assert.match(phone, /function makeStreetLife\(\)/);
+  assert.match(phone, /street-walker/);
+  assert.match(phone, /street-car/);
+  assert.match(phone, /aria-label.*toucher pour interagir/);
+  assert.match(phone, /is-greeting/);
+  assert.match(phone, /prefers-reduced-motion:reduce/);
+  assert.match(phone, /Tu salues un habitant de Grand-Bassam/);
 });

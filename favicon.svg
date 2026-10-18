@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Abijan Life">
+  <rect width="64" height="64" rx="16" fill="#092e2c"/>
+  <path d="M32 10 11 53h10l4-9h14l4 9h10L32 10Zm0 17 4 9h-8l4-9Z" fill="#f5f1e7"/>
+  <circle cx="49" cy="14" r="5" fill="#d8794f"/>
+</svg>
