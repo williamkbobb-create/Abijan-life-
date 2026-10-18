@@ -185,3 +185,12 @@ test("the avatar emoji replaces letter logos and acts as the in-game home contro
   assert.match(game, /avatar-home-button.*addEventListener/);
   assert.match(game, /Accueil du jeu\./);
 });
+
+
+test("interactive map has zoom controls, heritage pins, and repeat-tap close behavior", () => {
+  const fs=require("node:fs"), path=require("node:path"), root=path.join(__dirname,"..");
+  const html=fs.readFileSync(path.join(root,"index.html"),"utf8"), game=fs.readFileSync(path.join(root,"game.js"),"utf8"), css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
+  assert.match(html,/id="map-canvas"/);assert.match(html,/id="map-zoom-in"/);assert.match(html,/id="map-zoom-out"/);assert.match(html,/id="map-reset-view"/);
+  assert.match(html,/data-location="historic"/);assert.match(html,/data-location="nzima"/);assert.match(game,/function initMapPanZoom/);
+  assert.match(game,/toggleIfSelected && currentLocation === key/);assert.match(css,/touch-action:none/);assert.match(css,/\.location-dock\.is-hidden/);
+});
