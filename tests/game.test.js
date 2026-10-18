@@ -194,3 +194,13 @@ test("interactive map has zoom controls, heritage pins, and repeat-tap close beh
   assert.match(html,/data-location="historic"/);assert.match(html,/data-location="nzima"/);assert.match(game,/function initMapPanZoom/);
   assert.match(game,/toggleIfSelected && currentLocation === key/);assert.match(css,/touch-action:none/);assert.match(css,/\.location-dock\.is-hidden/);
 });
+
+
+test("map discovery includes culture and beach destinations, category filters, and local-only house visibility", () => {
+ const fs=require("node:fs"),path=require("node:path"),root=path.join(__dirname,"..");
+ const html=fs.readFileSync(path.join(root,"index.html"),"utf8"),game=fs.readFileSync(path.join(root,"game.js"),"utf8"),css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
+ for(const id of ["museum","artisans","azuretti","lighthouse","homes","myhome"]) assert.match(html,new RegExp('data-location="'+id+'"'));
+ for(const category of ["all","popular","culture","services","homes"]) assert.match(html,new RegExp('data-map-filter="'+category+'"'));
+ assert.match(html,/id="house-visibility-toggle"/);assert.match(game,/Ta maison est visible sur cette carte de démo uniquement/);
+ assert.match(game,/aucun autre joueur réel n’est connecté ici/);assert.match(css,/\.world-pin\.filter-hidden/);
+});
