@@ -72,14 +72,28 @@ test("buying drinks and local food deduct only simulated FCFA", () => {
   assert.equal(calculateActivity(initial, "drink").balance, STARTING_BALANCE - 500);
   assert.equal(calculateActivity(initial, "food").balance, STARTING_BALANCE - 750);
 });
+test("all seven map destinations have local crowds and travel support", () => {
+  for (const location of ["beach", "bar", "restaurant", "lavage", "market", "cafe", "town"]) {
+    assert.ok(PEOPLE[location].length >= 3, location + " should have local characters");
+    assert.ok(PEOPLE[location].every((person) => person.id && person.name && person.section && person.line));
+    const state = { ...freshState("Aya", "Coastal creative"), location: "beach" };
+    const trip = calculateTravel(state, location, "walk", "2026-10-18T12:00:00.000Z");
+    assert.ok(trip, location + " should be a valid travel destination");
+    assert.equal(trip.location, location);
+    assert.equal(validState(trip), true);
+  }
+});
 test("each playable location has a local crowd grouped into sections", () => {
-  for (const location of ["beach", "bar", "restaurant", "lavage"]) {
+  for (const location of ["beach", "bar", "restaurant", "lavage", "market", "cafe", "town"]) {
     assert.ok(PEOPLE[location].length >= 3);
     assert.ok(PEOPLE[location].every((person) => person.id && person.name && person.section && person.line));
   }
   assert.ok(PEOPLE.beach.some((person) => person.section !== PEOPLE.beach[0].section));
   assert.ok(PEOPLE.lavage.some((person) => person.section === "Wash bay"));
   assert.ok(PEOPLE.lavage.some((person) => person.section === "Parking area"));
+  assert.ok(PEOPLE.market.some((person) => person.role === "Market seller"));
+  assert.ok(PEOPLE.cafe.some((person) => person.role === "Café barista"));
+  assert.ok(PEOPLE.town.some((person) => person.role === "Local guide"));
 });
 test("sitting can restore energy and is recorded as a game activity", () => {
   const initial = { ...freshState("Aya", "Coastal creative"), energy: 60 };
