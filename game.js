@@ -101,7 +101,7 @@
     if (value.version === 2) return true;
     return Array.isArray(value.inventory) && value.inventory.length <= 100 &&
       value.inventory.every((item) => item && typeof item.id === "string" && Object.prototype.hasOwnProperty.call(SHOP_ITEMS, item.id) && Number.isInteger(item.quantity) && item.quantity > 0 && item.quantity <= 999) &&
-      (value.version < 5 || typeof value.ownsCar === "boolean") &&
+      (value.version < 5 || (typeof value.ownsCar === "boolean" && (value.transportMode !== "owned_car" || value.ownsCar))) &&
       Number.isInteger(value.day) && value.day >= 1 && value.day <= 1000000 &&
       Number.isInteger(value.timeMinutes) && value.timeMinutes >= 0 && value.timeMinutes < 1440 &&
       ["beach", "bar", "restaurant", "lavage"].includes(value.location) &&
@@ -553,7 +553,7 @@
     work.append(workNote); grid.append(work);
     const shop = document.createElement("article"); shop.className = "life-card";
     shop.innerHTML = '<span class="life-card-icon">🛍️</span><p class="life-card-kicker">LOCAL MARKET</p><h3>Shops & inventory</h3><p class="life-card-copy">Pick up everyday essentials and keepsakes for your story.</p>';
-    Object.entries(SHOP_ITEMS).forEach(([key, item]) => {
+    Object.entries(SHOP_ITEMS).filter(([key]) => !HOME_STORE_ITEMS.includes(key)).forEach(([key, item]) => {
       const button = document.createElement("button"); button.type = "button"; button.className = "life-button life-button-secondary";
       button.textContent = item.name + " · " + item.price.toLocaleString("en-US") + " FCFA";
       button.disabled = state.balance < item.price || state.inventory.length >= 100 || (state.inventory.find((owned) => owned.id === key)?.quantity || 0) >= 999;
