@@ -101,13 +101,17 @@ test("phone interface is loaded as a compact side panel with the world still pre
   assert.match(css, /\.phone-panel/);
   assert.match(css, /@media\s*\(max-width:\s*650px\)/);
   assert.match(js, /No real calls or online messages are sent/);
-  assert.match(js, /Send Money/);
+  assert.match(js, /Send money/); // Transfer is opened from a selected conversation, not the phone home screen.
   assert.match(js, /10000000/);
   assert.match(js, /window\.AbijanLifeGame/);
   assert.match(html, /id="buy-energy-button"/);
   assert.match(html, /id="life-panel"/);
   assert.match(fs.readFileSync(require("node:path").join(__dirname, "..", "styles.css"), "utf8"), /\.life-grid/);
   assert.match(css, /\.phone-transfer-form/);
+  const polish = fs.readFileSync(require("node:path").join(__dirname, "..", "ui-polish.js"), "utf8");
+  assert.match(polish, /street-life/);
+  assert.match(polish, /life-drawer-toggle/);
+  assert.match(polish, /phone-app-home/);
 });
 
 
