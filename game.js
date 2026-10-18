@@ -172,7 +172,13 @@
     restaurant: { title: "Restaurant Chez Bassam", description: "Savoure un plat local, prends une photo et profite d’un moment de détente.", cover: "restaurant-cover", icon: "🍽️", kicker: "GRAND-BASSAM · RESTAURATION", actions: ["food", "drink", "sit", "photo", "chat", "meet"] },
     lavage: { title: "Lavage International", description: "Découvre la zone de lavage et observe les voitures dans la file d’attente.", cover: "lavage-cover", icon: "🚘", kicker: "GRAND-BASSAM · VILLE", actions: ["inspect", "washcar", "explore", "photo", "sit", "chat", "meet"] },
     historic: { title: "Ville historique de Grand-Bassam", description: "Explore les rues patrimoniales et l’architecture de l’ancienne capitale. Point de découverte inspiré du site classé à l’UNESCO.", cover: "historic-cover", icon: "🏛️", kicker: "PATRIMOINE · UNESCO", actions: ["explore", "photo", "meet", "chat", "sit"] },
-    nzima: { title: "Village N’zima", description: "Découvre la culture, les traditions et l’histoire de la communauté N’zima à travers une étape de jeu fictive.", cover: "nzima-cover", icon: "🛶", kicker: "CULTURE · GRAND-BASSAM", actions: ["explore", "photo", "meet", "chat", "sit"] }
+    nzima: { title: "Village N’zima", description: "Découvre la culture, les traditions et l’histoire de la communauté N’zima à travers une étape de jeu fictive.", cover: "nzima-cover", icon: "🛶", kicker: "CULTURE · GRAND-BASSAM", actions: ["explore", "photo", "meet", "chat", "sit"] },
+    museum: { title: "Musée National du Costume", description: "Un lieu de découverte inspiré du musée de Grand-Bassam : patrimoine, vêtements traditionnels et mini-défis culturels.", cover: "historic-cover", icon: "🏺", kicker: "CULTURE · PATRIMOINE", actions: ["explore", "photo", "meet", "chat", "sit"] },
+    artisans: { title: "Village artisanal", description: "Explore un marché fictif inspiré de l’artisanat local. Plus tard, tu pourras y découvrir des vêtements, décorations et objets pour ta maison.", cover: "historic-cover", icon: "🧺", kicker: "ARTISANAT · DÉCOUVERTE", actions: ["explore", "photo", "food", "meet", "chat"] },
+    azuretti: { title: "Plage d’Azuretti", description: "Une sortie côtière inspirée d’Azuretti pour se détendre, prendre des photos et rencontrer des personnages de la démo.", cover: "beach-cover", icon: "🌅", kicker: "CÔTE · LOISIRS", actions: ["swim", "explore", "photo", "game", "meet", "sit"] },
+    lighthouse: { title: "Phare et littoral", description: "Point d’exploration fictif inspiré du patrimoine côtier. Débloque des souvenirs et des photos de découverte.", cover: "historic-cover", icon: "🗼", kicker: "EXPLORATION · LITTORAL", actions: ["explore", "photo", "meet", "chat", "sit"] },
+    homes: { title: "Quartier des joueurs", description: "Quartier de maisons fictives pour cette démo locale. Les visites et voisins sont simulés : aucun autre joueur réel n’est connecté ici.", cover: "historic-cover", icon: "🏘️", kicker: "QUARTIER · MODE DÉMO", actions: ["explore", "photo", "meet", "chat", "sit"] },
+    myhome: { title: "Ma maison", description: "Ta maison de jeu est affichée dans le quartier uniquement sur cet appareil de démo. Ce réglage ne publie rien en ligne et n’est pas synchronisé avec d’autres joueurs.", cover: "historic-cover", icon: "🏠", kicker: "TON ESPACE · VISIBILITÉ LOCALE", actions: ["explore", "photo", "chat", "sit"] }
   };
   const ACTION_LABELS = {
     swim: ["🏊", "Se baigner", "−12 points d’énergie"], explore: ["🚶", "Explorer", "−5 points d’énergie"], drink: ["🍹", "Acheter une boisson", "500 FCFA"],
@@ -199,7 +205,7 @@
     if (dock) dock.classList.remove("is-hidden");
     currentLocation = key;
     if (scene) {
-      scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage", "location-historic", "location-nzima");
+      scene.classList.remove("location-beach", "location-bar", "location-restaurant", "location-lavage", "location-historic", "location-nzima", "location-museum", "location-artisans", "location-azuretti", "location-lighthouse", "location-homes", "location-myhome");
       scene.classList.add("location-" + key);
     }
     document.querySelectorAll("[data-location]").forEach((pin) => {
@@ -363,6 +369,34 @@
     $("character-name").addEventListener("input", () => $("character-name").setCustomValidity(""));
     document.querySelectorAll("[data-location]").forEach((button) => button.addEventListener("click", () => selectLocation(button.dataset.location, true)));
     initMapPanZoom();
+    document.querySelectorAll("[data-map-filter]").forEach((button) => button.addEventListener("click", () => {
+      const filter = button.dataset.mapFilter;
+      document.querySelectorAll("[data-map-filter]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      document.querySelectorAll(".world-pin[data-map-category]").forEach((pin) => {
+        const visible = filter === "all" || pin.dataset.mapCategory === filter;
+        if (pin.id === "my-home-pin" && pin.hidden) return;
+        pin.classList.toggle("filter-hidden", !visible);
+        pin.tabIndex = visible ? 0 : -1;
+      });
+    }));
+    const houseToggle = $("house-visibility-toggle");
+    const myHomePin = $("my-home-pin");
+    houseToggle?.addEventListener("click", () => {
+      const visible = myHomePin.hidden;
+      myHomePin.hidden = !visible;
+      houseToggle.setAttribute("aria-pressed", String(visible));
+      houseToggle.textContent = visible ? "✓ Maison visible" : "＋ Ma maison";
+      if (visible) {
+        myHomePin.classList.remove("filter-hidden");
+        showToast("Ta maison est visible sur cette carte de démo uniquement.");
+      } else {
+        if (currentLocation === "myhome") {
+          document.querySelector(".location-dock")?.classList.add("is-hidden");
+          currentLocation = null;
+        }
+        showToast("Ta maison est masquée sur cette carte de démo.");
+      }
+    });
     $("reset-button").addEventListener("click", resetGame);
     $("avatar-home-button").addEventListener("click", () => {
       closeOverlays();
