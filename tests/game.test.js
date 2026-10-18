@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, calculateHomeUpgrade, calculateTravel, advanceTime, JOBS, SHOP_ITEMS, HOME_UPGRADES, TRANSPORT, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT } = require("../game.js");
+const { freshState, validState, migrateState, calculateActivity, calculateRest, calculateEnergyPurchase, calculateTransfer, calculateWorkShift, calculatePurchase, calculateHomeSleep, calculateHomeUpgrade, calculateTravel, calculateCarPurchase, advanceTime, JOBS, SHOP_ITEMS, HOME_UPGRADES, HOME_STORE_ITEMS, CAR_PRICE, TRANSPORT, DAILY_SHIFT_LIMIT, COSTS, ACTIVITIES, PEOPLE, STARTING_BALANCE, MAX_BALANCE, STARTING_ENERGY, ENERGY_PACK_COST, ENERGY_PACK_AMOUNT } = require("../game.js");
 test("new character starts with the documented demo balance and energy", () => {
   const state = freshState("Aya Kouassi", "Coastal creative");
   assert.equal(state.name, "Aya Kouassi");
@@ -263,4 +263,28 @@ test("version 3 saves migrate to version 4 and keep their existing wallet and pr
   assert.equal(migrated.timeMinutes, 900);
   assert.equal(migrated.location, "restaurant");
   assert.equal(validState(migrated), true);
+});
+
+test("car purchase costs simulated FCFA and ownership unlocks free personal-car travel", () => {
+  const initial = freshState("Aya", "Coastal creative");
+  const car = calculateCarPurchase(initial, "2026-10-18T12:00:00.000Z");
+  assert.equal(CAR_PRICE, 5000000);
+  assert.equal(car.ownsCar, true);
+  assert.equal(car.balance, STARTING_BALANCE - CAR_PRICE);
+  assert.equal(calculateCarPurchase(car), null, "cannot buy a second car");
+  assert.equal(calculateTravel(initial, "bar", "owned_car"), null, "cannot use a car before owning one");
+  const trip = calculateTravel({ ...car, transportMode: "owned_car" }, "bar", "owned_car", "2026-10-18T12:05:00.000Z");
+  assert.equal(trip.balance, car.balance, "owned-car travel has no fare in Update 1");
+  assert.equal(trip.energy, car.energy);
+  assert.equal(trip.location, "bar");
+  assert.equal(trip.timeMinutes, car.timeMinutes + 10);
+  assert.equal(validState({ ...car, transportMode: "owned_car" }), true);
+  assert.equal(validState({ ...initial, transportMode: "owned_car" }), false);
+});
+test("home furniture catalogue is separate from everyday shop items", () => {
+  assert.deepEqual(HOME_STORE_ITEMS, ["sofa", "bed", "dining_table"]);
+  for (const key of HOME_STORE_ITEMS) assert.ok(SHOP_ITEMS[key]);
+  assert.equal(SHOP_ITEMS.sofa.price, 150000);
+  assert.equal(SHOP_ITEMS.bed.price, 200000);
+  assert.equal(SHOP_ITEMS.dining_table.price, 100000);
 });
