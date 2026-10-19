@@ -139,3 +139,57 @@ main{max-width:none;padding:0 clamp(10px,2vw,26px)}
 .wash-car-four{background:linear-gradient(180deg,#f4f1e7 0 27%,#7c9b70 28% 100%);transform:translateY(-12px) rotate(3deg)}
 .location-lavage .pin-lavage{box-shadow:0 0 0 7px #f8e9bf55,0 8px 20px #173d3650}
 @media(max-width:760px){.lavage-car-lineup{left:17%;top:31%;width:53%;height:21%;gap:3px}.wash-car{min-height:18px}.wash-car:before{top:-29%;height:42%}}
+
+/* Leaflet geographic map integration: keep game UI separate from map rendering. */
+.world-scene{background:#e9e5d8;isolation:isolate}
+.city-map{position:absolute;inset:0;width:100%;height:100%;z-index:0;background:#e5e1d6;touch-action:pan-x pan-y}
+.city-map .leaflet-control-zoom{margin-top:118px;margin-left:12px;border:0;box-shadow:0 3px 14px #123a2e35}
+.city-map .leaflet-control-zoom a{width:36px;height:36px;line-height:36px;color:#174c40}
+.city-map .leaflet-control-attribution{font-size:9px;max-width:78%;background:#ffffffd9;padding:2px 5px}
+.map-status{position:absolute;z-index:8;top:58px;left:12px;right:12px;max-width:460px;padding:10px 12px;border-radius:7px;background:#fff8e9;color:#6f4327;border:1px solid #e8c69e;box-shadow:0 4px 18px #17382f20;font-size:11px;line-height:1.5}
+.map-status[hidden]{display:none}
+.scene-sun,.scene-ocean,.scene-beach,.scene-shoreline,.scene-foam,.scene-horizon-haze,.scene-village,.scene-pirogue,.scene-greenery,.lavage-car-lineup,.scene-road,.scene-palm,.scene-town-label,.map-hint{display:none!important}
+.world-locations{position:absolute;z-index:4;top:16px;left:16px;display:flex;align-items:center;gap:7px;max-width:calc(100% - 105px);flex-wrap:wrap;padding:8px;border:1px solid #ffffffb8;border-radius:10px;background:#092e2be8;box-shadow:0 6px 20px #073b3635;backdrop-filter:blur(8px)}
+.world-locations>p{width:100%;margin:0 0 1px;color:#c8e1d0;font-size:8px;font-weight:800;letter-spacing:1.4px}
+.world-locations .world-pin{position:relative;inset:auto;display:flex;align-items:center;gap:5px;min-width:0;padding:7px 9px;border-radius:6px;box-shadow:none;transform:none}
+.world-locations .world-pin:hover,.world-locations .world-pin.selected{transform:none;box-shadow:0 0 0 2px #f6c66a3b}
+.world-locations .pin-icon{width:24px;height:24px;flex:0 0 24px;font-size:15px;border-radius:4px}
+.world-locations .world-pin b{font-size:8px;letter-spacing:.5px}
+.world-locations .world-pin small{display:none}
+.scene-controls{z-index:6}
+.location-dock{z-index:6}
+.phone-launcher{z-index:35}
+.phone-panel{z-index:45}
+@media(max-width:650px){
+  .world-scene{height:calc(100svh - 190px);min-height:470px;max-height:760px;border-radius:8px}
+  .world-locations{top:12px;left:10px;max-width:calc(100% - 82px);gap:5px;padding:6px}
+  .world-locations .world-pin{padding:6px}
+  .world-locations .pin-icon{width:21px;height:21px;flex-basis:21px;font-size:13px}
+  .world-locations .world-pin b{font-size:7px}
+  .scene-controls{right:10px;top:12px;gap:6px}
+  .round-control{width:36px;height:36px}
+  .city-map .leaflet-control-zoom{margin-top:128px;margin-left:8px}
+  .city-map .leaflet-control-zoom a{width:34px;height:34px;line-height:34px}
+  .city-map .leaflet-control-attribution{font-size:8px;max-width:72%}
+  .location-dock{bottom:10px;width:calc(100% - 20px);grid-template-columns:68px minmax(0,1fr)}
+  .dock-art{min-height:150px}
+  .dock-art>span{font-size:36px}
+  .dock-main{padding:10px}
+  .dock-main h2{font-size:18px}
+  .dock-main>p{font-size:9px;margin-bottom:8px}
+  .quick-actions{gap:5px}
+  .game-action{padding:7px 8px;gap:4px}
+  .game-action>span{font-size:14px}
+  .game-action b{font-size:8px}
+}
+@media(max-width:390px){
+  .world-locations{max-width:calc(100% - 72px);gap:4px;padding:5px}
+  .world-locations .world-pin{gap:3px;padding:5px}
+  .world-locations .pin-icon{display:none}
+  .world-locations .world-pin b{font-size:7px}
+  .location-dock{grid-template-columns:54px minmax(0,1fr)}
+  .dock-main{padding:8px}
+  .dock-main h2{font-size:16px}
+  .location-kicker{font-size:7px;letter-spacing:.7px}
+  .open-indicator{font-size:7px}
+}
