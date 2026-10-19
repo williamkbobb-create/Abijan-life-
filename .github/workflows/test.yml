@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feat/grand-bassam-playable-v1
+      - 'integration/**'
   pull_request:
     branches:
       - main

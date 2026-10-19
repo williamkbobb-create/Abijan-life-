@@ -321,3 +321,25 @@ test("home furniture catalogue is separate from everyday shop items", () => {
   assert.equal(SHOP_ITEMS.bed.price, 200000);
   assert.equal(SHOP_ITEMS.dining_table.price, 100000);
 });
+
+test("interactive map is wired into the Update 1 world view without replacing game travel", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const root = path.join(__dirname, "..");
+  const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+  const css = fs.readFileSync(path.join(root, "city-map.css"), "utf8");
+  const js = fs.readFileSync(path.join(root, "city-map.js"), "utf8");
+  assert.match(html, /leaflet@1\.9\.4\/dist\/leaflet\.css/);
+  assert.match(html, /leaflet@1\.9\.4\/dist\/leaflet\.js/);
+  assert.match(html, /id="city-map"/);
+  assert.match(html, /href="city-map\.css"/);
+  assert.match(html, /src="city-map\.js"/);
+  assert.match(html, /IN-GAME DESTINATIONS · NOT GPS LOCATIONS/);
+  assert.equal((html.match(/class="world-pin pin-/g) || []).length, 7);
+  assert.match(css, /\.world-scene\.map-focus \.city-map\s*\{\s*display:\s*block/);
+  assert.match(css, /@media \(max-width: 760px\)/);
+  assert.match(js, /window\.L\.map/);
+  assert.match(js, /openstreetmap\.org/);
+  assert.match(js, /MutationObserver/);
+  assert.match(js, /interactive map could not load/i);
+});
