@@ -57,6 +57,50 @@
   let toastTimer = null;
   let currentLocation = "beach";
   let selectedPerson = null;
+  let cityMap = null;
+  let cityMapObserver = null;
+  let mapTileErrorShown = false;
+  const GRAND_BASSAM_CENTER = [5.2019, -3.7388];
+  function initCityMap() {
+    const container = $("city-map");
+    if (!container || cityMap || container._leaflet_id) return;
+    if (!window.L) {
+      showMapStatus("The interactive map could not load. Check your connection and reload to try again.");
+      return;
+    }
+    try {
+      cityMap = window.L.map(container, { center: GRAND_BASSAM_CENTER, zoom: 14, zoomControl: true, scrollWheelZoom: true, tap: true, zoomAnimation: true, markerZoomAnimation: true });
+      window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        minZoom: 3, maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
+      }).on("tileerror", () => {
+        if (!mapTileErrorShown) {
+          mapTileErrorShown = true;
+          showMapStatus("Some map tiles could not load. Check your connection; OpenStreetMap tiles may be temporarily unavailable.");
+        }
+      }).addTo(cityMap);
+      window.L.marker(GRAND_BASSAM_CENTER).addTo(cityMap).bindPopup("<strong>Grand-Bassam</strong><br>Starting area · Côte d’Ivoire");
+      if (window.ResizeObserver) {
+        cityMapObserver = new ResizeObserver(() => { if (cityMap) cityMap.invalidateSize({ pan: false }); });
+        cityMapObserver.observe(container);
+      }
+      window.addEventListener("orientationchange", () => {
+        window.setTimeout(() => { if (cityMap) cityMap.invalidateSize({ pan: false }); }, 180);
+      }, { passive: true });
+      window.addEventListener("resize", () => { if (cityMap) cityMap.invalidateSize({ pan: false }); }, { passive: true });
+      window.setTimeout(() => { if (cityMap) cityMap.invalidateSize({ pan: false }); }, 80);
+    } catch (_) {
+      cityMap = null;
+      showMapStatus("The map could not be initialized. Reload the page to try again.");
+    }
+  }
+  function showMapStatus(message) {
+    const status = $("map-status");
+    if (!status) return;
+    status.textContent = message;
+    status.hidden = false;
+  }
+
   function freshState(name, style) {
     return { version: 1, name: name.trim(), style, balance: STARTING_BALANCE, energy: STARTING_ENERGY, actions: [], relationships: {}, createdAt: new Date().toISOString() };
   }
@@ -97,6 +141,8 @@
     $("profile-style").textContent = state.style;
     $("avatar-initial").textContent = state.name.trim().charAt(0).toUpperCase();
     renderState();
+    initCityMap();
+    if (cityMap) window.setTimeout(() => cityMap.invalidateSize({ pan: false }), 60);
   }
   function renderState() {
     $("balance").textContent = state.balance.toLocaleString("en-US");
@@ -329,10 +375,13 @@
     $("reset-button").addEventListener("click", resetGame);
     $("rest-button").addEventListener("click", rest);
     $("map-view-button").addEventListener("click", () => {
-      const scene = document.querySelector(".world-scene");
-      const active = scene.classList.toggle("map-focus");
-      $("map-view-button").setAttribute("aria-pressed", String(active));
-      showToast(active ? "Choose a destination on the map." : "Destination actions are back.");
+      initCityMap();
+      if (cityMap) {
+        cityMap.invalidateSize({ pan: false });
+        cityMap.setView(GRAND_BASSAM_CENTER, Math.max(cityMap.getZoom(), 14), { animate: true });
+      }
+      $("map-view-button").setAttribute("aria-pressed", "true");
+      showToast("Explore Grand-Bassam. Demo activities remain available above the map.");
     });
     document.querySelectorAll("[data-close-overlay]").forEach((button) => button.addEventListener("click", closeOverlays));
     document.querySelectorAll("[data-person-action]").forEach((button) => button.addEventListener("click", () => personAction(button.dataset.personAction)));
