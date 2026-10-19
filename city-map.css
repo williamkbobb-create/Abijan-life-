@@ -1,4 +1,4 @@
-/* Interactive OpenStreetMap layer used by the Update 1 game-view toggle. */
+/* Responsive map layer. Game destinations are clearly illustrative, not verified GPS locations. */
 .city-map {
   display: none;
   position: absolute;
@@ -11,8 +11,10 @@
 }
 .world-scene.map-focus .city-map { display: block; }
 .city-map .leaflet-control-zoom {
-  margin: 0 12px 72px 0;
+  margin: 0 10px 66px 0;
   border: 0;
+  border-radius: 8px;
+  overflow: hidden;
   box-shadow: 0 3px 14px #123a2e35;
 }
 .city-map .leaflet-control-zoom a {
@@ -30,68 +32,89 @@
 .map-status {
   position: absolute;
   z-index: 8;
-  top: 74px;
-  left: 12px;
-  right: 70px;
+  bottom: 104px;
+  left: 10px;
+  right: 54px;
   max-width: 460px;
-  padding: 10px 12px;
+  padding: 9px 11px;
   border: 1px solid #e8c69e;
   border-radius: 7px;
   background: #fff8e9;
   color: #6f4327;
   box-shadow: 0 4px 18px #17382f20;
   font-size: 11px;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 .map-status[hidden] { display: none; }
 .world-locations {
   position: absolute;
   z-index: 7;
-  top: 14px;
-  left: 14px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  max-width: calc(100% - 78px);
-  padding: 8px;
+  top: 12px;
+  left: 12px;
+  width: min(510px, calc(100% - 72px));
+  max-height: 42%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-content: start;
+  gap: 7px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 10px;
   border: 1px solid #ffffffb8;
   border-radius: 10px;
-  background: #092e2be8;
+  background: #092e2bf0;
   box-shadow: 0 6px 20px #073b3635;
   backdrop-filter: blur(8px);
 }
 .world-locations > p {
-  width: 100%;
-  margin: 0;
+  grid-column: 1 / -1;
+  margin: 0 0 2px;
   color: #c8e1d0;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 800;
-  letter-spacing: 1.1px;
+  line-height: 1.4;
+  letter-spacing: .8px;
 }
 .world-locations .world-pin {
   position: relative;
   inset: auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 5px;
-  min-width: 0;
-  padding: 6px 8px;
-  border-radius: 6px;
+  justify-content: flex-start;
+  gap: 7px;
+  padding: 7px;
+  overflow: hidden;
+  border: 1px solid #ffffff26;
+  border-radius: 7px;
+  text-align: left;
   transform: none;
 }
 .world-locations .world-pin:hover,
 .world-locations .world-pin.selected {
   transform: none;
+  border-color: #ffd27f;
   box-shadow: 0 0 0 2px #f6c66a3b;
 }
 .world-locations .pin-icon {
-  width: 24px;
-  height: 24px;
-  flex: 0 0 24px;
-  font-size: 15px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  font-size: 16px;
 }
-.world-locations .world-pin b { font-size: 8px; letter-spacing: .4px; }
+.world-locations .world-pin b {
+  min-width: 0;
+  font-size: 8px;
+  line-height: 1.25;
+  letter-spacing: .25px;
+  overflow-wrap: anywhere;
+}
 .world-locations .world-pin small { display: none; }
 .world-scene.map-focus .scene-sun,
 .world-scene.map-focus .scene-ocean,
@@ -113,12 +136,27 @@
 .world-scene.map-focus .scene-controls { z-index: 9; }
 .world-scene.map-focus .location-dock { z-index: 6; }
 @media (max-width: 760px) {
-  .world-locations { top: 10px; left: 8px; max-width: calc(100% - 62px); gap: 4px; padding: 6px; }
-  .world-locations .world-pin { padding: 5px; gap: 3px; }
-  .world-locations .pin-icon { display: none; }
-  .world-locations .world-pin b { font-size: 7px; }
-  .city-map .leaflet-control-zoom { margin-right: 8px; margin-bottom: 64px; }
+  .world-locations {
+    top: 8px;
+    left: 8px;
+    width: calc(100% - 58px);
+    max-height: 38%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding: 8px;
+  }
+  .world-locations > p { font-size: 8px; }
+  .world-locations .world-pin { min-height: 38px; padding: 6px; gap: 6px; }
+  .world-locations .pin-icon { flex-basis: 22px; width: 22px; height: 22px; font-size: 14px; }
+  .world-locations .world-pin b { font-size: 8px; }
+  .city-map .leaflet-control-zoom { margin-right: 7px; margin-bottom: 62px; }
   .city-map .leaflet-control-zoom a { width: 34px; height: 34px; line-height: 34px; }
   .city-map .leaflet-control-attribution { max-width: 72%; font-size: 8px; }
-  .map-status { top: 72px; left: 8px; right: 8px; }
+  .map-status { bottom: 96px; left: 8px; right: 48px; font-size: 10px; }
+}
+@media (max-width: 380px) {
+  .world-locations { width: calc(100% - 54px); gap: 5px; padding: 6px; }
+  .world-locations .world-pin { gap: 4px; padding: 5px; }
+  .world-locations .pin-icon { flex-basis: 19px; width: 19px; height: 19px; font-size: 12px; }
+  .world-locations .world-pin b { font-size: 7px; }
 }
